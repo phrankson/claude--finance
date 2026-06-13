@@ -1,60 +1,72 @@
 ![AI Personal Finance Advisor](.github/banner.svg)
 
-# AI Personal Finance Advisor for Claude Code
+# AI Personal Finance Advisor — German Edition
 
-> **AI-Powered Financial Planning & Analysis Engine — 14 skills, 5 parallel agents, professional PDF reports.**
+> **AI-Powered Financial Planning for German Clients — 15 skills, 5 parallel agents, professional PDF reports.**
+>
+> Optimized for Angestellte and Selbstständige. GKV/PKV · bAV · GRV · UCITS ETFs · Abgeltungsteuer.
 
-> ⚠️ **This is NOT financial advice.** This tool is for informational and educational purposes only. Consult a licensed financial advisor, CPA, or attorney before making any financial decisions.
+> ⚠️ **Kein Ersatz für Finanz-, Steuer- oder Versicherungsberatung.** Dieses Tool dient ausschließlich Informations- und Bildungszwecken. Consult a licensed financial advisor (Finanzberater), tax advisor (Steuerberater), or insurance broker (Versicherungsmakler) before making any financial decisions.
 
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
-![Skills](https://img.shields.io/badge/Skills-14-brightgreen.svg)
+![Skills](https://img.shields.io/badge/Skills-15-brightgreen.svg)
 ![Agents](https://img.shields.io/badge/Agents-5-orange.svg)
 ![PDF Reports](https://img.shields.io/badge/PDF%20Reports-YES-success.svg)
 ![Claude Code](https://img.shields.io/badge/Built%20for-Claude%20Code-7c5cff.svg)
+![Market](https://img.shields.io/badge/Market-Germany-black.svg)
 
 ---
 
-## ⭐ Why This Exists
+## Why This Exists
 
-Traditional financial advisors charge **1% of assets under management** every year — that's **$10,000/year on a $1M portfolio** for advice that's often a slide deck and a phone call.
+Most financial planning tools are built for US markets — 401(k), IRA, HYSA, Social Security. None of that applies to German clients.
 
-A junior CFP costs **$2,000–$5,000** for a one-time plan. A fee-only fiduciary costs **$200–$400/hour**.
+This system is purpose-built for **German Angestellte and Selbstständige**:
 
-This tool gives you the same multi-dimensional financial analysis — cash flow, debt strategy, investment allocation, retirement projections, tax optimization, FIRE planning, estate gaps — **as a professional PDF report**, generated in **under 5 minutes**, **for free**, right inside Claude Code.
+- GKV vs PKV decision with 2025 JAEG (€73,800) and BBG figures
+- bAV Entgeltumwandlung (€3,624/year SV-free, employer 15% mandatory top-up)
+- Rürup-Rente for Selbstständige (€27,566/year deductible, 2025)
+- UCITS ETFs only — US-listed ETFs (VTI, VOO, BND) are **legally unavailable** to German retail investors (PRIIPs/MiFID II)
+- Abgeltungsteuer (26.375% flat) in all investment projections
+- FIRE number at **33× spending** (not 25×) to account for Abgeltungsteuer
+- KVdR 9/10 rule for healthcare in early retirement
+- Dispo-first debt strategy, Schufa context
 
-It does not replace a fiduciary advisor for execution, but it gives you the **diagnosis** and **prioritized action plan** that you would otherwise pay thousands for.
+It produces the same multi-dimensional analysis — cash flow, debt strategy, investment allocation, retirement projections, tax optimization, insurance audit, FIRE planning — **as a professional PDF report**, generated in minutes, inside Claude Code.
 
 ---
 
-## 🚀 What It Does
+## What It Does
 
-- 📊 **Financial Health Score (0–100)** — composite score across 5 dimensions, with letter grade and signal
-- 💵 **Cash Flow Analysis** — income vs expense breakdown, savings rate, leverage points
-- 💳 **Debt Payoff Strategy** — avalanche vs snowball comparison, payoff timeline, total interest cost
-- 📈 **Investment Allocation Review** — current vs target allocation, drift detection, rebalance recommendations
-- 🎯 **Retirement Projections** — current path vs target, gap analysis, multiple contribution scenarios
-- 🔥 **FIRE Calculator** — Financial Independence number, years to FI, withdrawal-rate modeling
-- 🧾 **Tax Optimization** — HSA, 401(k), Roth conversion, tax-loss harvesting opportunities
-- 🛡️ **Protection Audit** — life, disability, umbrella, estate documents, emergency fund
+- 📊 **Financial Health Score (0–100)** — composite score across 5 dimensions with letter grade
+- 🏥 **GKV vs PKV Analysis** — full cost comparison, decision matrix, retirement healthcare risk
+- 💛 **BU Gap Calculation** — Berufsunfähigkeit coverage vs Erwerbsminderungsrente gap
+- 🏦 **Cash Flow Analysis** — Nettolohn breakdown, savings rate, expense benchmarks
+- 💳 **Debt Payoff Strategy** — Dispo first, avalanche method, payoff timeline
+- 📈 **Investment Allocation Review** — UCITS ETF recommendations, Sparerpauschbetrag, Verlustverrechnungstopf
+- 🎯 **Retirement Projections** — GRV (Rentenpunkte) + bAV + private depot, 3-pillar gap
+- 🔥 **FIRE Calculator** — 33× rule, Abgeltungsteuer-adjusted SWR, GKV in early retirement
+- 🧾 **Tax Optimization** — bAV, Rürup, Sparerpauschbetrag, Kirchensteuer, year-end checklist
+- 🛡️ **Protection Audit** — BU, Haftpflicht, GKV/PKV, Risikolebens, estate documents
 - 📋 **Top 10 Action Items** — prioritized by impact, ready to execute
-- 🗓️ **90-Day Plan** — month-by-month tasks (Foundation → Acceleration → Optimization)
-- 📄 **Professional PDF Report** — 9-page client-ready deliverable with charts and tables
+- 🗓️ **90-Day Plan** — month-by-month tasks
+- 📄 **Professional PDF Report** — 9-page client-ready deliverable
 
 ---
 
-## 📦 Installation
+## Installation
 
 **One-command install (recommended):**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/zubair-trabzada/ai-finance-claude/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/phrankson/claude--finance/main/install.sh | bash
 ```
 
 **Local install:**
 
 ```bash
-git clone https://github.com/zubair-trabzada/ai-finance-claude.git
-cd ai-finance-claude
+git clone https://github.com/phrankson/claude--finance.git
+cd claude--finance
 ./install.sh
 ```
 
@@ -65,130 +77,124 @@ cd ai-finance-claude
 ```
 
 The installer:
-- Checks Python 3.8+ and auto-installs `reportlab>=4.0.0`
+- Checks Python 3.8+
+- Creates a Python venv at `~/.claude/skills/finance/venv/` and installs ReportLab into it (compatible with macOS Homebrew Python / PEP 668)
 - Copies the orchestrator to `~/.claude/skills/finance/`
-- Copies the 13 sub-skills to `~/.claude/skills/finance-*/`
-- Copies agents to `~/.claude/agents/`
+- Copies all 15 sub-skills to `~/.claude/skills/finance-*/`
 - Copies the PDF generator to `~/.claude/skills/finance/scripts/`
 
 ---
 
-## ⚡ Command Reference
+## Command Reference
 
 | Command | What It Does |
-| --- | --- |
-| `/finance` | **Main orchestrator** — full multi-agent plan + PDF report |
-| `/finance-quick` | 60-second snapshot — score, signal, top 3 actions (no agents) |
-| `/finance-analyze` | Full multi-agent analysis (5 parallel agents) |
-| `/finance-budget` | Cash flow & monthly budget analysis with leverage points |
-| `/finance-debt` | Debt payoff strategy — avalanche vs snowball, timeline, interest cost |
-| `/finance-emergency` | Emergency fund target & build plan based on expenses |
-| `/finance-portfolio` | Investment allocation review with drift & rebalance recs |
-| `/finance-retirement` | Retirement projections with multiple contribution scenarios |
-| `/finance-fire` | FIRE calculator — FI number, years to FI, withdrawal-rate stress test |
-| `/finance-taxes` | Tax-saving opportunities (HSA, 401(k), Roth, tax-loss harvesting) |
-| `/finance-networth` | Net worth tracker with assets/liabilities breakdown |
-| `/finance-goals` | Goal-based planning (house, kids' college, sabbatical, etc.) |
-| `/finance-compare` | Compare two scenarios side-by-side (rent vs buy, job offers, etc.) |
-| `/finance-screen` | Financial product screener (HYSA, IRAs, brokerages, credit cards) |
-| `/finance-report-pdf` | Generate the client-ready PDF from a saved analysis |
+|---------|-------------|
+| `/finance` | **Main orchestrator** — routing hub for all skills |
+| `/finance quick` | 60-second snapshot — score, signal, top 3 actions |
+| `/finance analyze` | Full multi-agent analysis (5 parallel agents) |
+| `/finance insurance` | GKV vs PKV decision · BU gap · Haftpflicht · Risikolebens |
+| `/finance budget` | Cash flow & monthly budget analysis |
+| `/finance debt` | Debt payoff — Dispo first, avalanche vs snowball |
+| `/finance emergency` | Notgroschen target & build plan |
+| `/finance portfolio` | UCITS ETF allocation review |
+| `/finance retirement` | GRV + bAV + Depot projections, 3-pillar gap |
+| `/finance fire` | FIRE calculator (33× rule, Abgeltungsteuer-adjusted SWR) |
+| `/finance taxes` | bAV · Rürup · Sparerpauschbetrag · Verlustverrechnungstopf |
+| `/finance networth` | Net worth tracker with milestones |
+| `/finance goals` | Goal-based savings plans (Hauskauf, Ausbildung, etc.) |
+| `/finance compare` | Kauf vs Miete · bAV vs ETF · job offers · scenarios |
+| `/finance screen` | ETF screener (UCITS only, German-eligible) |
+| `/finance report-pdf` | Generate client-ready PDF from saved analysis |
 
 ---
 
-## 🤖 How It Works
+## How It Works
 
-When you run `/finance`, the orchestrator launches **5 parallel sub-agents** that each analyze one dimension of your finances:
+When you run `/finance analyze`, the orchestrator launches **5 parallel sub-agents**:
 
-1. **Cash Flow Agent** — income, expenses, savings rate, leverage opportunities
-2. **Debt Agent** — payoff strategy, timeline modeling, interest minimization
-3. **Investment Agent** — allocation analysis, drift detection, rebalance recommendations
-4. **Retirement Agent** — gap analysis, contribution scenarios, projection modeling
-5. **Protection Agent** — insurance audit, estate document review, emergency fund check
+1. **Cash Flow Agent** — Nettolohn breakdown, savings rate, expense-to-income ratios
+2. **Debt Agent** — Dispo-first strategy, payoff timeline, total interest cost
+3. **Investment Agent** — UCITS ETF allocation, Abgeltungsteuer impact, Verlustverrechnungstopf
+4. **Retirement Agent** — GRV Rentenpunkte projection + bAV + private depot gap analysis
+5. **Protection Agent** — BU gap, GKV/PKV adequacy, Haftpflicht, estate documents
 
-Each agent produces a scored sub-report (0–100). The orchestrator then **synthesizes** them into a single weighted **Financial Health Score**, plus a letter grade (A+ to F) and a plain-English signal (Excellent / Healthy / Fair / Weak / Critical).
-
-The PDF generator (`generate_finance_pdf.py`, built on ReportLab) renders the final 9-page report with score gauges, horizontal bar charts, allocation pie chart, payoff timeline, and a prioritized action table.
+Each agent scores 0–100. The orchestrator synthesizes them into a composite **Financial Health Score** (letter grade A+ to F).
 
 ```
-┌─────────────────┐
-│ /finance        │  ← user types in Claude Code
-└────────┬────────┘
-         │
-   ┌─────▼─────┐
-   │Orchestrator│
-   └─────┬─────┘
-         │ launches 5 in parallel
-   ┌─────┼──────┬──────┬──────┬──────┐
-   ▼     ▼      ▼      ▼      ▼      ▼
- Cash  Debt  Invest  Retire Protect
-   │     │      │      │      │
-   └─────┴──────┼──────┴──────┘
-                ▼
-         Composite Score
-                ▼
-            PDF Report
-```
-
----
-
-## 🎯 Use Cases
-
-- 🏠 **Personal financial planning** — annual or quarterly check-up
-- 🔥 **FIRE planning** — early retirement modeling and withdrawal-rate stress tests
-- 👨‍👩‍👧 **Family financial review** — coordinated planning for couples and parents
-- 🏖️ **Pre-retirement planning** — final 5–10 year glide-path optimization
-- 💳 **Debt elimination strategy** — high-interest payoff with maximum interest savings
-- 💼 **Career change financial analysis** — pre/post job-change cash flow modeling
-- 🏡 **House buying decision** — affordability analysis, rent vs buy, mortgage scenarios
-- 📊 **Side-hustle income planning** — what to do with the extra $1K–$5K/month
-- 🎓 **College savings strategy** — 529s, custodial accounts, scholarship trade-offs
-
----
-
-## 📊 Example Output
-
-Running `/finance` produces a **9-page professional PDF** (`FINANCE-PLAN.pdf`):
-
-| Page | Content |
-| --- | --- |
-| 1 | **Cover** — Financial Health Score gauge (0–100), grade, signal, executive summary |
-| 2 | **Score Dashboard** — horizontal bar charts for the 5 categories with notes |
-| 3 | **Cash Flow** — income/expense table, savings rate, % of income breakdown |
-| 4 | **Debt Summary** — accounts table, payoff timeline visual, total interest cost |
-| 5 | **Investments** — allocation pie chart, current vs target, variance flags |
-| 6 | **Retirement** — current vs target gap, progress bar, scenario comparison table |
-| 7 | **Protection** — color-coded scorecard for life, disability, estate, emergency fund |
-| 8 | **Top 10 Actions** — prioritized table by impact (High/Med/Low) |
-| 9 | **90-Day Plan** — Month 1 (Foundation) → Month 2 (Acceleration) → Month 3 (Optimization) |
-
-Every page carries a footer disclaimer and page number. The cover uses a half-circle gauge that's **color-coded green/amber/red** based on score band.
-
-**Try the demo:**
-
-```bash
-python3 ~/.claude/skills/finance/scripts/generate_finance_pdf.py --demo
-# → FINANCE-PLAN-sample.pdf
+┌─────────────────────┐
+│ /finance analyze    │  ← user types in Claude Code
+└──────────┬──────────┘
+           │
+     ┌─────▼──────┐
+     │Orchestrator │
+     └─────┬──────┘
+           │  launches 5 in parallel
+   ┌───────┼───────┬───────┬────────┐
+   ▼       ▼       ▼       ▼        ▼
+ Cash    Debt   Invest  Retire  Protect
+   │       │       │       │        │
+   └───────┴───────┼───────┴────────┘
+                   ▼
+            Composite Score
+                   ▼
+               PDF Report
 ```
 
 ---
 
-## 🏗️ Project Structure
+## Recommended Workflow
+
+**New client session (60–90 min total):**
 
 ```
-ai-finance-claude/
+1. /finance quick          → 5 min — ice-breaker, identifies urgent gaps
+2. /finance insurance      → 10–15 min — BU + GKV/PKV often most critical
+3. /finance analyze        → 15–25 min — full picture, 5 parallel agents
+4. /finance [deep-dive]    → as needed, based on weakest category score
+5. /finance report-pdf     → generates client-ready PDF
+```
+
+See `docs/DE-BERATER-GUIDE.md` for the full junior advisor manual — intake form, copy-paste prompts for all skills, 6 German client scenarios, escalation rules, and the 2025 key numbers reference card.
+
+---
+
+## Key German Numbers (2025)
+
+| Figure | Value | Used in |
+|--------|-------|---------|
+| JAEG (GKV threshold) | €73,800/year gross | `/finance insurance` |
+| BBG KV (GKV ceiling) | €5,512.50/month | `/finance insurance` |
+| GKV avg rate | ~16.3% (14.6% + ~1.7% Zusatzbeitrag) | `/finance insurance` |
+| bAV deferred max (SV-free) | €3,624/year | `/finance taxes` |
+| Rürup max deductible (single) | €27,566/year | `/finance taxes` |
+| Sparerpauschbetrag | €1,000/person; €2,000 married | `/finance taxes` |
+| Abgeltungsteuer | 25% + 5.5% Soli = 26.375% | `/finance portfolio`, `/finance fire` |
+| GRV standard retirement age | 67 | `/finance retirement` |
+| FIRE FI multiplier | 33× (not 25×) | `/finance fire` |
+| Einlagensicherung | €100,000 per bank | `/finance emergency` |
+
+Verify annually at [bmas.de](https://www.bmas.de) and [gkv-spitzenverband.de](https://www.gkv-spitzenverband.de).
+
+---
+
+## Project Structure
+
+```
+claude--finance/
 ├── README.md
 ├── LICENSE
-├── install.sh
+├── install.sh                        # venv-aware installer (PEP 668 compatible)
 ├── uninstall.sh
 ├── requirements.txt
 ├── .gitignore
 ├── .github/
 │   └── banner.svg
-├── finance/                         # main orchestrator skill
+├── finance/                          # main orchestrator skill
 │   └── SKILL.md
-├── skills/                          # 13 sub-skills
+├── skills/                           # 15 sub-skills
 │   ├── finance-quick/
 │   ├── finance-analyze/
+│   ├── finance-insurance/            # GKV/PKV · BU · Haftpflicht (new)
 │   ├── finance-budget/
 │   ├── finance-debt/
 │   ├── finance-emergency/
@@ -201,82 +207,85 @@ ai-finance-claude/
 │   ├── finance-compare/
 │   ├── finance-screen/
 │   └── finance-report-pdf/
-├── agents/                          # parallel sub-agents
-└── scripts/
-    └── generate_finance_pdf.py      # ReportLab PDF generator
+├── scripts/
+│   └── generate_finance_pdf.py       # ReportLab PDF generator
+└── docs/
+    ├── DE-BERATER-GUIDE.md           # junior advisor manual (German)
+    └── superpowers/plans/
+        └── 2026-06-13-junior-advisor-guide.md
 ```
 
 ---
 
-## 💼 Want to Sell This as a Service?
+## PDF Report (9 pages)
 
-This tool is purpose-built so that anyone in our community can offer **professional financial planning services** as a side business or full agency — without needing a CFP license to do basic diagnostic and education work (always refer execution to licensed professionals).
+| Page | Content |
+|------|---------|
+| 1 | **Cover** — Financial Health Score gauge, grade, executive summary |
+| 2 | **Score Dashboard** — bar charts for 5 categories |
+| 3 | **Cash Flow** — Nettolohn breakdown, savings rate, expense benchmarks |
+| 4 | **Debt** — accounts table, Dispo priority, payoff timeline |
+| 5 | **Investments** — UCITS ETF allocation, current vs target |
+| 6 | **Retirement** — GRV + bAV + Depot gap, 3-pillar projection |
+| 7 | **Protection** — BU gap, GKV/PKV status, Haftpflicht, estate checklist |
+| 8 | **Top 10 Actions** — prioritized by € impact |
+| 9 | **90-Day Plan** — Foundation → Acceleration → Optimization |
 
-**Pricing benchmarks community members are charging:**
+**Demo:**
 
-| Deliverable | Typical Price |
-| --- | --- |
-| One-time Financial Health Report (PDF) | **$500 – $1,500** |
-| Quarterly review + updated plan | **$1,000 – $2,000/quarter** |
-| Annual financial check-up + accountability calls | **$2,000 – $5,000/year** |
-| Couples financial planning package | **$1,500 – $3,000** |
-| Pre-retirement glide-path package | **$2,000 – $4,000** |
-
-**The math:** ten $1,000 reports per month = **$10,000/month in recurring service income**, delivered in minutes with this tool.
-
-### 👉 Join the AI Workshop community to get:
-
-- ✅ Step-by-step **client acquisition playbook** (cold outreach scripts, LinkedIn templates)
-- ✅ **Pricing & packaging guides** for financial planning services
-- ✅ **Compliance disclaimers** and engagement letter templates
-- ✅ **Sales scripts** for the discovery call → paid engagement conversion
-- ✅ **Done-for-you marketing assets** (landing pages, lead magnets, email sequences)
-- ✅ Direct access to the creator and the community
-
-### 🔗 [**Join the AI Workshop → skool.com/aiworkshop**](https://skool.com/aiworkshop)
+```bash
+~/.claude/skills/finance/venv/bin/python3 ~/.claude/skills/finance/scripts/generate_finance_pdf.py --demo
+# → FINANCE-PLAN-sample.pdf
+```
 
 ---
 
-## 🔗 Related Tools
+## Use Cases
 
-Part of the **"Build and Sell with Claude Code"** series:
-
-| Repo | What It Does |
-| --- | --- |
-| [ai-marketing-claude](https://github.com/zubair-trabzada/ai-marketing-claude) | AI Marketing Suite — full marketing audits & content |
-| [ai-sales-team-claude](https://github.com/zubair-trabzada/ai-sales-team-claude) | AI Sales Team — prospect research, outreach, follow-ups |
-| [ai-legal-claude](https://github.com/zubair-trabzada/ai-legal-claude) | AI Legal Assistant — contract review, NDA, ToS, privacy |
-| [ai-reputation-claude](https://github.com/zubair-trabzada/ai-reputation-claude) | AI Reputation Manager — review response, crisis playbooks |
-| [ai-ads-claude](https://github.com/zubair-trabzada/ai-ads-claude) | AI Ads Strategist — full ad strategy, hooks, copy, funnels |
-| [ai-trading-claude](https://github.com/zubair-trabzada/ai-trading-claude) | AI Trading Analyst — stock analysis, options, sectors |
-| [ai-crypto-claude](https://github.com/zubair-trabzada/ai-crypto-claude) | AI Crypto Analyst — token analysis, DeFi, on-chain |
-| [ai-realestate-claude](https://github.com/zubair-trabzada/ai-realestate-claude) | AI Real Estate Analyst — property analysis, market, flip |
-| [dataforseo-claude](https://github.com/zubair-trabzada/dataforseo-claude) | DataForSEO toolkit — keyword research, rank tracking, backlinks |
+- 🏥 **GKV vs PKV decision** — clients above JAEG threshold or becoming Selbstständige
+- 🏖️ **Früh in Rente** — FIRE planning with Abgeltungsteuer and GKV in early retirement
+- 🏠 **Hauskauf** — affordability with German transaction costs (7–12%), Kauf vs Miete
+- 💛 **BU gap audit** — Erwerbsminderungsrente averages ~€960/month; most clients are underinsured
+- 💼 **Selbstständige onboarding** — no GRV, no bAV, Rürup-Rente as only tax-deductible pension
+- 📈 **bAV optimization** — Entgeltumwandlung saves both taxes AND Sozialversicherungsbeiträge
+- 💳 **Dispo elimination** — 8–15% APR; highest-priority debt before any investing
+- 🎯 **Quarterly review** — track score progress and rerun after life changes
 
 ---
 
-## 📜 License
+## Advisor Guide
 
-[MIT License](LICENSE) — © 2026 Zubair Trabzada. Free to use, modify, and resell as a service.
+`docs/DE-BERATER-GUIDE.md` is a complete instruction manual for junior advisors:
+
+- **Section 3** — Client intake form (7 blocks: profile, assets, liabilities, expenses, retirement, insurance, goals)
+- **Section 4** — Core workflow with session structures (intake, full analysis, quarterly review)
+- **Section 5** — Copy-paste prompts for every skill with what to watch for in output
+- **Section 6** — 6 German client scenarios with full prompts (GKV→PKV, Selbstständige, Hauskauf, Dispo, FIRE, mortgage vs ETF)
+- **Section 8** — Escalation rules with legal thresholds (WpHG, VVG §34d, StBerG, RDG)
+- **Section 9** — Quick reference card: 2025 figures + German acronym glossary
 
 ---
 
-## ⚠️ Disclaimer
+## License
 
-**This software is NOT financial advice.**
+[MIT License](LICENSE) — Free to use, modify, and build services on top of.
 
-This tool is provided for informational and educational purposes only. The Financial Health Score, projections, recommendations, and any output generated by this software are based on inputs provided by the user and general financial principles, and should NOT be relied upon as a substitute for personalized advice from:
+---
 
-- A **licensed financial advisor** (CFP, CFA, fiduciary)
-- A **Certified Public Accountant (CPA)** for tax matters
-- An **attorney** for estate, legal, or contractual matters
-- An **insurance professional** for coverage decisions
+## Disclaimer
 
-**Past performance does not guarantee future results.** Projections involve assumptions about market returns, inflation, and personal circumstances that may not match real-world outcomes.
+**This software does NOT constitute financial advice (Finanzberatung im Sinne des WpHG), insurance advice (Versicherungsberatung im Sinne des VVG §34d GewO), tax advice (Steuerberatung im Sinne des StBerG), or legal advice (Rechtsberatung im Sinne des RDG).**
 
-The authors, contributors, and distributors of this software disclaim all liability for any financial decisions or outcomes that may result from use of this software. Use of this software constitutes acknowledgment of these limitations.
+All outputs are educational and informational. They are based on user-provided inputs and general financial principles. Always consult:
 
-**If you are in financial distress, in default, facing foreclosure or bankruptcy, or making decisions involving significant sums of money, you should consult a licensed professional before acting on any output from this tool.**
+- A **licensed financial advisor (Finanzberater)** for investment decisions
+- A **Steuerberater** for tax matters
+- An **unabhängiger Versicherungsmakler** for insurance decisions (BdV.de, Verbraucherzentrale.de)
+- A **Notar or Anwalt** for estate and legal matters
+
+Investment projections assume historical average returns. Actual returns will vary. Contribution limits, tax thresholds, and insurance figures are based on 2025 values — verify current figures annually at bmas.de, bundesfinanzministerium.de, and gkv-spitzenverband.de.
+
+**If a client is in financial distress, facing Insolvenz or Privatinsolvenz, or making decisions involving significant sums, refer them to a Schuldnerberatung (free via Caritas, AWO, or VbZ) before using this tool.**
 
 ---
 
