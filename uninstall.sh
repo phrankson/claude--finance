@@ -25,7 +25,7 @@ echo "  • skills/finance-*/      (all 15 sub-skills)"
 echo "  • agents/finance-*.md"
 echo ""
 
-read -p "Continue with uninstall? (y/N) " -n 1 -r
+read -p "Continue with uninstall? (y/N) " -n 1 -r < /dev/tty
 echo ""
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
   echo -e "${BLUE}Uninstall cancelled.${NC}"
