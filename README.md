@@ -73,7 +73,17 @@ cd claude--finance
 **Uninstall:**
 
 ```bash
+# Interactive (prompts for confirmation)
 ./uninstall.sh
+
+# Non-interactive / scripted
+./uninstall.sh --yes
+
+# Remote uninstall (interactive terminal)
+curl -fsSL https://raw.githubusercontent.com/phrankson/claude--finance/main/uninstall.sh | bash
+
+# Remote uninstall (non-interactive / CI)
+curl -fsSL https://raw.githubusercontent.com/phrankson/claude--finance/main/uninstall.sh | bash -s -- --yes
 ```
 
 The installer:
@@ -184,7 +194,7 @@ claude--finance/
 ├── README.md
 ├── LICENSE
 ├── install.sh                        # venv-aware installer (PEP 668 compatible)
-├── uninstall.sh
+├── uninstall.sh                      # supports --yes flag for non-interactive removal
 ├── requirements.txt
 ├── .gitignore
 ├── .github/
