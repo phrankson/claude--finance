@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # AI Personal Finance Advisor (German Edition) - Uninstaller
-# Removes all finance skills, agents, and Python venv from ~/.claude/
+# Removes finance skills, agents, and Python venv from .claude/ in the current directory.
+# Must be run from the same project directory where install.sh was run.
 # Usage: bash uninstall.sh [--yes|-y]   (--yes skips confirmation)
 
 set -e
@@ -19,15 +20,22 @@ BLUE='\033[0;34m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-CLAUDE_DIR="${HOME}/.claude"
+CLAUDE_DIR="${PWD}/.claude"
 SKILLS_DIR="${CLAUDE_DIR}/skills"
 AGENTS_DIR="${CLAUDE_DIR}/agents"
+
+# Enforce project-local uninstall — must be inside a git repo
+if [ ! -d ".git" ]; then
+  echo -e "\033[0;31m✗ No .git directory found in: ${PWD}\033[0m" >&2
+  echo -e "\033[0;31m✗ Run uninstall.sh from the project directory where you ran install.sh.\033[0m" >&2
+  exit 1
+fi
 
 echo ""
 echo -e "${BOLD}${YELLOW}AI Personal Finance Advisor (German Edition) — Uninstaller${NC}"
 echo "============================================================="
 echo ""
-echo -e "${YELLOW}This will remove the following from ~/.claude/:${NC}"
+echo -e "${YELLOW}This will remove the following from ${PWD}/.claude/:${NC}"
 echo "  • skills/finance/        (orchestrator + scripts + venv)"
 echo "  • skills/finance-*/      (all 15 sub-skills)"
 echo "  • agents/finance-*.md"

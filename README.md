@@ -56,9 +56,12 @@ It produces the same multi-dimensional analysis — cash flow, debt strategy, in
 
 ## Installation
 
-**One-command install (recommended):**
+Skills install into `.claude/` **inside your project directory** — they are only available when Claude Code is opened from that folder. This keeps finance skills scoped to the projects where you need them.
+
+**Remote install (recommended):**
 
 ```bash
+cd your-project          # must be inside a git repo
 curl -fsSL https://raw.githubusercontent.com/phrankson/claude--finance/main/install.sh | bash
 ```
 
@@ -66,18 +69,20 @@ curl -fsSL https://raw.githubusercontent.com/phrankson/claude--finance/main/inst
 
 ```bash
 git clone https://github.com/phrankson/claude--finance.git
-cd claude--finance
-./install.sh
+cd your-project          # the project you want to add finance skills to
+bash /path/to/claude--finance/install.sh
 ```
 
 **Uninstall:**
 
 ```bash
+cd your-project          # same directory where you installed
+
 # Interactive (prompts for confirmation)
-./uninstall.sh
+bash /path/to/claude--finance/uninstall.sh
 
 # Non-interactive / scripted
-./uninstall.sh --yes
+bash /path/to/claude--finance/uninstall.sh --yes
 
 # Remote uninstall (interactive terminal)
 curl -fsSL https://raw.githubusercontent.com/phrankson/claude--finance/main/uninstall.sh | bash
@@ -87,11 +92,12 @@ curl -fsSL https://raw.githubusercontent.com/phrankson/claude--finance/main/unin
 ```
 
 The installer:
+- Aborts if not run from inside a git project directory
 - Checks Python 3.8+
-- Creates a Python venv at `~/.claude/skills/finance/venv/` and installs ReportLab into it (compatible with macOS Homebrew Python / PEP 668)
-- Copies the orchestrator to `~/.claude/skills/finance/`
-- Copies all 15 sub-skills to `~/.claude/skills/finance-*/`
-- Copies the PDF generator to `~/.claude/skills/finance/scripts/`
+- Creates a Python venv at `.claude/skills/finance/venv/` and installs ReportLab into it (compatible with macOS Homebrew Python / PEP 668)
+- Copies the orchestrator to `.claude/skills/finance/`
+- Copies all 15 sub-skills to `.claude/skills/finance-*/`
+- Copies the PDF generator to `.claude/skills/finance/scripts/`
 
 ---
 
@@ -244,7 +250,8 @@ claude--finance/
 **Demo:**
 
 ```bash
-~/.claude/skills/finance/venv/bin/python3 ~/.claude/skills/finance/scripts/generate_finance_pdf.py --demo
+# Run from your project directory
+.claude/skills/finance/venv/bin/python3 .claude/skills/finance/scripts/generate_finance_pdf.py --demo
 # → FINANCE-PLAN-sample.pdf
 ```
 

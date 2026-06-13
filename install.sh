@@ -2,8 +2,12 @@
 # AI Personal Finance Advisor (German Edition) - Installer
 # Repo: phrankson/claude--finance
 #
-# Local install:  ./install.sh
-# Remote install: curl -fsSL https://raw.githubusercontent.com/phrankson/claude--finance/main/install.sh | bash
+# Installs skills into .claude/ inside the current directory (project-local).
+# Must be run from inside a git project. Skills are only available when
+# Claude Code is opened in that project directory.
+#
+# Local install:  cd your-project && /path/to/install.sh
+# Remote install: cd your-project && curl -fsSL https://raw.githubusercontent.com/phrankson/claude--finance/main/install.sh | bash
 
 set -e
 
@@ -21,7 +25,7 @@ REPO="phrankson/claude--finance"
 BRANCH="main"
 TARBALL_URL="https://github.com/${REPO}/archive/refs/heads/${BRANCH}.tar.gz"
 
-CLAUDE_DIR="${HOME}/.claude"
+CLAUDE_DIR="${PWD}/.claude"
 SKILLS_DIR="${CLAUDE_DIR}/skills"
 AGENTS_DIR="${CLAUDE_DIR}/agents"
 VENV_DIR="${SKILLS_DIR}/finance/venv"
@@ -154,7 +158,7 @@ install_orchestrator() {
   fi
   mkdir -p "${SKILLS_DIR}/finance"
   cp -R "${src}/." "${SKILLS_DIR}/finance/"
-  ok "Installed orchestrator → ~/.claude/skills/finance/"
+  ok "Installed orchestrator → .claude/skills/finance/"
 }
 
 install_skills() {
@@ -172,7 +176,7 @@ install_skills() {
     cp -R "${dir}." "${SKILLS_DIR}/${name}/"
     count=$((count + 1))
   done
-  ok "Installed ${count} sub-skills → ~/.claude/skills/finance-*/"
+  ok "Installed ${count} sub-skills → .claude/skills/finance-*/"
 }
 
 install_agents() {
@@ -188,7 +192,7 @@ install_agents() {
     count=$((count + 1))
   done
   if [ "$count" -gt 0 ]; then
-    ok "Installed ${count} agents → ~/.claude/agents/"
+    ok "Installed ${count} agents → .claude/agents/"
   fi
 }
 
@@ -201,7 +205,7 @@ install_scripts() {
   mkdir -p "${SKILLS_DIR}/finance/scripts"
   cp -R "${src}/." "${SKILLS_DIR}/finance/scripts/"
   chmod +x "${SKILLS_DIR}/finance/scripts/"*.py 2>/dev/null || true
-  ok "Installed scripts → ~/.claude/skills/finance/scripts/"
+  ok "Installed scripts → .claude/skills/finance/scripts/"
 }
 
 print_summary() {
@@ -213,9 +217,12 @@ print_summary() {
   echo -e "${BOLD}${GREEN}║              INSTALLATION COMPLETE                       ║${NC}"
   echo -e "${BOLD}${GREEN}╚══════════════════════════════════════════════════════════╝${NC}"
   echo ""
-  echo -e "${BOLD}Installed:${NC}"
-  echo -e "  ${GREEN}•${NC} ${skill_count} skill folder(s) under ~/.claude/skills/"
-  echo -e "  ${GREEN}•${NC} ReportLab venv at ~/.claude/skills/finance/venv/"
+  echo -e "${BOLD}Installed into:${NC} ${CYAN}${PWD}/.claude/${NC}"
+  echo -e "  ${GREEN}•${NC} ${skill_count} skill folder(s) under .claude/skills/"
+  echo -e "  ${GREEN}•${NC} ReportLab venv at .claude/skills/finance/venv/"
+  echo ""
+  echo -e "${YELLOW}⚠  Skills are project-local. Open Claude Code from this directory:${NC}"
+  echo -e "    ${BLUE}cd ${PWD} && claude${NC}"
   echo ""
   echo -e "${BOLD}${CYAN}Command Reference:${NC}"
   echo -e "  ${MAGENTA}/finance${NC}             — Main orchestrator (routing + PDF)"
@@ -247,6 +254,14 @@ print_summary() {
 main() {
   print_banner
 
+  # Enforce project-local install — must be inside a git repo
+  if [ ! -d ".git" ]; then
+    err "No .git directory found in: ${PWD}"
+    err "Skills install into .claude/ inside your project directory."
+    err "cd into your project first, then re-run install."
+    exit 1
+  fi
+
   info "Detecting environment..."
   if [ "$IS_LOCAL" -eq 1 ]; then
     ok "Local install detected (source: ${SOURCE_DIR})"
@@ -262,7 +277,7 @@ main() {
   echo ""
   info "Creating Claude directories..."
   mkdir -p "${SKILLS_DIR}" "${AGENTS_DIR}"
-  ok "~/.claude/skills/ and ~/.claude/agents/ ready"
+  ok ".claude/skills/ and .claude/agents/ ready (project-local)"
 
   echo ""
   info "Installing components..."
