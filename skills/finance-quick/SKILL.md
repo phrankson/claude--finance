@@ -1,11 +1,13 @@
 ---
 name: finance-quick
-description: 60-Second Financial Snapshot — fast assessment of financial health based on six core inputs (income, expenses, savings, debt, age, retirement goal). No subagents. Produces a compact terminal scorecard with savings rate, DTI ratio, emergency fund coverage, retirement on-track status, and top 3 priority actions in under 40 lines.
+description: 60-Second Financial Snapshot — fast assessment of financial health based on six core inputs (income, expenses, savings, debt, age, retirement goal). No subagents. Produces a compact terminal scorecard with savings rate, Schuldendienstquote, emergency fund coverage, retirement on-track status, and top 3 priority actions in under 40 lines.
 ---
 
 # /finance quick — 60-Second Financial Snapshot
 
 **DISCLAIMER: For educational/informational purposes only. Not financial advice.**
+
+Before analysis, read `.claude/skills/shared/german-context.md` for 2026 German financial constants.
 
 ## Purpose
 
@@ -14,7 +16,7 @@ Deliver a high-signal financial health scorecard in under 60 seconds without lau
 ## When To Trigger
 
 - User types `/finance quick`
-- User asks "how am I doing financially?", "what's my financial health?", "quick check on my finances"
+- User asks "how am I doing financially?", "what's my financial health?", "quick check on my finances", "wie steht es um meine Finanzen?"
 - User wants a baseline before deciding to run `/finance analyze`
 
 ## DO NOT Launch Subagents
@@ -25,75 +27,96 @@ This skill must complete in a single response after collecting inputs. No parall
 
 Ask the user for these six numbers in a single prompt. Accept rough estimates — precision is not required for a snapshot.
 
-1. **Monthly take-home income** (after-tax dollars hitting their account)
-2. **Monthly expenses** (rent/mortgage + utilities + food + transport + everything else)
-3. **Total liquid savings** (checking + savings + brokerage cash, NOT retirement accounts)
-4. **Total debt** (credit cards + student loans + auto + mortgage balance)
-5. **Current age**
-6. **Target retirement age**
+1. **Monatliches Nettoeinkommen** (after-tax Euro landing in their account — for Angestellte this is after GKV, Rentenversicherung, Lohnsteuer)
+2. **Monatliche Ausgaben** (Miete/Hypothek + Nebenkosten + Lebensmittel + Transport + alles andere)
+3. **Liquide Ersparnisse gesamt** (Girokonto + Tagesgeld + Depot-Cash, NICHT bAV/Riester/Rentenversicherung)
+4. **Schulden gesamt** (Kreditkarten + Ratenkredite + KFZ-Kredit + Hypothekensaldo)
+5. **Aktuelles Alter**
+6. **Angestrebtes Rentenalter**
 
 If the user only provides partial data, compute what you can and flag missing fields in the output.
 
 ## Calculations
 
-### 1. Savings Rate
+### 1. Sparquote (Savings Rate)
 ```
-savings_rate = (monthly_income - monthly_expenses) / monthly_income * 100
+sparquote = (nettoeinkommen - ausgaben) / nettoeinkommen * 100
+```
+**Benchmarks (% of Nettoeinkommen):**
+- ≥ 20% → Ausgezeichnet
+- 15-19% → Gut
+- 10-14% → Ausreichend
+- 5-9% → Schwach
+- < 5% → Kritisch
+
+### 2. Schuldendienstquote (Debt Service Ratio)
+In Germany, the relevant metric is Schuldendienstquote — monthly debt payments relative to Nettoeinkommen (not gross income).
+```
+monatliche_schuldenrate = ca. 2% der Gesamtschulden (grobe Schätzung)
+schuldendienstquote = monatliche_schuldenrate / nettoeinkommen * 100
+```
+**Benchmarks (Schuldendienstquote, % of Nettoeinkommen):**
+- < 15% → Ausgezeichnet
+- 15-20% → Gesund
+- 20-30% → Akzeptabel (Grenzwert)
+- > 30% → Belastet — Schuldenabbau priorisieren
+- > 40% → Kritisch
+
+**Hinweis:** Deutsche Empfehlung: Schuldendienstquote < 30% Nettoeinkommen (aus german-context.md). Dieser Grenzwert gilt als wichtige Orientierung bei Baufinanzierungen und Konsumentenkrediten.
+
+### 3. Notgroschen-Abdeckung
+```
+abgedeckte_monate = liquide_ersparnisse / monatliche_ausgaben
 ```
 **Benchmarks:**
-- 20%+ → Excellent
-- 15-19% → Good
-- 10-14% → Fair
-- 5-9% → Weak
-- <5% → Critical
+- ≥ 6 Monate → Ausgezeichnet
+- 3-5.9 Monate → Gut
+- 1-2.9 Monate → Schwach
+- < 1 Monat → Kritisch
 
-### 2. Debt-to-Income Ratio (DTI)
-```
-monthly_debt_payments = estimate as ~2% of total_debt (rough proxy)
-DTI = monthly_debt_payments / monthly_income * 100
-```
-**Benchmarks:**
-- <15% → Excellent
-- 15-28% → Healthy
-- 28-36% → Manageable
-- 36-43% → Stressed
-- >43% → Critical
+### 4. Altersvorsorge — Planmäßiger Stand
 
-### 3. Emergency Fund Coverage
-```
-months_covered = total_savings / monthly_expenses
-```
-**Benchmarks:**
-- 6+ months → Excellent
-- 3-5.9 months → Good
-- 1-2.9 months → Weak
-- <1 month → Critical
+Aspirational Milestones für Deutschland (Jahresbruttolohn als Multiplikator; GRV bietet einen Boden, der den Kapitalbedarf gegenüber Ländern ohne gesetzliche Rente reduziert):
 
-### 4. Retirement On-Track Status
-Use the rule-of-thumb multiplier of current annual income by age:
-- Age 30 → 1x income saved
-- Age 35 → 2x income
-- Age 40 → 3x income
-- Age 45 → 4x income
-- Age 50 → 6x income
-- Age 55 → 7x income
-- Age 60 → 8x income
-- Age 67 → 10x income
+- Alter 30 → 0.5× Jahresbruttolohn in investierbarem Vermögen
+- Alter 35 → 1× Jahresbruttolohn
+- Alter 40 → 2× Jahresbruttolohn
+- Alter 45 → 3× Jahresbruttolohn
+- Alter 50 → 5× Jahresbruttolohn
+- Alter 55 → 6.5× Jahresbruttolohn
+- Alter 60 → 8× Jahresbruttolohn
+- Alter 67 → 10× Jahresbruttolohn (Rentenalter regulär)
 
-Compare user's actual retirement savings (if provided; otherwise assume liquid savings as a floor) to the age benchmark. Compute years until retirement = target_retirement_age - current_age.
+Diese Zahlen sind aspirational — die gesetzliche Rentenversicherung (GRV) liefert einen Boden. Wenn GRV-Rentenauskunft (Renteninformation) vorhanden, in die Analyse einbeziehen.
+
+Tatsächliche Altersvorsorgesparnisse (bAV, Depot, Riester) mit der Alters-Benchmark vergleichen. Jahre bis zur Rente berechnen = angestrebtes Rentenalter - aktuelles Alter.
 
 ### 5. Composite Quick Score (0-100)
 ```
-quick_score = (savings_rate_score + dti_score + emergency_score + retirement_score) / 4
+quick_score = (sparquote_score + schuldendienstquote_score + notgroschen_score + altersvorsorge_score) / 4
 ```
-Each subscore is 0-100 based on the benchmarks above.
+Jeder Teilscore ist 0-100 basierend auf den obigen Benchmarks.
 
-**Grade:**
+**Note:**
 - 85-100 → A
 - 70-84 → B
 - 55-69 → C
 - 40-54 → D
-- <40 → F
+- < 40 → F
+
+## Quick-Check-Liste (7 Punkte)
+
+Vor oder nach der Score-Berechnung diese Punkte prüfen und im Output kennzeichnen:
+
+| Punkt | Frage | Status |
+|-------|-------|--------|
+| Notgroschen | ≥ 3 Monatsausgaben auf Tagesgeld? | ✅ / ❌ |
+| Sparquote | ≥ 20% Nettolohn gespart/investiert? | ✅ / ❌ |
+| Haftpflichtversicherung | Privathaftpflicht vorhanden? (€50-130/Jahr — unverzichtbar) | ✅ / ❌ |
+| BU-Versicherung | Berufsunfähigkeitsversicherung vorhanden? (Kritisch im Erwerbsalter) | ✅ / ❌ |
+| bAV mit AG-Zuschuss | Arbeitgeberzuschuss zur bAV vollständig ausgenutzt? (Gratis-Geld) | ✅ / ❌ |
+| Freistellungsauftrag | Bei jedem Depot/Tagesgeld-Anbieter Freistellungsauftrag gesetzt? (€1.000 p.a. steuerfrei) | ✅ / ❌ |
+| Schuldendienstquote | Monatliche Schuldenrate < 30% Nettoeinkommen? | ✅ / ❌ |
 
 ## Output Format
 
@@ -101,86 +124,96 @@ Keep output under 40 lines total. Use plain ASCII (no markdown tables for the te
 
 ```
 ================================================
-  60-SECOND FINANCIAL SNAPSHOT
+  60-SEKUNDEN FINANZ-SNAPSHOT
 ================================================
 
-Financial Health: [Grade] ([score]/100)
-Life Stage: [Early/Mid/Pre-Retirement/etc]
+Finanzielle Gesundheit: [Note] ([Score]/100)
+Lebensphase: [Berufsstart / Aufbauphase / Mid-Career / Vorruhestand]
 
-CORE METRICS
-- Savings Rate:        [X]%   [Excellent/Good/Fair/Weak/Critical]
-- Debt-to-Income:      [X]%   [status]
-- Emergency Fund:      [X.X] months   [status]
-- Retirement Track:    [On / Behind / Critically Behind]
+KERNKENNZAHLEN
+- Sparquote:              [X]%   [Ausgezeichnet/Gut/Ausreichend/Schwach/Kritisch]
+- Schuldendienstquote:    [X]%   [Status]  (Ziel: < 30% Netto)
+- Notgroschen:            [X.X] Monate   [Status]
+- Altersvorsorge-Track:   [Planmäßig / Im Rückstand / Kritisch im Rückstand]
 
-TOP 3 PRIORITY ACTIONS
-1. [Highest impact action — specific dollar amount + this week]
-2. [Second priority — specific action]
-3. [Third priority — specific action]
+QUICK-CHECK
+- Notgroschen ≥ 3 Monate:     [✅ / ❌]
+- Sparquote ≥ 20%:             [✅ / ❌]
+- Haftpflichtversicherung:     [✅ / ❌]
+- BU vorhanden:                [✅ / ❌]
+- bAV AG-Zuschuss genutzt:     [✅ / ❌]
+- Freistellungsauftrag gesetzt:[✅ / ❌]
+- Schuldendienstquote < 30%:   [✅ / ❌]
 
-KEY NUMBER TO IMPROVE FIRST
-[The single metric that will move the score most]
+TOP 3 PRIORITÄTEN
+1. [Höchste Wirkung — konkreter Euro-Betrag + diese Woche]
+2. [Zweite Priorität — spezifische Aktion]
+3. [Dritte Priorität — spezifische Aktion]
+
+WICHTIGSTE ZAHL ZUM VERBESSERN
+[Die eine Kennzahl die den Score am meisten bewegt]
 
 ================================================
-Run `/finance analyze` for full multi-agent analysis
-DISCLAIMER: For educational/informational purposes
-only. Not financial advice.
+Für vollständige Analyse: `/finance analyze`
+DISCLAIMER: Nur zu Bildungs-/Informationszwecken.
+Keine Finanzberatung.
 ================================================
 ```
 
-## Priority Action Logic
+## Prioritätsaktionen-Logik
 
-Rank actions by which metric is weakest:
+Aktionen nach schwächster Kennzahl ranken:
 
-- **If emergency fund < 1 month** → Top action: "Build emergency fund to $X (1 month minimum) before any other moves"
-- **If DTI > 43%** → Top action: "Aggressive debt paydown — list highest APR debt first, target $X extra/month"
-- **If savings rate < 5%** → Top action: "Audit top 3 expense categories — find $X cuttable this month"
-- **If retirement critically behind** → Top action: "Open or increase retirement contribution by $X/month (target 15% of gross income)"
-- **If high-interest debt exists (assume credit cards if total_debt > 0 and user has any reported)** → "Pay down highest-APR debt before incremental investing"
+- **Wenn Notgroschen < 1 Monat** → Top-Aktion: "Notgroschen auf €X (1 Monat Mindest) aufbauen bevor andere Schritte — auf Tagesgeld (~3-3.5% p.a.) bei DKB/ING/Trade Republic"
+- **Wenn Schuldendienstquote > 30%** → Top-Aktion: "Aggressiver Schuldenabbau — höchsten Zinssatz (Dispo zuerst) priorisieren, €X extra/Monat ansetzen"
+- **Wenn Sparquote < 5%** → Top-Aktion: "Top 3 Ausgabenkategorien auditieren — €X einsparbares Potenzial diesen Monat finden"
+- **Wenn Altersvorsorge kritisch im Rückstand** → Top-Aktion: "bAV-Beitrag erhöhen (AG-Zuschuss zuerst ausnutzen), dann ETF-Sparplan aufsetzen — Ziel 15-20% des Nettoeinkommens"
+- **Wenn Hochzinsschulden vorhanden (Dispo > 8-14%)** → "Dispo-Kredit abbezahlen bevor weitere Investitionen"
 
-If all four metrics are healthy, surface optimization actions:
-- "Increase retirement contribution to capture full employer match"
-- "Shift emergency fund to high-yield savings (4-5% APY vs 0.01%)"
-- "Diversify beyond cash — start dollar-cost averaging into index funds"
+Wenn alle vier Kennzahlen gut sind, Optimierungsaktionen nennen:
+- "bAV-Beitrag erhöhen um vollen Arbeitgeberzuschuss auszunutzen"
+- "Notgroschen auf Tagesgeld mit ~3-3.5% p.a. verschieben — DKB, ING, Trade Republic vergleichen"
+- "Freistellungsauftrag prüfen — €1.000/Jahr (Single) steuerfrei auf alle Broker aufteilen"
+- "Sparplan auf MSCI World UCITS ETF (SWDA/XDWD) aufsetzen, monatliches Investing automatisieren"
 
-## Example Walkthrough
+## Beispiel-Walkthrough
 
-**User inputs:**
-- Income: $7,500/mo
-- Expenses: $6,200/mo
-- Savings: $8,000
-- Debt: $32,000 (mostly student loans)
-- Age: 31
-- Target retirement: 65
+**Nutzereingaben:**
+- Nettoeinkommen: €4.800/Monat
+- Ausgaben: €3.900/Monat
+- Liquide Ersparnisse: €7.200
+- Schulden: €18.000 (Ratenkredit)
+- Alter: 31
+- Rentenalter angestrebt: 67
 
-**Computed:**
-- Savings rate: 17.3% → Good
-- DTI: ~8.5% → Excellent
-- Emergency fund: 1.29 months → Weak
-- Retirement: 34 years to retirement, $8K saved, benchmark at 31 is ~$90K → Critically Behind
+**Berechnet:**
+- Sparquote: 18.75% → Gut
+- Schuldendienstquote: ~7.5% → Ausgezeichnet
+- Notgroschen: 1.85 Monate → Schwach
+- Altersvorsorge: 36 Jahre bis Rente, €7.200 Ersparnisse, Benchmark bei 31 ist ~0.5× Jahresbrutto (angenommen €55.000 Brutto → Ziel ~€27.500) → Im Rückstand
 
-**Score:** (75 + 95 + 35 + 25) / 4 = 57.5 → C
+**Score:** (75 + 95 + 30 + 40) / 4 = 60 → C
 
-**Top 3 actions:**
-1. Build emergency fund from $8K to $18,600 (3 months) — redirect $1,000/mo for 11 months
-2. Open Roth IRA, contribute $583/mo ($7,000/yr max) starting this month
-3. Refinance/consolidate student loans if APR > 6% — could save $X/year
+**Top 3 Prioritäten:**
+1. Notgroschen von €7.200 auf €11.700 (3 Monate) aufstocken — €500/Monat für 9 Monate umleiten; auf Tagesgeld bei DKB oder ING (~3.5% p.a.)
+2. ETF-Sparplan einrichten — nach Notgroschen-Aufbau €300/Monat in MSCI World UCITS ETF (SWDA/XDWD) via Trade Republic oder Scalable
+3. Freistellungsauftrag bei jedem Broker/Tagesgeld-Konto setzen — €1.000/Jahr Kapitalerträge steuerfrei
 
-## Edge Cases
+## Sonderfälle
 
-- **User provides no debt** → Skip DTI scoring, weight others equally
-- **User is retired** → Replace retirement track with withdrawal sustainability (4% rule check)
-- **User is under 25** → Use lower retirement benchmarks (0.5x at 25); emphasize starting now
-- **User has very high income (>$300K/yr)** → Add note: tax-advantaged accounts may be capped; mention backdoor Roth, mega-backdoor, HSA
-- **User declines to share numbers** → Offer 3 hypothetical scenarios (struggling / average / strong) and let them self-identify
+- **Nutzer nennt keine Schulden** → DTI-Scoring überspringen, andere Faktoren gleichgewichten
+- **Nutzer ist in Rente** → Altersvorsorge-Track ersetzen durch Entnahme-Nachhaltigkeit (4%-Regel-Check; GRV-Rente einbeziehen)
+- **Nutzer unter 25** → Niedrigere Altersvorsorge-Benchmarks (0.25× bei 25); Frühzeitigkeit betonen; Zinseszinseffekt visualisieren
+- **Nutzer mit sehr hohem Einkommen (> €150.000 Brutto)** → Hinweis: bAV und Riester haben Beitragsgrenzen; Rürup-Rente und Depot-Investitionen besprechen; `/finance taxes` empfehlen
+- **Nutzer verweigert Zahlenangabe** → 3 Szenarien anbieten (finanziell angespannt / durchschnittlich / stark aufgestellt) und selbst einordnen lassen
 
-## Hand-Off
+## Übergabe
 
-End every snapshot with the line:
-> Run `/finance analyze` for the full 5-agent deep dive, or `/finance debt` / `/finance retirement` for focused work.
+Jeden Snapshot mit dieser Zeile beenden:
+> `/finance analyze` für die vollständige Analyse, oder `/finance debt` / `/finance retirement` für gezielte Themen.
 
-## Tone
+## Ton
 
-Direct. Quantitative. No hedging language like "you might consider." Say "do X this week" with specific dollar amounts. Acknowledge wins ("17% savings rate is above the US median") before flagging gaps.
+Direkt. Quantitativ. Keine unverbindliche Sprache wie "Sie könnten erwägen." Stattdessen: "Diese Woche X tun" mit konkreten Euro-Beträgen. Stärken zuerst anerkennen ("18% Sparquote liegt über dem deutschen Durchschnitt") bevor Lücken benannt werden.
 
-**DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor, CPA, or tax professional before making major financial decisions.**
+**DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor, Steuerberater, or financial planner before making major financial decisions.**

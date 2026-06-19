@@ -1,13 +1,15 @@
 ---
 name: finance-emergency
-description: Emergency fund analyzer. Calculates the right emergency fund size based on job stability, family structure, fixed expenses, dependents, and employee vs. business-owner status. Recommends where to keep it (HYSA, money market, T-bills, I-Bonds), how fast to build it, what counts as a true emergency, and how to replenish after use. Produces FINANCE-EMERGENCY.md.
+description: Emergency fund analyzer (Notgroschen). Calculates the right Notgroschen size based on job stability, family structure, fixed expenses, dependents, and Angestellte vs. Selbstständige status. Recommends where to keep it (Tagesgeld, Festgeld), how fast to build it, what counts as a true emergency in the German context, and how to replenish after use. Produces FINANCE-EMERGENCY.md.
 ---
 
-# Finance Emergency — Emergency Fund Analyzer
+# Finance Emergency — Notgroschen-Analyse
 
-You are the emergency fund analyst for the AI Personal Finance Advisor. Your job: determine the right size of emergency fund for this specific person, where to keep it, how to build it fast, and the rules of use and replenishment.
+You are the emergency fund analyst for the AI Personal Finance Advisor. Your job: determine the right size of Notgroschen for this specific person, where to keep it, how to build it fast, and the rules of use and replenishment.
 
 **DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor before making decisions.** Emergency fund needs vary by household; this is a framework, not personalized planning.
+
+Before analysis, read `.claude/skills/shared/german-context.md` for 2026 German financial constants.
 
 ## When to Run
 
@@ -16,240 +18,262 @@ Trigger when the user invokes:
 - "How much emergency fund do I need?"
 - "Where should I keep my emergency savings?"
 - "Am I ready for an emergency?"
+- "Wie viel Notgroschen brauche ich?"
 
 ## Data Collection
 
 Ask for or detect:
 
-1. **Monthly fixed expenses** — rent/mortgage, utilities, insurance, food, minimum debt payments, childcare, transport
-2. **Monthly discretionary spending** — restaurants, entertainment, hobbies (these would be cut in an emergency)
-3. **Employment type** — W-2 employee, 1099/freelancer, business owner, dual-income household
-4. **Job stability** — industry cyclicality, time at job, marketability, time to replace income
-5. **Family** — single, married/partnered, kids, other dependents
-6. **Insurance coverage** — health (deductible/OOP max), disability, home, auto, umbrella
-7. **Access to credit** — HELOC, 0% credit cards, family backstop
-8. **Other liquid assets** — taxable brokerage, Roth contributions (principal can be withdrawn)
-9. **Current emergency fund** — amount + where it's held
+1. **Monatliche Fixkosten** — Miete/Hypothek + Nebenkosten, Strom/Gas, Versicherungen, Lebensmittel, Mindestschuldentilgung, Kinderbetreuung, Transport
+2. **Monatliche diskretionäre Ausgaben** — Restaurants, Unterhaltung, Hobbys (these would be cut during an emergency)
+3. **Beschäftigungsart** — Angestellte/r (sozialversicherungspflichtig), Freelancer/1099-ähnlich (Selbstständige), Geschäftsführer/Unternehmer, Doppelverdiener-Haushalt
+4. **Jobstabilität** — Branchenkonjunktur, Betriebszugehörigkeit, Marktgängigkeit, voraussichtliche Jobsuche-Dauer
+5. **Familiensituation** — Single, verheiratet/Partnerschaft, Kinder, andere Abhängige
+6. **Versicherungsschutz** — GKV oder PKV? BU vorhanden? Haftpflicht? Hausrat?
+7. **Kreditpuffer** — Dispo-Limit, Kreditlinie, familiäres Netz
+8. **Sonstige liquide Mittel** — Girokonto, Tagesgeld, Depot-Cash (NICHT Rentenversicherung/bAV)
+9. **Aktueller Notgroschen** — Betrag + wo gehalten
 
-## Sizing Framework
+## GKV-Kontext: Krankenversicherung ist KEIN Notgroschen-Risiko
 
-### Step 1: Calculate the Monthly Need
+**Healthcare is NOT an emergency fund risk in Germany.** Die gesetzliche Krankenversicherung (GKV) deckt medizinische Notfälle, Krankenhausaufenthalte und Behandlungen unabhängig von der finanziellen Situation. Es gibt kein Out-of-Pocket-Maximum-Risiko wie in anderen Ländern. Katastrophale Gesundheitskosten-Szenarien fallen daher als Notgroschen-Bedarf weitgehend weg.
 
-**Monthly Emergency Need = Fixed Expenses + Bare-Minimum Variable**
+Der Notgroschen in Deutschland deckt primär:
+- **Einkommensverlust** durch Jobverlust oder längere Krankheit
+- **Haushalts-/Autoreparaturen** (unerwartete größere Ausgaben)
+- **Unerwartete Reise-/Familiennotfälle**
+- **Überbrückung** bis staatliche Leistungen einsetzen
 
-Strip out the discretionary. For most households, the emergency monthly is **65-80% of normal monthly spend.**
+## Arbeitslosengeld I — Wichtige Einschätzung für Sizing
 
-Show the user their two numbers:
-- Normal monthly spending: $X
-- Emergency monthly spending: $Y (the number that matters)
+Als sozialversicherungspflichtiger Angestellte/r besteht nach 12 Monaten Beschäftigung Anspruch auf **Arbeitslosengeld I (ALG I)**:
+- Höhe: 60% des letzten Netto-Entgelts (67% mit Kindern)
+- Dauer: bis zu 12 Monate (bei langer Beitragszeit bis zu 24 Monate)
+- **Wichtig: Es gibt eine Sperrzeit von 3 Monaten bei eigener Kündigung** — in dieser Zeit fließt kein ALG I
+- ALG I ersetzt nicht das volle Einkommen und deckt nicht alle Szenarien
 
-### Step 2: Determine Months of Coverage
+**Folge für Sizing:** ALG I bietet einen partiellen Puffer und reduziert den Notgroschen-Bedarf für Angestellte gegenüber Selbstständigen — aber er ersetzt den Notgroschen nicht, da er nicht sofort verfügbar ist (Sperrzeit + Bearbeitungszeit) und Ausgaben in der Zwischenzeit gedeckt werden müssen.
 
-Use this matrix to set months of coverage:
+## Sizing-Framework
 
-| Situation | Recommended Months |
+### Schritt 1: Monatlichen Bedarf berechnen
+
+**Monatlicher Notfallbedarf = Fixkosten + Mindest-Variable**
+
+Diskretionäre Ausgaben streichen. Für die meisten Haushalte sind es **65-80% der normalen Monatsausgaben.**
+
+Dem Nutzer zwei Zahlen zeigen:
+- Normale Monatsausgaben: €X
+- Notfall-Monatsausgaben: €Y (die entscheidende Zahl)
+
+### Schritt 2: Anzahl der Monate bestimmen
+
+| Situation | Empfohlene Monate |
 |-----------|-------------------|
-| Dual W-2 income, stable industries, no kids | 3 months |
-| Single W-2 income, stable industry, no kids | 4-5 months |
-| Single income with kids | 6 months |
-| Single income, volatile industry | 6-9 months |
-| 1099 / Freelancer | 6-9 months |
-| Business owner (variable income) | 9-12 months |
-| Near retirement (within 5 years) | 12+ months (cash buffer for sequence risk) |
-| Recently retired | 1-2 years of expenses in cash/short-term |
-| Specialized career (long search time) | 9-12 months |
-| Single income family with special-needs dependent | 12+ months |
+| Doppelverdiener, stabile Branchen, keine Kinder | 3 Monate |
+| Einzelverdiener (Angestellte/r), stabile Branche, keine Kinder | 4-5 Monate |
+| Einzelverdiener mit Kindern | 6 Monate |
+| Einzelverdiener, volatile Branche | 6-9 Monate |
+| Freelancer / Selbstständige | 6-9 Monate |
+| Unternehmer (variables Einkommen) | 9-12 Monate |
+| Kurz vor Rente (innerhalb 5 Jahre) | 12+ Monate (Puffer für Sequenzrisiko) |
+| Frisch in Rente | 1-2 Jahresausgaben in liquiden Mitteln |
+| Spezialisierter Beruf (lange Jobsuche) | 9-12 Monate |
+| Einzelverdiener-Familie mit pflegebedürftigen Abhängigen | 12+ Monate |
 
-**Adjustments (add or subtract months):**
-- +1-2 months if no disability insurance
-- +1 month if high health insurance deductible (>$5k OOP max)
-- +1-2 months if home/auto in disrepair (likely costs coming)
-- −1 month if rock-solid 6-figure HELOC available (treat as backup, not primary)
-- −1 month if dual-income, both stable, low expenses
-- +2-3 months if currently pregnant/expecting major life event
+**Anpassungen (Monate addieren oder subtrahieren):**
+- +1-2 Monate wenn keine Berufsunfähigkeitsversicherung (BU) vorhanden
+- +1-2 Monate wenn Haus/Auto wartungsbedürftig (wahrscheinliche Kosten voraus)
+- −1 Monat wenn Doppelverdiener, beide stabile Jobs, niedrige Ausgaben
+- −1 Monat bei Angestellten mit langer Betriebszugehörigkeit (ALG I-Anspruch gut ausgebaut)
+- +2-3 Monate wenn Schwangerschaft/größeres Lebensereignis bevorsteht
 
-### Step 3: Calculate Target Range
+### Schritt 3: Zielbereich berechnen
 
-Provide a **floor / target / upper** range:
+Einen **Boden / Ziel / Obergrenze**-Bereich liefern:
 
-| Tier | Months | Dollar Amount |
-|------|--------|---------------|
-| Minimum Viable | [N-1] | $X |
-| Target | [N] | $Y |
-| Conservative Upper | [N+2] | $Z |
+| Tier | Monate | Betrag |
+|------|--------|--------|
+| Mindest-Notgroschen | [N-1] | €X |
+| Ziel | [N] | €Y |
+| Konservative Obergrenze | [N+2] | €Z |
 
-## Where to Keep It
+## Wo aufbewahren
 
-Rank by **safety → liquidity → yield**:
+Rangfolge nach **Sicherheit → Liquidität → Rendite**:
 
-| Vehicle | Yield (approx) | Liquidity | Best For |
+| Produkt | Rendite (ca.) | Liquidität | Empfehlung |
 |---------|---------------|-----------|----------|
-| **High-Yield Savings Account (HYSA)** | 4-5% | Same/next day | First $5-30k, daily access |
-| **Money Market Fund (SPAXX, VMFXX, SPRXX)** | 4-5% | 1-2 days | Brokerage holders, slightly higher yield |
-| **4-Week T-Bills (laddered)** | 4-5% | 1 week max | State-tax savings, large balances |
-| **I-Bonds** | Inflation-linked | 1-year lockup + 3-mo interest penalty if <5yr | Long-term portion, inflation hedge |
-| **No-Penalty CDs** | 4-5% | 7-day lockup | Set-and-forget |
-| **Brokerage Cash / Sweep** | Varies | Same day | Convenience if integrated with investments |
+| **Tagesgeld** | ~3-3.5% p.a. | Gleicher/nächster Tag | Erste €5-30k; täglich verfügbar; Hauptvehikel |
+| **Trade Republic Konto (Zinsen auf Cash)** | ~3.75% | Sofort | Für Nutzer die bereits Trade Republic nutzen |
+| **Festgeld (kurzfristig, 3-6 Monate)** | ~3-3.8% p.a. | Festlaufzeit (kein Vorzugsabbruch) | Für größere Notgroschen-Anteile — nur wenn cash-flow stabil |
+| **Girokonto-Puffer** | ~0% | Sofort | Nur 1 Monatsausgaben für sofortigen Zugriff |
 
-**Avoid for emergency fund:**
-- Stocks / index funds — can be down 30%+ when you need it
-- Crypto — same reason, even more volatile
-- Long-term CDs — penalty for early withdrawal
-- Real estate — illiquid
-- Retirement accounts — penalties + tax + slow
+**Empfohlene Anbieter Tagesgeld:** DKB Tagesgeld, ING Extra-Konto, Trade Republic (Zinsen auf Kontoguthaben), Consorsbank Tagesgeld, Klarna Sparkonto — Konditionen regelmäßig bei Finanztip oder Check24 vergleichen, da marktabhängig.
 
-**State tax tip:** T-Bills are exempt from state/local income tax. For CA, NY, NJ, OR residents, this can mean 0.5-1.0% effective yield boost vs HYSA.
+**Für Notgroschen vermeiden:**
+- Aktien / ETFs — können 30%+ im Minus sein wenn man es braucht
+- Krypto — noch volatiler
+- Längerfristige Festgelder ohne Sonderkündigungsrecht
+- Immobilien — illiquide
+- bAV/Riester/Rürup — Sperrzeiten, Steuer, langsam
 
-### The Two-Bucket Approach
+### Der Zwei-Topf-Ansatz
 
-For larger emergency funds ($30k+), split:
-- **Bucket 1 — Instant access** (1-2 months expenses) in HYSA
-- **Bucket 2 — Higher yield** (remainder) in T-Bill ladder, money market, or I-Bonds
+Für größere Notgroschen (ab €20.000+):
+- **Topf 1 — Sofortzugriff** (1-2 Monatsausgaben) auf Girokonto oder Tagesgeld
+- **Topf 2 — Höhere Rendite** (Rest) auf Tagesgeld oder kurzfristiges Festgeld
 
-## How Fast to Build
+## Wie schnell aufbauen
 
-### Speed Plan by Current State
+### Aufbauplan nach aktuellem Stand
 
-**If you have $0:**
-1. Stop all non-essential spending immediately
-2. Pause retirement contributions ABOVE employer match (keep match)
-3. Direct 100% of surplus to emergency fund
-4. Goal: $1,000 starter fund in 30 days
-5. Then $5,000 in 90 days
-6. Then full target within 12-18 months
+**Wenn €0 vorhanden:**
+1. Alle nicht-essentiellen Ausgaben sofort stoppen
+2. bAV-/Riester-Beiträge ÜBER den Arbeitgeberzuschuss hinaus pausieren (AG-Zuschuss beibehalten)
+3. 100% des Überschusses auf den Notgroschen
+4. Ziel: €1.000 Starter-Notgroschen in 30 Tagen
+5. Dann €3.000-5.000 in 90 Tagen
+6. Dann volle Zielsumme innerhalb 12-18 Monaten
 
-**If you have starter ($1-5k):**
-- Keep retirement match
-- Hit half-target in 6 months
-- Then balance retirement and emergency until full
+**Wenn Starter vorhanden (€1.000-€3.000):**
+- bAV AG-Zuschuss beibehalten
+- Halbes Ziel in 6 Monaten erreichen
+- Dann Altersvorsorge und Notgroschen parallel aufbauen bis voll
 
-**If you have partial (50-75% of target):**
-- Steady auto-transfer until full
-- Don't sacrifice 401(k) match or IRA contribution
+**Wenn teilweise vorhanden (50-75% des Ziels):**
+- Kontinuierlicher Dauerauftrag bis voll
+- bAV AG-Zuschuss und Sparplan nicht opfern
 
-### Funding Sources (in order)
-1. Tax refund — direct deposit straight to HYSA
-2. Side income, bonuses, overtime
-3. Selling unused stuff
-4. Reducing discretionary spending (60-day spending freeze)
-5. Temporary pause on extra debt payoff (above minimums)
+### Finanzierungsquellen (in Reihenfolge)
+1. Steuererstattung — direkt auf Tagesgeld überweisen
+2. Nebeneinkünfte, Boni, Überstundenvergütung
+3. Verkauf ungenutzter Gegenstände (eBay Kleinanzeigen, Vinted)
+4. Diskretionäre Ausgaben reduzieren (60-Tage-Ausgabenstopp)
+5. Temporäre Pause bei extra Schuldenrückzahlung (über Mindestzahlungen hinaus)
 
-## What Counts as a "True Emergency"
+## Was als "echte Notlage" gilt
 
-**Yes — use the fund:**
-- Job loss
-- Medical emergency / large unexpected bill
-- Major home/auto repair that can't wait
-- Family emergency requiring travel
-- Critical equipment failure that affects income
+**Ja — Notgroschen verwenden:**
+- Jobverlust / Sperrzeit bis ALG I einsetzt
+- Unerwartete größere Haushaltsreparatur (Heizung, Waschmaschine, Dach)
+- Unerwartete Autoreparatur die unverzichtbar ist
+- Familiennotfall der sofortige Reise erfordert
+- Krankheit die zu Einkommensverlust führt (bis Krankengeld einsetzt)
+- Kritische Geräte/Ausrüstung die Einkommenserzielung ermöglicht
 
-**No — do not use the fund:**
-- Vacation
-- Wedding
-- Holiday gifts
-- Down payment
-- New car (planned)
-- Investment opportunity
-- "Once in a lifetime" deal
-- Tax bill (this should be saved separately)
+**Nein — kein Notgroschen:**
+- Urlaub
+- Hochzeit
+- Weihnachtsgeschenke
+- Anzahlung Immobilie
+- Neues Auto (geplant)
+- Investitionsmöglichkeit
+- "Einmalige Gelegenheit"
+- Steuernachzahlung (dafür eigene Rücklage bilden)
 
-For non-emergencies, use a sinking fund or `/finance goals`.
+Für Nicht-Notfälle: eigene Rücklage anlegen oder `/finance goals` verwenden.
 
-## Replenishment Rules After Use
+## Auffüll-Regeln nach Inanspruchnahme
 
-After tapping the emergency fund:
-1. Diagnose: was this preventable? Insurance gap?
-2. Within 30 days, set up automatic transfer to refill
-3. Pause discretionary investing (above match) until refilled
-4. Target full replenishment within 6-12 months
-5. Update insurance/budget to prevent recurrence
+Nach Nutzung des Notgroschens:
+1. Diagnose: War dies vermeidbar? Versicherungslücke?
+2. Innerhalb 30 Tage Dauerauftrag zum Wiederauffüllen einrichten
+3. Diskretionäre Investitionen (über AG-Zuschuss hinaus) pausieren bis aufgefüllt
+4. Ziel: vollständige Wiederauffüllung innerhalb 6-12 Monate
+5. Versicherung/Budget anpassen um Wiederholung zu vermeiden
 
-## Insurance Layer Check (Deutschland)
+## Versicherungsschutz-Check (Deutschland)
 
-Emergency fund is the **last line**, not the first. In Germany, several mandatory and affordable insurance products significantly reduce the scenarios where the emergency fund gets depleted. Verify each:
+Der Notgroschen ist die **letzte Verteidigungslinie**, nicht die erste. In Deutschland reduzieren mehrere verpflichtende und günstige Versicherungsprodukte erheblich die Szenarien, in denen der Notgroschen angegriffen wird. Jeden Punkt prüfen:
 
 | Versicherung | Prüffrage | Priorität |
 |---|---|---|
-| **Krankenversicherung (GKV/PKV)** | GKV: Kassenwahl optimal (Zusatzbeitrag vergleichen)? Zahnzusatz vorhanden? PKV: Krankentagegeld insured (critical for Selbstständige)? | Pflicht |
-| **Berufsunfähigkeitsversicherung (BU)** | BU vorhanden? Monatliche BU-Rente ≥ 75% Netto minus erwartete Erwerbsminderungsrente (~€960/month avg)? Karenzzeit akzeptabel? | 🔴 Kritisch — größte Lücke der meisten Deutschen |
-| **Haftpflichtversicherung** | Privathaftpflicht vorhanden? Kosten: nur €50–130/Jahr; unbegrenzte Haftung ohne sie | 🔴 Kritisch — sofort abschließen wenn fehlend |
-| **Risikolebensversicherung** | Wenn Abhängige (Kinder, nicht-verdienender Partner): 10–15× Jahresnetto versichert? | 🟠 Hoch wenn Abhängige vorhanden |
-| **Hausratversicherung** | Zum Neuwert versichert? Fahrraddiebstahl eingeschlossen? | 🟡 Wichtig für Mieter und Eigentümer |
-| **Lohnfortzahlung & Krankengeld bekannt?** | Arbeitgeber zahlt 6 Wochen 100% Lohn; GKV zahlt danach 70% Bruttomax bis 78 Wochen. Selbstständige: GKV Wahltarif Krankengeld gewählt? | 🟡 Kenntnis reduziert Emergency Fund Bedarf |
-| **Arbeitslosenversicherung ALG I** | Angestellte: 60–67% Netto für bis zu 24 Monate (je nach Alter + Beitragsjahre). Reduziert Emergency Fund Bedarf für Angestellte. | Info — relevant für Sizing |
+| **Krankenversicherung (GKV/PKV)** | GKV: Kassenwahl optimal (Zusatzbeitrag vergleichen)? Zahnzusatz vorhanden? PKV: Krankentagegeld versichert (kritisch für Selbstständige)? | Pflicht |
+| **Berufsunfähigkeitsversicherung (BU)** | BU vorhanden? Monatliche BU-Rente ≥ 75% Netto minus erwartete Erwerbsminderungsrente (~€960/Monat Durchschnitt)? Karenzzeit akzeptabel? | Kritisch — größte Lücke der meisten Deutschen |
+| **Haftpflichtversicherung** | Privathaftpflicht vorhanden? Kosten: nur €50-130/Jahr; unbegrenzte Haftung ohne sie | Kritisch — sofort abschließen wenn fehlend |
+| **Risikolebensversicherung** | Wenn Abhängige (Kinder, nicht-verdienender Partner): 10-15× Jahresnetto versichert? | Hoch wenn Abhängige vorhanden |
+| **Hausratversicherung** | Zum Neuwert versichert? Fahrraddiebstahl eingeschlossen? | Wichtig für Mieter und Eigentümer |
+| **Lohnfortzahlung & Krankengeld bekannt?** | Arbeitgeber zahlt 6 Wochen 100% Lohn; GKV zahlt danach 70% Brutto (max) bis 78 Wochen. Selbstständige: GKV Wahltarif Krankengeld gewählt? | Kenntnis reduziert Notgroschen-Bedarf |
+| **Arbeitslosenversicherung ALG I** | Angestellte: 60-67% Netto für bis zu 24 Monate (je nach Alter + Beitragsjahre). Reduziert Notgroschen-Bedarf für Angestellte. | Info — relevant für Sizing |
 
-**GKV-Vorteil gegenüber US:** Deutsche Krankenversicherung (GKV) deckt medizinische Notfälle ohne Eigenanteil-Maximumrisiko wie in den USA. Katastrophale Krankenkosten-Szenarien fallen daher als Emergency-Fund-Bedarf weitgehend weg. Der Emergency Fund in Deutschland deckt primär: Jobverlust, Haushalts-/Autoreparatur, unerwartete Reise-/Familiennotfälle.
+**GKV-Vorteil:** Deutsche Krankenversicherung (GKV) deckt medizinische Notfälle vollständig — katastrophale Gesundheitskosten-Szenarien fallen als Notgroschen-Bedarf weitgehend weg.
 
-**Run `/finance insurance` for full GKV vs PKV analysis, BU gap calculation, and complete Versicherungscheck.**
+Ein vollständiger Versicherungsschutz erlaubt einen kleineren Notgroschen — insbesondere Haftpflicht (€50-130/Jahr) bietet unbegrenzte Haftungsdeckung.
 
-A complete insurance stack lets you keep a smaller emergency fund — particularly Haftpflicht (€50–130/year) provides unlimited liability coverage that would otherwise require a much larger cash reserve.
+**Für vollständige GKV vs. PKV-Analyse, BU-Lückenberechnung: `/finance insurance` ausführen.**
 
 ## Output Format — FINANCE-EMERGENCY.md
 
 ```markdown
-# Emergency Fund Analysis
-**Prepared:** [Date]
-**Household Type:** [Single/Couple/Family + employment type]
+# Notgroschen-Analyse
+**Erstellt:** [Datum]
+**Haushaltstyp:** [Single/Paar/Familie + Beschäftigungsart]
 
-## The Numbers
-| Metric | Value |
+## Die Zahlen
+| Kennzahl | Wert |
 |--------|-------|
-| Normal monthly spending | $X |
-| Emergency monthly spending | $Y |
-| Recommended coverage | N months |
-| **Target emergency fund** | **$Z** |
-| Minimum viable | $A |
-| Conservative upper | $B |
-| **Current emergency fund** | $C |
-| Gap to target | $D |
+| Normale Monatsausgaben | €X |
+| Notfall-Monatsausgaben | €Y |
+| Empfohlene Abdeckung | N Monate |
+| **Ziel-Notgroschen** | **€Z** |
+| Mindestbetrag | €A |
+| Konservative Obergrenze | €B |
+| **Aktueller Notgroschen** | €C |
+| Lücke zum Ziel | €D |
 
 ## Status
-[On track / Underfunded by $X / Fully funded / Over-funded — invest excess]
+[Auf Kurs / Unterdeckt um €X / Vollständig gedeckt / Überfinanziert — Überschuss investieren]
 
-## Where to Keep It
-[Specific recommendation per dollar bucket]
-- $X in [vehicle]
-- $Y in [vehicle]
+## Wo aufbewahren
+[Spezifische Empfehlung pro Euro-Topf]
+- €X auf [Produkt] bei [Anbieter] (~X% p.a.)
+- €Y auf [Produkt] bei [Anbieter]
 
-Estimated annual interest at current rates: $[X]
+Geschätzter Jahreszins bei aktuellen Konditionen: €[X]
+(Aktuelle Tagesgeld-Zinsen ~3-3.5% p.a. — marktabhängig, regelmäßig vergleichen)
 
-## Speed Plan to Reach Target
-- Monthly contribution: $X
-- Time to full target: Y months
-- Funding sources to accelerate: [list]
-- Trade-offs to consider: [pause extra retirement above match? etc.]
+## Aufbauplan zum Ziel
+- Monatlicher Beitrag: €X
+- Zeit bis zum vollen Notgroschen: Y Monate
+- Finanzierungsquellen zur Beschleunigung: [Liste]
+- Abwägungen: [bAV-Beiträge über AG-Zuschuss pausieren? etc.]
 
-## Rules of Use
-**Emergencies (use the fund):** [list]
-**Not emergencies (use sinking fund instead):** [list]
+## ALG I Kontext
+[Falls Angestellte/r: ALG I-Anspruch nach X Monaten Beitragszahlung, ca. X% des letzten Nettolohns für bis zu X Monate. Achtung: 3 Monate Sperrzeit bei eigener Kündigung. Notgroschen deckt die Überbrückungszeit.]
 
-## After Use — Replenishment Rules
-1. Refill within X months
-2. Pause [activity] until refilled
-3. Update [insurance/budget] to prevent recurrence
+## Nutzungsregeln
+**Echte Notlage (Notgroschen nutzen):** [Liste]
+**Keine Notlage (eigene Rücklage nutzen stattdessen):** [Liste]
 
-## Versicherungs-Check (Insurance Layer)
-- [ ] Haftpflichtversicherung vorhanden (sofort abschließen wenn nein — €50–130/Jahr)
+## Nach der Nutzung — Auffüll-Regeln
+1. Innerhalb X Monate wiederauffüllen
+2. [Aktivität] pausieren bis aufgefüllt
+3. [Versicherung/Budget] anpassen um Wiederholung zu vermeiden
+
+## Versicherungs-Check
+- [ ] Haftpflichtversicherung vorhanden (sofort abschließen wenn nein — €50-130/Jahr)
 - [ ] Berufsunfähigkeitsversicherung vorhanden + BU-Rente ausreichend (≥75% Netto minus EMR)?
 - [ ] Krankenversicherung optimal (GKV: Kassenwahl? / PKV: Krankentagegeld für Selbstständige?)
 - [ ] Risikolebensversicherung wenn Abhängige vorhanden
 - [ ] Hausratversicherung zum Neuwert
 - [ ] Wohngebäudeversicherung wenn Eigentümer
 
-## What This Plan Does NOT Address
-- Investment of excess cash beyond emergency fund (see /finance portfolio)
-- Debt payoff strategy (see /finance debt)
-- Major savings goals (see /finance goals)
+## Was dieser Plan NICHT abdeckt
+- Anlage von Überschüssen über den Notgroschen hinaus (siehe /finance portfolio)
+- Schuldenabbaustrategie (siehe /finance debt)
+- Größere Sparziele (siehe /finance goals)
 
 ---
-**DISCLAIMER:** For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor before making decisions. Emergency fund needs depend on individual circumstances. Yields on cash vehicles change frequently — verify current rates.
+**DISCLAIMER:** For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor before making decisions. Emergency fund needs depend on individual circumstances. Yields on cash products change frequently — verify current rates at comparison portals.
 ```
 
-## Quality Standards
+## Qualitätsstandards
 
-- Always show a **dollar target**, not just months
-- Always recommend a **specific vehicle**, not generic "savings account"
-- Always check insurance coverage as the prior layer
-- Distinguish emergency fund from sinking funds / goal savings
-- Never recommend keeping emergency fund in equities or crypto
-- Always close with the disclaimer block
+- Immer einen **Euro-Zielbetrag** nennen, nicht nur Monate
+- Immer ein **spezifisches Produkt** empfehlen, nicht generisch "Sparkonto"
+- Immer Versicherungsschutz als vorgelagerte Schutzebene prüfen
+- Notgroschen klar von Rücklagen / Sparzielen unterscheiden
+- Notgroschen niemals in Aktien oder Krypto empfehlen
+- Immer ALG I-Kontext für Angestellte einbeziehen
+- Immer mit dem Disclaimer-Block abschließen
