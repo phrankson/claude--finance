@@ -9,6 +9,8 @@ You are the budgeting specialist. Analyze the user's spending patterns, identify
 
 **DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor before making decisions.**
 
+Before analysis, read `.claude/skills/shared/german-context.md` for 2026 German financial constants.
+
 ## When to Use
 
 Trigger when the user says:
@@ -23,226 +25,246 @@ Trigger when the user says:
 
 Ask the user for:
 
-**Income**
-1. Net monthly take-home (after taxes, 401k, health insurance)
-2. Variable/irregular income (bonuses, freelance, side hustle)
-3. Spouse/partner net income (if applicable)
+**Einkommen**
+1. Monatliches Nettoeinkommen (Take-home nach Steuern und Sozialversicherung) — for Angestellte, GKV and Rentenversicherung are already deducted; the Netto figure is what lands in the bank account
+2. Variable/unregelmäßige Einkünfte (Boni, Freelance, Nebentätigkeiten)
+3. Nettoeinkommen Partner/Partnerin (falls zutreffend)
 
-**Fixed Expenses (Monthly)**
-4. Rent or mortgage (PITI for owners)
-5. Utilities (electric, gas, water, sewer, trash)
-6. Internet + cell phones
-7. Insurance (auto, life, disability, renters/home)
-8. Debt minimums (car, student, credit card, personal)
-9. Subscriptions (streaming, gym, software)
-10. Childcare/tuition
+**Fixkosten (Monatlich)**
+4. Miete oder Hypothek (Kaltmiete + Nebenkosten/Betriebskosten für Mieter; Annuität + Nebenkosten für Eigentümer)
+5. Strom, Gas, Wasser (falls nicht in Nebenkosten enthalten)
+6. Internet + Mobilfunk
+7. Versicherungen (KFZ, Haftpflicht, BU, Hausrat, Rechtsschutz) — Note: GKV-Beitrag is already deducted from Netto for Angestellte; PKV-Beitrag is a separate additional expense for PKV-Versicherte only
+8. Schuldentilgung (KFZ-Kredit, Ratenkredit, Kreditkarte, Mindestbeträge)
+9. Abonnements (Streaming, Fitnessstudio, Software)
+10. Kinderbetreuung/Kita/Schule
 
-**Variable Expenses (Monthly Average)**
-11. Groceries
-12. Dining out
-13. Transportation (gas, ride-share, transit, parking)
-14. Personal care (haircuts, gym, beauty)
-15. Entertainment (concerts, hobbies, books)
-16. Shopping (clothing, household goods)
-17. Travel/vacations (annualized to monthly)
+**Variable Ausgaben (Monatlicher Durchschnitt)**
+11. Lebensmittel (Supermarkt, Wochenmarkt)
+12. Essen gehen / Restaurants / Lieferdienste
+13. Transport (Sprit, ÖPNV, Deutschlandticket, Parken, Taxi/Ridesharing)
+14. Körperpflege (Friseur, Kosmetik, Drogerie)
+15. Freizeit (Konzerte, Hobbys, Bücher, Sport)
+16. Shopping (Kleidung, Haushaltswaren)
+17. Urlaub/Reisen (Jahresbetrag ÷ 12)
 
-**Irregular/Annual**
-18. Annual insurance premiums (auto, home if not monthly)
-19. Holiday gifts ($600/year = $50/month sinking fund)
-20. Car maintenance ($600/year = $50/month)
-21. Home maintenance (1% of home value/year)
+**Einmalige/Jährliche Ausgaben**
+18. Jährliche Versicherungsprämien (falls nicht monatlich abgebucht)
+19. Weihnachten/Geschenke (z.B. €600/Jahr = €50/Monat Rücklage)
+20. KFZ-Wartung (z.B. TÜV, Inspektion — €600/Jahr = €50/Monat Rücklage)
+21. Haushaltsreparaturen (Mieter: ca. €200-400/Jahr; Eigentümer: ca. 1% Immobilienwert/Jahr)
 
-**Goals**
-22. Savings target (% or $)
-23. Debt payoff goals
-24. Big purchases (car, house, wedding)
+**Ziele**
+22. Sparziel (% oder €)
+23. Schuldentilgungsziele
+24. Große Anschaffungen (Auto, Immobilie, Hochzeit)
 
-## Budgeting Methods — Choose Best Fit
+## Budgetierungsmethoden — Beste Wahl ermitteln
 
-Detect which method fits the user:
+Erkenne, welche Methode zum Nutzer passt:
 
-### Method 1: 50/30/20 Rule (default for most people)
-- **50% Needs**: Housing, utilities, groceries, transport, insurance, minimum debt
-- **30% Wants**: Dining out, entertainment, hobbies, subscriptions, travel
-- **20% Savings + Debt Payoff**: Emergency fund, retirement, extra debt, goals
+### Methode 1: 50/30/20-Regel (Standard für die meisten)
+- **50% Grundbedürfnisse**: Miete + Nebenkosten, Lebensmittel, Transport, Versicherungen (PKV falls zutreffend), Mindestschuldentilgung
+- **30% Lifestyle**: Essen gehen, Urlaub, Hobbys, Abonnements, Shopping
+- **20% Sparen/Entschulden**: Notgroschen, Depot/ETF-Sparplan, bAV/Riester, extra Schuldentilgung
 
-Use when: stable income, want simple framework, not in debt crisis.
+Alle Prozentsätze beziehen sich auf das **Nettoeinkommen** — in Deutschland ist dies die übliche Konvention, da Steuern und Sozialabgaben bereits abgezogen sind.
 
-### Method 2: Zero-Based Budgeting
-Every dollar assigned a job. Income - Expenses - Savings = $0.
-Track in categories with monthly reset.
+Anwendung wenn: stabiles Einkommen, einfaches Framework gewünscht, keine Schuldenkrise.
 
-Use when: variable income, getting out of debt, want maximum control.
+### Methode 2: Zero-Based Budgeting (Haushaltsbuch)
+Jeder Euro hat eine Aufgabe. Einkommen - Ausgaben - Sparen = €0.
+Kategoriebasiertes Tracking mit monatlichem Reset.
 
-### Method 3: Envelope Method (Cash or Digital)
-Pre-allocate fixed amounts per category. When envelope is empty, no more spending in that category until next period.
+Anwendung wenn: variables Einkommen, Schuldenabbau, maximale Kontrolle gewünscht.
 
-Use when: chronic overspending in specific categories, behavioral problem not math problem.
+### Methode 3: Umschlagmethode (Digital oder Bargeld)
+Feste Beträge pro Kategorie vorverteilen. Wenn eine Kategorie aufgebraucht ist, kein weiteres Ausgeben bis zur nächsten Periode.
 
-### Method 4: Pay-Yourself-First
-Save % automatically before any other spending. Spend the rest freely.
+Anwendung wenn: chronisches Überausgeben in bestimmten Kategorien, Verhaltens- statt Matheproblem.
 
-Use when: high income, high savings rate desired, hate tracking expenses.
+### Methode 4: Pay-Yourself-First (Sparquote zuerst)
+Sparbetrag automatisch abbuchen bevor andere Ausgaben. Rest frei ausgeben.
 
-### Method 5: 60/20/20 (Aggressive Savers)
-- 60% Needs + Wants
-- 20% Retirement
-- 20% Other savings/debt
+Anwendung wenn: gutes Einkommen, hohe Sparquote gewünscht, kein Tracking-Aufwand.
 
-Use when: FIRE-track, high earner, behind on retirement.
+### Methode 5: 60/20/20 (Aggressive Sparer)
+- 60% Grundbedürfnisse + Lifestyle
+- 20% Altersvorsorge
+- 20% Sonstige Rücklagen/Schuldenabbau
 
-## Analysis Framework
+Anwendung wenn: FIRE-Ziel, hohes Einkommen, Altersvorsorge im Rückstand.
 
-### Step 1: Categorize Every Dollar
-Group all expenses into:
-- **Survival** (housing, utilities, basic food, basic transport, insurance, min debt)
-- **Lifestyle** (dining, entertainment, shopping, hobbies, subscriptions)
-- **Goals** (retirement, emergency fund, extra debt, sinking funds)
-- **Waste** (forgotten subscriptions, fees, impulse buys, lifestyle creep)
+## Analyserahmen
 
-### Step 2: Benchmark Each Category
+### Schritt 1: Jeden Euro kategorisieren
+Alle Ausgaben einteilen in:
+- **Grundbedürfnisse** (Miete + NK, Strom/Gas, Grundversorgung, Basis-Transport, Versicherungen, Mindestschuldentilgung)
+- **Lifestyle** (Restaurants, Unterhaltung, Shopping, Hobbys, Abonnements)
+- **Ziele** (Altersvorsorge, Notgroschen, extra Schuldenabbau, Rücklagen)
+- **Verschwendung** (vergessene Abos, Gebühren, Impulskäufe, Lifestyle-Inflation)
 
-| Category | Healthy Range (% of gross) | Red Flag |
+### Schritt 2: Jede Kategorie benchmarken
+
+| Kategorie | Gesunder Bereich (% Nettoeinkommen) | Warnsignal |
 |----------|---------------------------|----------|
-| Housing (PITI or rent) | 25-28% | >35% |
-| Transportation | 10-15% | >20% |
-| Food (groceries + dining) | 10-12% | >18% |
-| Insurance | 5-8% | >12% |
-| Debt (non-mortgage) | 0-10% | >15% |
-| Savings | 15-20%+ | <10% |
-| Discretionary | 10-20% | >30% |
+| Miete + Nebenkosten (Warmmiete) | ≤ 30% | > 35% |
+| Transport | 10-15% | > 20% |
+| Lebensmittel (Single) | ~15% | > 22% |
+| Lebensmittel (Paar) | ~12% | > 18% |
+| Versicherungen (zusätzliche Policen) | 3-6% | > 10% |
+| Schulden (ohne Miete/Hypothek) | 0-10% | > 15% |
+| Sparen/Investieren | ≥ 20% | < 10% |
+| Diskretionär/Lifestyle | 10-20% | > 30% |
 
-### Step 3: Identify Waste (Top 5 Categories to Audit)
-1. **Subscription audit** — list every recurring charge >$5/month, ask "still using?"
-2. **Bank/credit card fees** — overdraft, ATM, annual, interest
-3. **Insurance shopping** — auto/home insurance every 2-3 years
-4. **Dining frequency** — count times eating out per week
-5. **Lifestyle inflation** — categories that grew >20% YoY without income growth
+**Hinweis für Angestellte (GKV):** Die gesetzliche Krankenversicherung ist bereits über den Lohnabzug bezahlt und im Nettolohn enthalten. Sie erscheint nicht als separate monatliche Ausgabe. Nur der PKV-Beitrag (bei privat Versicherten) ist eine zusätzliche monatliche Ausgabe.
 
-### Step 4: Find the $500 (Quick Win)
-Find $500/month of reducible spending. Common sources:
-- Unused subscriptions ($50-150)
-- Dining out frequency reduction ($100-300)
-- Cell phone plan switch ($30-80)
-- Insurance reshopping ($50-200)
-- Grocery meal planning ($100-200)
-- Cutting one premium service ($20-50)
+### Schritt 3: Verschwendung identifizieren (Top 5 Audits)
+1. **Abo-Audit** — jede wiederkehrende Abbuchung > €5/Monat auflisten: "Noch in Nutzung?"
+2. **Bank-/Kontogebühren** — Dispo-Zinsen, Kontoführungsgebühren, Fremdwährungsgebühren
+3. **Versicherungsvergleich** — KFZ/Hausrat alle 2-3 Jahre über Check24/Verivox vergleichen
+4. **Restaurant-Häufigkeit** — Mahlzeiten pro Woche außer Haus zählen
+5. **Lifestyle-Inflation** — Kategorien die > 20% p.a. gestiegen sind ohne Einkommenssteigerung
+
+### Schritt 4: Den €300-Quick-Win finden
+Einsparquellen suchen. Typische Quellen in Deutschland:
+- Ungenutzte Abonnements kündigen (€30-80)
+- Weniger Restaurantbesuche/Lieferdienste (€80-200)
+- Mobilfunkplan wechseln: gute SIM-Only-Tarife ab ~€20-30/Monat (Aldi Talk, Tchibo Mobil, Freenet, WinSIM) — prüfen ob aktueller Tarif günstiger möglich ist
+- Versicherungsvergleich über Check24/Verivox (€50-150/Jahr)
+- Lebensmitteleinkauf mit Planung (€50-100)
+- Streaming-Dienste konsolidieren (€15-30)
 
 ## Output: FINANCE-BUDGET.md
 
 Write to the current working directory:
 
 ```markdown
-# Personal Budget Plan
-**Prepared:** [Date]
-**Method:** [50/30/20 / Zero-Based / Envelope / Pay-Yourself-First / Custom]
-**Monthly Net Income:** $X,XXX
+# Persönlicher Budgetplan
+**Erstellt:** [Datum]
+**Methode:** [50/30/20 / Zero-Based / Umschlag / Pay-Yourself-First / Individuell]
+**Monatliches Nettoeinkommen:** €X.XXX
 
-## Executive Summary
-- Current savings rate: X%
-- Target savings rate: X%
-- Monthly waste identified: $XXX
-- Top 3 categories to optimize: ...
+## Zusammenfassung
+- Aktuelle Sparquote: X% des Nettolohns
+- Ziel-Sparquote: ≥ 20% Nettoeinkommen
+- Identifizierte monatliche Verschwendung: €XXX
+- Top 3 Kategorien zur Optimierung: ...
 
-## Current Spending Snapshot
+## Aktuelle Ausgabenübersicht
 
-| Category | Current $ | Current % | Benchmark % | Verdict |
+| Kategorie | Aktuell € | Aktuell % | Benchmark % Netto | Bewertung |
 |----------|-----------|-----------|-------------|---------|
-| Housing | $X | X% | 25-28% | ✅ / ⚠️ / 🚨 |
+| Miete + Nebenkosten (Warmmiete) | €X | X% | ≤ 30% | ✅ / ⚠️ / 🚨 |
+| Lebensmittel | €X | X% | ~15% Single / ~12% Paar | |
+| Transport | €X | X% | 10-15% | |
+| Versicherungen (zusätzl. zu GKV) | €X | X% | 3-6% | |
+| Abonnements | €X | X% | | |
 | ... | | | | |
-| **Total Spending** | $X | XX% | | |
-| **Savings** | $X | XX% | 15-20%+ | |
+| **Gesamtausgaben** | €X | XX% | | |
+| **Sparen/Investieren** | €X | XX% | ≥ 20% | |
 
-## Recommended Budget (12-Month)
+## Empfohlenes Budget (12 Monate)
 
-### Monthly Allocation
-| Category | New Budget | Change | Reasoning |
-|----------|------------|--------|-----------|
-| Housing | $X | $0 | Lock-in cost |
-| Groceries | $X | -$X | Meal planning |
-| Dining | $X | -$X | 8x/month → 4x/month |
-| Subscriptions | $X | -$X | Canceled: [list] |
-| Retirement | $X | +$X | Max employer match |
-| Emergency Fund | $X | +$X | Build to 6 months |
-| ... | | | |
+### Monatliche Aufteilung nach 50/30/20 (% von Nettoeinkommen)
+| Bereich | Kategorie | Neues Budget | Änderung | Begründung |
+|---------|----------|------------|--------|-----------|
+| **Grundbedürfnisse (50%)** | Miete + NK | €X | €0 | Fixkosten |
+| | Lebensmittel | €X | -€X | Einkaufsplanung |
+| | Transport | €X | -€X | ÖPNV + Rad |
+| | Versicherungen | €X | €0 | Bestehende Policen |
+| **Lifestyle (30%)** | Essen gehen | €X | -€X | 8x/Mo → 4x/Mo |
+| | Abonnements | €X | -€X | Gekündigt: [Liste] |
+| | Urlaub | €X | +€X | Monatliche Rücklage |
+| **Sparen/Entschulden (20%)** | Notgroschen | €X | +€X | Aufbau auf 3-6 Monatsausgaben |
+| | ETF-Sparplan / Depot | €X | +€X | monatlicher Sparplan |
+| | bAV/Riester | €X | +€X | AG-Zuschuss ausnutzen |
 
-### Sinking Funds (Annual Expenses ÷ 12)
-| Fund | Monthly | Annual Need |
+### Rücklagen — Sinking Funds (Jahresausgaben ÷ 12)
+| Rücklage | Monatlich | Jahresbedarf |
 |------|---------|-------------|
-| Holiday gifts | $50 | $600 |
-| Car maintenance | $75 | $900 |
-| Annual insurance | $X | $X |
-| Vacation | $X | $X |
-| Home maintenance | $X | $X |
+| Weihnachten/Geschenke | €50 | €600 |
+| KFZ-Wartung/TÜV | €75 | €900 |
+| Urlaub | €X | €X |
+| Haushaltsreparaturen | €X | €X |
 
-## Identified Waste — Cut List
+## Identifizierte Verschwendung — Streichliste
 
-| # | Item | Monthly $ | Annual $ | Action |
+| # | Posten | Monatlich € | Jährlich € | Aktion |
 |---|------|-----------|----------|--------|
-| 1 | ... | $X | $X | Cancel today |
-| 2 | ... | $X | $X | Negotiate down |
-| 3 | ... | $X | $X | Switch provider |
-| 4 | ... | $X | $X | Reduce frequency |
-| 5 | ... | $X | $X | Eliminate |
-| **TOTAL** | | $XXX | $X,XXX | |
+| 1 | ... | €X | €X | Heute kündigen |
+| 2 | ... | €X | €X | Anbieter wechseln |
+| 3 | ... | €X | €X | Verhandeln |
+| 4 | ... | €X | €X | Häufigkeit reduzieren |
+| 5 | ... | €X | €X | Eliminieren |
+| **GESAMT** | | €XXX | €X.XXX | |
 
-## The $500 Plan (Quick Wins, Week 1)
-1. [specific action with phone number / URL / step]
-2. [specific action]
-3. [specific action]
-4. [specific action]
-5. [specific action]
+## Quick-Win-Plan (Woche 1)
+1. [Spezifische Aktion mit URL oder Schritt]
+2. [Spezifische Aktion]
+3. [Spezifische Aktion]
+4. [Spezifische Aktion]
+5. [Spezifische Aktion]
 
-## 12-Month Spending Plan
+## 12-Monats-Ausgabenplan
 
-| Month | Income | Fixed | Variable | Savings | Sinking Funds | Notes |
+| Monat | Einkommen | Fixkosten | Variable | Sparen | Rücklagen | Notizen |
 |-------|--------|-------|----------|---------|---------------|-------|
-| Jan | $X | $X | $X | $X | $X | Tax prep |
-| Feb | $X | $X | $X | $X | $X | |
-| Mar | $X | $X | $X | $X | $X | Q1 review |
-| ... | | | | | | |
-| Dec | $X | $X | $X | $X | $X | Holiday peak |
+| Jan | €X | €X | €X | €X | €X | Steuererklärung vorbereiten |
+| Feb | €X | €X | €X | €X | €X | |
+| Mär | €X | €X | €X | €X | €X | Q1 Review |
+| Apr | €X | €X | €X | €X | €X | |
+| Mai | €X | €X | €X | €X | €X | |
+| Jun | €X | €X | €X | €X | €X | Halbjahreskontrolle |
+| Jul | €X | €X | €X | €X | €X | Haupturlaubszeit |
+| Aug | €X | €X | €X | €X | €X | |
+| Sep | €X | €X | €X | €X | €X | Q3 Review |
+| Okt | €X | €X | €X | €X | €X | |
+| Nov | €X | €X | €X | €X | €X | Black Friday — Budget einhalten |
+| Dez | €X | €X | €X | €X | €X | Weihnachten, Jahresabschluss |
 
-## Behavioral Triggers (For Sustainability)
-- **Automate**: Direct deposit splits, auto-investment transfers
-- **Friction**: Remove saved cards from impulse-shopping sites
-- **Visibility**: Weekly 10-min budget review (calendar block)
-- **Reward**: Built-in "fun money" budget so plan is sustainable
+## Verhaltenstipps (Nachhaltigkeit)
+- **Automatisieren**: Daueraufträge für Sparplan und Rücklagen direkt nach Gehaltseingang
+- **Reibung einbauen**: Gespeicherte Karten bei Impulskauf-Seiten löschen
+- **Sichtbarkeit**: Wöchentlicher 10-Minuten-Budget-Check (Kalendertermin setzen)
+- **Belohnung**: "Freiheitsgeld"-Kategorie fest einplanen — Budget muss nachhaltig sein, nicht bestrafend
 
-## Tools to Use
-- Spending tracker: [YNAB / Monarch / Empower / spreadsheet]
-- Subscription auditor: Rocket Money / Bobby
-- High-yield savings for sinking funds: [4%+ APY accounts]
+## Empfohlene Tools
+- Haushaltsbuch: Finanzfluss Budget-Template (kostenlos), YNAB (in Deutschland verfügbar), Outspoken (DE App), oder Google Sheets / Excel
+- Abonnement-Überblick: Finanzguru (DE App), oder eigene Liste aller Daueraufträge im Online-Banking
+- Tagesgeld für Rücklagen (~3-3.5% p.a.): DKB Tagesgeld, ING Extra-Konto, Trade Republic, Consorsbank
+- Versicherungsvergleich: Check24, Verivox, Finanztip
 
-## Tracking — Monthly Review Checklist
-- [ ] Update income (any variable income?)
-- [ ] Compare actual vs budget per category
-- [ ] Flag overages >10%
-- [ ] Top up sinking funds
-- [ ] Transfer to savings/investments
-- [ ] Net worth check
+## Monatliche Kontrollcheckliste
+- [ ] Einkommen aktualisieren (variables Einkommen eingegangen?)
+- [ ] Ist vs. Soll pro Kategorie vergleichen
+- [ ] Überschreitungen > 10% markieren und analysieren
+- [ ] Rücklagen auffüllen
+- [ ] Sparplan-Überweisung auf Depot/Tagesgeld prüfen
+- [ ] Nettovermögen kurz notieren
 
-## Next Steps
-1. Set up automated transfers this week
-2. Cancel the 5 wasted subscriptions today
-3. Schedule monthly 30-min budget review
-4. Re-run `/finance budget` in 90 days to recalibrate
+## Nächste Schritte
+1. Daueraufträge für Sparpläne diese Woche einrichten
+2. Unnötige Abonnements heute kündigen
+3. Monatlichen 30-Minuten-Budget-Termin im Kalender eintragen
+4. `/finance budget` in 90 Tagen erneut ausführen zur Kalibrierung
 
 ---
 **DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor before making decisions.**
 ```
 
-## Output Standards
-- Every recommendation in real dollars, not percentages alone
-- Every cut has a specific action (call X, cancel at URL Y)
-- Budget is sustainable, not punitive — must include "fun money"
-- Account for irregular and annual expenses via sinking funds
-- Sustainable savings rate > unsustainable max savings rate
+## Output-Standards
+- Jede Empfehlung in konkreten Euro-Beträgen, nicht nur Prozentsätzen
+- Jede Einsparung mit konkreter Aktion (bei Check24 vergleichen, kündigen unter URL, etc.)
+- Budget ist nachhaltig, nicht bestrafend — "Freiheitsgeld" muss enthalten sein
+- Unregelmäßige und jährliche Ausgaben über monatliche Rücklagen abdecken
+- Nachhaltige Sparquote > theoretisch maximale Sparquote
+- Alle Prozentwerte beziehen sich auf Nettoeinkommen (deutsche Konvention)
 
-## Handoff
-After writing FINANCE-BUDGET.md, tell the user:
-1. Total identified monthly savings ($XXX)
-2. Top 3 immediate actions
-3. Suggest follow-up: `/finance debt` if debt issues, `/finance retirement` if savings rate is low
+## Übergabe
+Nach dem Schreiben von FINANCE-BUDGET.md dem Nutzer mitteilen:
+1. Gesamt identifizierte monatliche Einsparungen (€XXX)
+2. Top 3 Sofortmaßnahmen
+3. Folge-Skills vorschlagen: `/finance debt` bei Schulden, `/finance retirement` bei niedriger Sparquote
 
 **DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor before making decisions.**
