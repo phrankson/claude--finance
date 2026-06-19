@@ -1,67 +1,291 @@
 ---
 name: finance-fire
-description: FIRE (Financial Independence Retire Early) calculator covering Lean FIRE, Fat FIRE, Coast FIRE, and Barista FIRE. Calculates FI number, years to FIRE based on savings rate, geographic arbitrage opportunities, sequence of returns risk, and withdrawal strategies (4% rule, dynamic withdrawal, guard rails). Use when the user says "/finance fire", "financial independence", "retire early", "FI number", "Coast FIRE", or any early retirement question.
+description: FIRE (Finanzielle Unabhängigkeit / frühzeitig in Rente) calculator for German Angestellte and Frugalisten. Calculates FIRE-Zahl, years-to-FIRE, GKV costs in early retirement, Rentenversicherung bridge strategy, tax-efficient Entnahmestrategie, and geographic arbitrage options within Germany and Europe. Use when the user says "/finance fire", "finanzielle Unabhängigkeit", "frühzeitig in Rente", "FIRE-Zahl", "Frugalist", "Entnahmeportfolio", "Lean FIRE", "Fat FIRE", "Coast FIRE", "früher Ruhestand", "Rente mit 40/45/50/55", or any early retirement question in a German financial context.
 ---
 
-# Finance FIRE — Financial Independence Retire Early Calculator
+# Finance FIRE — Finanzielle Unabhängigkeit für deutsche Anleger
 
-You are the FIRE (Financial Independence Retire Early) specialist. Calculate the user's FI number, time-to-FIRE, and optimal pathway across all four FIRE variants.
+**DISCLAIMER: Nur zu Informations- und Bildungszwecken. Keine Anlage- oder Steuerberatung. Konsultieren Sie einen zugelassenen Finanzberater und Steuerberater, bevor Sie Entscheidungen treffen.**
 
-**DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor before making decisions.**
-
-## When to Use
+## When to Run
 
 Trigger when the user says:
 - `/finance fire`
-- "Financial independence"
-- "Retire early"
-- "What's my FI number"
-- "Coast FIRE", "Lean FIRE", "Fat FIRE", "Barista FIRE"
-- "Years to FIRE"
-- "Geographic arbitrage"
-- "4% rule"
+- "Finanzielle Unabhängigkeit" / "Financial Independence"
+- "Frühzeitig in Rente" / "Retire early"
+- "FIRE-Zahl" / "FI number"
+- "Frugalist" / "Frugalismus"
+- "Lean FIRE", "Fat FIRE", "Coast FIRE", "Barista FIRE"
+- "Entnahmeportfolio" / "Entnahmestrategie"
+- "4%-Regel" / "Trinity Study"
+- "Rente mit [Alter]" (e.g., "Rente mit 45")
+- "Rentenlücke berechnen"
+- "Früher Ruhestand"
 
-## The Four FIRE Variants
+## Data Collection
 
-### 1. Lean FIRE
-- **Definition**: FI with minimalist spending ($25-40k/yr typical)
-- **FI Number**: $625k - $1M (25x of $25-40k)
-- **Lifestyle**: Frugal, often single or no kids, low cost-of-living area
-- **Trade-off**: Less margin for variable expenses, more lifestyle constraints
+Ask the user for the following. Mark optional items clearly; proceed with estimates if not provided.
 
-### 2. Fat FIRE
-- **Definition**: FI with comfortable to luxurious spending ($100-250k+/yr)
-- **FI Number**: $2.5M - $6.25M+
-- **Lifestyle**: Travel, hobbies, dining out, premium healthcare
-- **Trade-off**: Takes much longer to reach; requires high income or long timeline
+| # | Data point | German label | Notes |
+|---|---|---|---|
+| 1 | Target FIRE age | FIRE-Alter / Zielrente-Alter | When do you want to stop working? |
+| 2 | Current age | Aktuelles Alter | — |
+| 3 | Rentenversicherung Entgeltpunkte | DRV Entgeltpunkte (aus Rentenauskunft) | Find on DRV Kontoauszug (rentenversicherung.de); estimate if not available |
+| 4 | Monthly spending target in retirement | Monatlicher Entnahmebedarf (€/Monat) | How much do you want to spend in retirement? |
+| 5 | Current invested assets | Investiertes Vermögen (€) | Sum of: Depot + bAV + Riester + Rürup + Tagesgeld/Festgeld earmarked for FIRE |
+| 6 | Monthly savings | Monatliche Sparrate (€) | Amount invested per month toward FIRE |
+| 7 | Current annual gross income | Jahresbruttoeinkommen (€) | Used for GRV Entgeltpunkt projection |
+| 8 | GKV or PKV | Krankenversicherung | Which health insurance type? |
+| 9 | Relocation interest | Umzugsbereitschaft | Open to moving within Germany or abroad for lower cost of living? |
 
-### 3. Coast FIRE
-- **Definition**: Saved enough that with NO further contributions, compound growth reaches traditional FI by 65
-- **Formula**: `Coast FIRE Number = FI Number / (1+r)^years_to_traditional_retirement`
-- **Example**: $1.5M FI by 65 / (1.07)^30 = $197k needed at age 35
-- **After Coast**: Only need to cover current expenses; contributions optional
-- **Trade-off**: Still working, but with massive flexibility
+If data is missing, estimate conservatively and flag the assumption.
 
-### 4. Barista FIRE
-- **Definition**: Part-time work covers ongoing expenses; portfolio grows untouched OR provides partial income
-- **FI Number**: Often 50-70% of traditional FI number
-- **Lifestyle**: Part-time job (often for healthcare benefits), portfolio supplements
-- **Trade-off**: Still some work, but low-stress and chosen
+## FIRE Framework
 
-## Calculation Engine
+Before analysis, read `.claude/skills/shared/german-context.md` for 2026 German financial constants.
 
-### FI Number Calculation
+---
+
+### 1. FIRE-Zahl berechnen
+
+**Base formula (Trinity Study / 4%-Regel):**
 ```
-Traditional FI Number = Annual Spending × 25  (assumes 4% SWR)
-Conservative FI = Annual Spending × 28-33  (3.0-3.5% SWR for 50+ year timeline)
-Aggressive FI = Annual Spending × 20-22  (4.5-5% SWR for shorter timeline)
+FIRE-Zahl = Jährlicher Ausgabenbedarf × 25
 ```
 
-### Years to FIRE (by Savings Rate)
-**The famous table** (assumes 5% real return, starting from $0):
+**German-adjusted formula (recommended — accounts for GRV floor):**
+```
+GRV-Monatsrente = Entgeltpunkte × €39.32  (aktueller Rentenwert West 2026)
+GRV-Jahresrente = GRV-Monatsrente × 12
 
-| Savings Rate | Years to FIRE |
-|--------------|---------------|
+Netto-Entnahmebedarf = Jährlicher Ausgabenbedarf − GRV-Jahresrente
+FIRE-Zahl (GRV-adjustiert) = Netto-Entnahmebedarf × 25
+```
+
+**Why this matters:** German Rentenversicherung (GRV) provides a baseline income from age 67 (Regelrente) or 63 (with 45 Beitragsjahre). This floor reduces the portfolio you must accumulate vs. a FIRE calc that ignores public pension income.
+
+**Example:**
+- Monthly target spending: €2,500 → €30,000/year
+- Projected GRV at 67: 32 Entgeltpunkte × €39.32 = €1,258/month → €15,100/year
+- Net portfolio need: €30,000 − €15,100 = €14,900/year
+- **FIRE-Zahl: €14,900 × 25 = €372,500** (vs. €750,000 without GRV offset)
+
+**FIRE variants in EUR context:**
+
+| Variant | Beschreibung | Typischer Ausgaberahmen |
+|---|---|---|
+| Lean FIRE | Minimalistischer Lebensstil, keine Luxusausgaben | €1,000–€1,800/Monat |
+| Standard FIRE | Komfortabler Mittelklasse-Lebensstil | €1,800–€3,500/Monat |
+| Fat FIRE | Gehobener Lebensstil, Reisen, Hobbys | €3,500–€7,000+/Monat |
+| Coast FIRE | Portfolio groß genug, um ohne weitere Einzahlungen bis 67 zu wachsen | — |
+| Barista FIRE / Semi-FIRE | Teilzeit-Arbeit deckt laufende Kosten; Portfolio wächst oder ergänzt | — |
+
+**Coast FIRE-Zahl:**
+```
+Coast FIRE-Zahl = FIRE-Zahl / (1 + r)^(67 − aktuelles_Alter)
+```
+Use r = 5–7% real return. If your current Depot already exceeds this number, you can stop investing and still reach FIRE by 67.
+
+**Conservative withdrawal rate for long retirements (40+ years):**
+- 4% rule (× 25 multiplier): ~85–90% success rate historically over 50 years
+- 3.5% rule (× 28.5 multiplier): ~95%+ success rate; recommended for early retirees under 45
+- Dynamic approach: withdraw 3.5–4% but flex down in bad market years
+
+---
+
+### 2. GKV in der frühen Rente (kritischer Deutschland-spezifischer Abschnitt)
+
+This is the most important cost that non-German FIRE calculations ignore entirely. Budget this carefully.
+
+**Scenario A — GKV-Versicherter (freiwillig versichert vor Regelrente):**
+
+Before reaching statutory pension age, early retirees on GKV are classified as **freiwillig versichert** (not KVdR — Krankenversicherung der Rentner). KVdR only applies after Rentenalter and requires meeting the 9/10 rule (90% of the second half of working life in GKV).
+
+Key rules for freiwillig Versicherte:
+- **Mindestbemessungsgrundlage 2026:** €1,178/month → **Minimum GKV contribution: ~€193/month** even with zero income (16.3% × €1,178)
+- If your withdrawal income exceeds €1,178/month: full 16.3% applies to ALL income types:
+  - Capital gains (dividends, ETF Vorabpauschale distributions)
+  - Rental income
+  - bAV distributions
+  - Riester/Rürup payouts (counted as Versorgungsbezüge — at 14.6% + Zusatzbeitrag)
+- **Pflegeversicherung:** Additional ~3.4% (or 3.05% with children) on the same base — minimum adds ~€40/month
+
+**Strategy: Keep taxable income below €1,178/month → pay only minimum ~€193 GKV + ~€40 Pflege = ~€233/month total.**
+
+This is achievable with accumulating ETFs (e.g., iShares MSCI World SWDA, ISIN IE00B4L5Y983) that do not distribute dividends — only the annual Vorabpauschale is assessed, often minimal.
+
+**Scenario B — PKV-Versicherter:**
+- PKV premiums continue regardless of income — typically €400–€900/month in early retirement depending on age and tariff
+- PKV premiums rise significantly with age (especially 50–70)
+- No minimum-base advantage; no income-dependent contribution
+- Budget PKV as a fixed and rising cost — stress-test your FIRE number at PKV + 50% for age-related increases
+
+**GKV cost planning table:**
+
+| Income level (freiwillig GKV) | GKV + Pflege monthly cost (est.) |
+|---|---|
+| €0 – €1,178/month (minimum base) | ~€233/month |
+| €1,500/month | ~€245/month (16.3% × 1,500) |
+| €2,000/month | ~€326/month |
+| €3,000/month | ~€489/month |
+
+Include GKV/Pflege cost as a fixed line item in your FIRE budget.
+
+---
+
+### 3. Rentenversicherung-Brückenstrategie
+
+**The problem:** If you stop working at, say, age 48, you may accumulate fewer than 45 Beitragsjahre — meaning:
+- No early retirement (Altersrente für besonders langjährig Versicherte) at 63 without Abzüge
+- Potential reduction in eventual pension amount
+- Possible loss of KVdR eligibility (which provides much cheaper GKV in full retirement)
+
+**Option A: Freiwillige Beiträge zur Rentenversicherung**
+
+After leaving employment, you can voluntarily pay into GRV:
+- 2026 range: **€100.07–€1,404.90/month**
+- Each month at average earnings (ca. €506/month in 2026) adds approximately 0.08 Entgeltpunkte
+- Purpose: (a) reach 45 Beitragsjahre for penalty-free early pension at 63, (b) increase monthly pension amount, (c) satisfy KVdR eligibility (9/10 rule)
+- Worth calculating: cost of filling gap years vs. value of KVdR (saves ~€100–€300/month in GKV contributions from 63 onward)
+
+**Early pension milestones:**
+
+| Milestone | Age | Beitragsjahre required | Abzüge |
+|---|---|---|---|
+| Altersrente für besonders langjährig Versicherte | 63 | 45 Jahre | None |
+| Altersrente für langjährig Versicherte | 65 | 35 Jahre | None |
+| Regelrente | 67 | Any | None |
+| Early exit with Abzüge | Before Regelrente | 35+ Jahre | 0.3% per month early (max 14.4%) |
+
+**Entgeltpunkte projection formula:**
+```
+Annual Entgeltpunkte ≈ Jahresbruttolohn / Durchschnittsentgelt
+(Durchschnittsentgelt 2026 ≈ €45,358)
+
+Projected GRV monthly income = Total Entgeltpunkte × €39.32
+```
+
+Calculate: current Entgeltpunkte + projected points if working until FIRE-Alter → monthly GRV at 63 vs. 67.
+
+---
+
+### 4. Entnahmestrategie (Withdrawal Strategy)
+
+**Optimal withdrawal sequence for German FIRE-seekers:**
+
+**Phase 1 — FIRE to ~60 (use taxable Depot first):**
+- Draw from taxable Depot (Wertpapierdepot)
+- Tax treatment: Abgeltungsteuer 26.375% on gains; Teilfreistellung reduces taxable base by 30% for equity ETFs
+- Günstigerprüfung opportunity: if total income (including capital income) is below ~€25,000/year, filing Anlage KAP via ELSTER may result in capital income being taxed at marginal rate (14–25%) instead of flat 26.375%
+- Use Sparerpauschbetrag (€1,000 single / €2,000 married) annually — set Freistellungsauftrag at each broker
+
+**Tax-efficient withdrawal target:**
+```
+Optimal annual withdrawal ≤ Grundfreibetrag + Sparerpauschbetrag
+                          = €12,096 + €1,000 = €13,096 (single, 2026)
+→ effective Einkommensteuer: near zero
+```
+
+For higher spending needs, structure withdrawals to stay in the 14–20% marginal rate bracket.
+
+**Phase 2 — age 60–63 (bridge to early pension):**
+- Consider freiwillige Rentenversicherungsbeiträge to reach 45 Beitragsjahre
+- Continue taxable Depot drawdown
+- Evaluate bAV distributions if contractually accessible (most bAV not accessible before Rentenalter)
+
+**Phase 3 — from age 63/67 (GRV kicks in):**
+- GRV income supplements or replaces portfolio withdrawals
+- bAV/Riester/Rürup distributions begin (taxed as Sonstige Einkünfte at marginal rate — not Abgeltungsteuer)
+- Portfolio withdrawal rate can decrease substantially once GRV flows
+
+**Vorabpauschale note:**
+- Accumulating ETFs trigger annual Vorabpauschale (notional tax on unrealized gains)
+- Broker deducts automatically from cash in account
+- In FIRE with low income, Günstigerprüfung may recover over-withheld tax via Steuererklärung
+- Distributing ETFs (e.g., Vanguard FTSE All-World VWRL, ISIN IE00B3RBWM25) generate real dividend cash — useful for income but count toward GKV income assessment
+
+**Withdrawal strategies:**
+
+| Strategy | SWR | FIRE-Zahl multiplier | Empfehlung |
+|---|---|---|---|
+| 4%-Regel (Trinity Study) | 4.0% | 25× | Standard; ~85–90% Erfolgsrate über 50 Jahre |
+| 3.5%-Regel | 3.5% | 28.5× | Empfohlen für Ruhestand unter 45 Jahren |
+| Dynamische Entnahme (% aktuelles Portfolio) | variabel | — | Niemals Kapitalverzehr; Einkommen schwankt |
+| Guyton-Klinger Guard Rails | 5% Start | — | Höhere Anfangsrate mit Anpassungsmechanismus |
+| Eimer-Strategie (Bucket) | — | — | Tagesgeld (1–2 J.) + Anleihen (3–7 J.) + Aktien-ETF (8+ J.) |
+
+**Sequence of Returns Risk (Renditefolgerisiko):**
+- First 5 years post-FIRE are highest risk — a severe bear market early in retirement dramatically increases portfolio failure probability
+- Mitigation:
+  1. Tagesgeld-Puffer: 1–2 years spending in instant-access savings (DKB, ING, Trade Republic Tagesgeld ~3–3.5% p.a.)
+  2. Anleihen-Anteil: Hold 3–5 years expenses in EU government bonds or bond ETFs
+  3. Flexible Entnahme: Reduce discretionary spending in down years
+  4. Semi-FIRE / Barista FIRE: Part-time income buffers early years
+
+---
+
+### 5. Geographic Arbitrage für deutsche FIRE-Anleger
+
+**Within Germany:**
+
+| Region | Cost vs. Munich/Hamburg | Notes |
+|---|---|---|
+| Munich, Hamburg, Frankfurt, Stuttgart | Baseline | Highest cost; highest local infrastructure |
+| Berlin, Düsseldorf, Cologne | −10–15% | Still high; but lower than top tier |
+| Leipzig, Dresden, Erfurt, Magdeburg | −30–40% | East Germany; lower housing costs, same healthcare |
+| Rural Sachsen, Thüringen, Sachsen-Anhalt, Mecklenburg-Vorpommern | −40–55% | Lowest cost within Germany; good infrastructure for online workers |
+
+**EU destinations (maintaining EU mobility rights):**
+
+| Country/Region | COL vs. German average | Key notes |
+|---|---|---|
+| Portugal (Lissabon, Porto) | −20–30% | NHR tax regime phasing out for new applicants; check current status |
+| Portugal (Madeira, Algarve) | −30–40% | Lower cost than Lisbon; warm climate |
+| Spain (Canary Islands — Las Palmas, Tenerife) | −30–40% | EU, warm, lower housing cost; IGIC (lower than mainland VAT) |
+| Croatia (Zadar, Split) | −40–55% | EU member since 2013; growing expat community; Schengen |
+| Romania (Bukarest, Cluj) | −55–65% | Very low cost; EU; good internet infrastructure |
+| Estonia (Tallinn) | −20–30% | EU, digital infrastructure, e-Residency |
+| Hungary (Budapest) | −45–55% | EU; low cost; note political/institutional risk |
+
+**Non-EU destinations (note German tax implications):**
+
+| Destination | COL reduction | Key German tax warning |
+|---|---|---|
+| Thailand | −55–70% | Germany–Thailand DBA: German-source income (GRV, bAV) remains taxable in Germany |
+| Georgia (Tbilisi) | −60–75% | No DBA with Germany; risk of dual taxation on German-source income |
+| Mexico (CDMX, Oaxaca, Mérida) | −50–65% | DBA exists; German-source pension taxed in Germany |
+
+**Critical German expat tax rule:**
+
+If you maintain a **Wohnsitz** (registered domicile) or **gewöhnlicher Aufenthalt** (habitual abode) in Germany, you remain **unbeschränkt steuerpflichtig** — fully liable to German income tax on worldwide income regardless of where you live.
+
+To escape German tax liability:
+1. Formally **deregister (Abmeldung)** at your Einwohnermeldeamt
+2. Give up your German residence (Wohnsitz)
+3. Establish domicile in a lower-tax country
+4. Note: Germany has Doppelbesteuerungsabkommen (DBA) with most countries — check your destination's DBA for treatment of GRV pension, bAV, capital income
+
+Even after Abmeldung, GRV pension income is typically still taxable in Germany (as Rentenbesteuerung applies to German-source income per §49 EStG).
+
+---
+
+### 6. FIRE-Timeline-Berechnung
+
+**Years to FIRE formula (with existing portfolio):**
+```
+n = ln((FIRE-Zahl − PV × (1+r) / PMT + PMT/r) / (PMT/r)) / ln(1+r)
+
+Where:
+  FIRE-Zahl = target portfolio (GRV-adjusted)
+  PV = current portfolio value
+  PMT = annual savings (Jahressparrate)
+  r = assumed real return rate (net of inflation)
+```
+
+**Savings rate → years to FIRE reference table** (assumes 5% real return, starting from €0):
+
+| Sparquote | Jahre bis FIRE |
+|---|---|
 | 5% | 66 |
 | 10% | 51 |
 | 15% | 43 |
@@ -78,273 +302,183 @@ Aggressive FI = Annual Spending × 20-22  (4.5-5% SWR for shorter timeline)
 | 70% | 8.5 |
 | 75% | 7 |
 | 80% | 5.5 |
-| 85% | 4 |
-| 90% | 2.5 |
 
-**Insight**: Savings rate is THE lever. Going from 10% → 50% cuts time from 51 → 17 years.
+**The single biggest lever: savings rate.** Going from 10% → 50% cuts time from 51 → 17 years. Existing portfolio shortens timeline further.
 
-### Years to FIRE Formula (with existing balance)
-```
-Years = ln((FI - PV×(1-r)/PMT + PMT/r) / (PMT/r)) / ln(1+r)
-Where:
-  FI = FI number target
-  PV = current portfolio
-  PMT = annual savings
-  r = real return rate
-```
+**Sensitivity analysis:** calculate years to FIRE at:
+- Return assumption 5% (conservative: MSCI World long-run minus inflation)
+- Return assumption 7% (optimistic)
+- Spending reduction of 10% vs. 20% (Lean FIRE path)
 
-### Coast FIRE Calculation
-```
-Coast FIRE Number = Traditional FI Number / (1 + r)^(traditional_retirement_age - current_age)
-```
-Use r = 5-7% real return.
+---
 
-### Geographic Arbitrage
-Same income, lower COL = higher savings rate.
+## Output
 
-| Move From → To | Avg COL Reduction | Savings Rate Boost |
-|----------------|-------------------|---------------------|
-| SF/NYC → Austin/Raleigh | 30-40% | +15-20% |
-| Austin → Tulsa/Knoxville | 20-30% | +10-15% |
-| US → Portugal/Mexico/Thailand | 40-60% | +20-30% (if income unchanged) |
-| Urban → Rural | 20-35% | +10-20% |
-
-### Sequence of Returns Risk
-First 5 years of retirement matter disproportionately. If markets drop 30% in year 1 and you withdraw 4%, you've effectively withdrawn 5.7% of original — recovery is much harder.
-
-**Mitigation strategies**:
-1. **Bond tent**: Hold 3-5 years expenses in bonds/cash near retirement
-2. **Cash buffer**: 1-2 years living expenses in HYSA
-3. **Flexible spending**: Cut variable expenses in down years
-4. **Guard rails (Guyton-Klinger)**: Adjust withdrawals based on portfolio performance
-5. **Part-time income**: Even small income (Barista FIRE) buffers downside
-
-### Withdrawal Strategies
-
-**Strategy 1: 4% Rule (Trinity Study)**
-- Withdraw 4% of initial portfolio, increase by inflation each year
-- 30-year success rate: ~95% (60/40 portfolio)
-- 50-year success rate: ~85%
-- Simple, well-studied
-
-**Strategy 2: 3.5% Rule (Early Retiree Adjustment)**
-- For 50+ year retirements
-- More conservative, higher success rate
-- Adds $$ to FI number (Annual × 28.5)
-
-**Strategy 3: Dynamic Withdrawal (% of current portfolio)**
-- Withdraw fixed % (e.g., 4%) of CURRENT portfolio each year
-- Never run out, but income varies
-- Recommendation: floor + ceiling guardrails
-
-**Strategy 4: Guyton-Klinger Guard Rails**
-- Initial: 5% withdrawal
-- If portfolio drops 20% below initial path → cut withdrawal 10%
-- If portfolio rises 20% above initial path → raise withdrawal 10%
-- Allows higher initial rate with safety mechanism
-
-**Strategy 5: Bucket Strategy**
-- Bucket 1: 1-2 years cash
-- Bucket 2: 3-7 years bonds
-- Bucket 3: 8+ years stocks
-- Refill from stocks in good years, spend from cash in bad years
-
-## Output: FINANCE-FIRE.md
-
-Write to the current working directory:
+Write a file `FINANCE-FIRE.md` to the current working directory with the following structure:
 
 ```markdown
-# FIRE Plan — Path to Financial Independence
-**Prepared:** [Date]
-**Current Age:** XX | **Annual Spending:** $XX,XXX | **Savings Rate:** XX%
+# FIRE-Plan — Finanzielle Unabhängigkeit
+**Erstellt:** [Datum]
+**Aktuelles Alter:** XX | **Ziel-FIRE-Alter:** XX | **Monatl. Entnahmebedarf:** €X,XXX | **Sparquote:** XX%
 
-## Executive Summary
-- **Target FIRE Variant:** [Lean / Fat / Coast / Barista]
-- **Your FI Number:** $X,XXX,XXX
-- **Current Portfolio:** $XXX,XXX (X% of FI)
-- **Years to FIRE at current savings rate:** XX years (FIRE age: XX)
-- **Coast FIRE Number:** $XXX,XXX (already passed? ✅ / behind by $X)
-- **Verdict:** [On track / Accelerate needed / Already FI]
+## Zusammenfassung (Executive Summary)
+- **FIRE-Variante:** [Lean / Standard / Fat / Coast / Barista]
+- **FIRE-Zahl (unadjustiert, 4%-Regel):** €X
+- **FIRE-Zahl (GRV-adjustiert, empfohlen):** €X
+- **Aktuelles Depot:** €X (X% der FIRE-Zahl)
+- **Jahre bis FIRE bei aktueller Sparquote:** X Jahre (FIRE-Alter: XX)
+- **Coast FIRE-Zahl heute:** €X — [erreicht ✅ / noch €X fehlend ❌]
+- **Urteil:** [Auf Kurs / Sparquote erhöhen nötig / Bereits FIRE]
 
-## Your Numbers
+## Ihre Kennzahlen
 
-### Inputs
-| Item | Value |
-|------|-------|
-| Current age | XX |
-| Annual spending (today) | $X |
-| Current invested assets | $X |
-| Annual income (net) | $X |
-| Annual savings | $X |
-| Savings rate | XX% |
-| Expected real return | X% |
+### Eingaben
+| Kennzahl | Wert |
+|---|---|
+| Aktuelles Alter | XX |
+| Ziel-FIRE-Alter | XX |
+| Monatlicher Entnahmebedarf | €X,XXX |
+| Aktuelles investiertes Vermögen | €X |
+| Monatliche Sparrate | €X |
+| Sparquote (netto) | XX% |
+| Erwartete Realrendite | X% |
+| DRV Entgeltpunkte (bisher) | XX |
+| Krankenversicherung | GKV / PKV |
 
-### FI Number — All Variants
+### FIRE-Zahl — Alle Varianten
 
-| Variant | Spending | FI Number | Years Away |
-|---------|----------|-----------|------------|
-| Lean FIRE | $X (your minimum) | $X | X yrs |
-| Standard FIRE | $X (your current) | $X | X yrs |
-| Fat FIRE | $X (your comfortable) | $X | X yrs |
-| Coast FIRE | n/a | $X (today) | X yrs |
-| Barista FIRE (50% expenses) | $X | $X | X yrs |
+| Variante | Jahresausgaben | FIRE-Zahl | Jahre bis FIRE |
+|---|---|---|---|
+| Lean FIRE | €X (Minimum) | €X | X Jahre |
+| Standard FIRE | €X (aktuell) | €X | X Jahre |
+| Fat FIRE | €X (komfortabel) | €X | X Jahre |
+| Coast FIRE | — | €X (heute) | — |
+| Barista FIRE (50% Depot-Entnahme) | €X | €X | X Jahre |
 
-## Years-to-FIRE Table — The Savings Rate Lever
+## GKV-Kosten im frühen Ruhestand
 
-| Your Savings Rate | Years to FIRE | FIRE Age |
-|-------------------|---------------|----------|
-| Current (XX%) | XX | XX |
-| +5% (to XX%) | XX | XX |
-| +10% (to XX%) | XX | XX |
-| +15% (to XX%) | XX | XX |
+| Szenario | Monatliche GKV + Pflege |
+|---|---|
+| GKV freiwillig, Mindestbeitrag (Einkommen ≤ €1,178/Monat) | ~€233/Monat |
+| GKV freiwillig, Einkommen €1,500/Monat | ~€245/Monat |
+| GKV freiwillig, Einkommen €2,500/Monat | ~€408/Monat |
+| PKV (Schätzung bei Ihrem Alter) | €X/Monat (steigend) |
+
+**Empfehlung:** [GKV-Mindestbeitrag durch akkumulierende ETFs anstreben / PKV-Kosten im Budget berücksichtigen]
+
+## Rentenversicherung-Analyse
+
+| Kennzahl | Wert |
+|---|---|
+| Aktuelle Entgeltpunkte | XX |
+| Projizierte Entgeltpunkte bei FIRE-Alter XX | XX |
+| Erwartete GRV-Rente mit 63 (45 Beitragsjahre) | €X/Monat |
+| Erwartete GRV-Rente mit 67 (Regelrente) | €X/Monat |
+| Fehlende Jahre für 45 Beitragsjahre (Rente mit 63) | X Jahre |
+| Freiwillige Beiträge zum Lücken füllen (Schätzung) | €X/Monat × X Jahre |
+| Lohnt freiwillige Einzahlung? | [Ja — KVdR-Vorteil überwiegt / Rechnen Sie nach] |
+
+## Entnahmestrategie
+
+**Empfohlene Entnahmereihenfolge:**
+1. Taxable Depot (Wertpapierdepot) — bis ca. Alter 60–63
+2. Freiwillige GRV-Beiträge falls nötig — zur Brücke bis 63/67
+3. bAV / Riester / Rürup — ab vertragsgemäßem Auszahlungsbeginn
+4. GRV-Rente ab 63 oder 67 — reduziert Portfolioentnahme dauerhaft
+
+**Steueroptimierung:**
+- Jahresentnahme ≤ €13,096 (Grundfreibetrag + Sparerpauschbetrag) → effektiv 0% Steuer
+- Günstigerprüfung via Anlage KAP prüfen wenn Gesamteinkommen < ~€25,000/Jahr
+- Freistellungsauftrag bei allen Depotbanken setzen
+
+**Renditefolgerisiko-Puffer:**
+- Tagesgeld-Puffer: X Monate Ausgaben (€X bei [DKB/ING/Trade Republic] ~3–3.5% p.a.)
+- Anleihen-Anteil in den ersten 5 FIRE-Jahren: X% des Portfolios
+
+## Jahres-Portfolio-Projektion
+
+| Alter | Jahr | Einzahlung | Portfolio (5%) | Portfolio (7%) | % der FIRE-Zahl |
+|---|---|---|---|---|---|
+| XX | YYYY | €X | €X | €X | X% |
+| ... | | | | | |
+| FIRE-Alter | YYYY | €0 | €X | €X | 100% |
+
+## Sparquote-Hebel
+
+| Sparquote | Jahre bis FIRE | FIRE-Alter |
+|---|---|---|
+| Aktuell (XX%) | XX | XX |
+| +5% (auf XX%) | XX | XX |
+| +10% (auf XX%) | XX | XX |
 | 50% | XX | XX |
 | 70% | XX | XX |
 
-**Key insight**: Increasing your savings rate from XX% to XX% (only $X/month more) cuts X years off your timeline.
+**Kernbotschaft:** Sparquote von XX% auf XX% erhöhen (nur €X/Monat mehr) verkürzt den Weg um X Jahre.
 
-## Reference: Savings Rate → Time to FI
+## Geographic Arbitrage Optionen
 
-| Savings Rate | Years to FIRE |
-|--------------|---------------|
-| 10% | 51 |
-| 20% | 37 |
-| 30% | 28 |
-| 40% | 22 |
-| 50% | 17 |
-| 60% | 12.5 |
-| 70% | 8.5 |
-| 80% | 5.5 |
+| Ziel | Kostensenkung vs. Ihrem Wohnort | Neue Sparquote | Neue Jahre bis FIRE |
+|---|---|---|---|
+| Aktuell bleiben | 0% | XX% | XX Jahre |
+| Ostdeutschland (ländlich) | −35–45% | XX% | XX Jahre |
+| Portugal / Madeira | −25–35% | XX% | XX Jahre |
+| Kanarische Inseln (Spanien) | −30–40% | XX% | XX Jahre |
+| Kroatien / Rumänien | −45–60% | XX% | XX Jahre |
 
-(Assumes 5% real return, starting from zero. Existing portfolio shortens timeline further.)
+**Steuerwarnung Auswanderung:** Abmeldung erforderlich. GRV-Rente bleibt in Deutschland steuerpflichtig (§49 EStG). DBA des Ziellandes prüfen.
 
-## Year-by-Year Portfolio Projection
+## Asset-Allokation nach FIRE-Phase
 
-| Age | Year | Contribution | Portfolio (5%) | Portfolio (7%) | % to FI |
-|-----|------|--------------|----------------|----------------|---------|
-| XX | YYYY | $X | $X | $X | X% |
-| ... | | | | | |
-| FIRE | YYYY | $0 | $X | $X | 100% |
+| Phase | Aktien-ETFs | Anleihen | Tagesgeld/Cash | Begründung |
+|---|---|---|---|---|
+| Anspar-Phase (jetzt bis FIRE −5 Jahre) | 85–90% | 5–10% | 5% | Wachstum maximieren |
+| Vorruhestand (5 Jahre vor FIRE) | 70% | 20% | 10% | Anleihen-Puffer aufbauen |
+| Früher Ruhestand (Jahre 1–5) | 60% | 25% | 15% | Renditefolgerisiko minimieren |
+| Ruhestand (Jahre 6+) | 70–75% | 20% | 5–10% | Längerer Horizont |
 
-## Coast FIRE Status
+## Pre-FIRE Checkliste
 
-- **Coast FIRE Number (at your age):** $X
-- **Your current portfolio:** $X
-- **Coast FIRE achieved?** ✅ Yes / ❌ No (need additional $X)
-- **What this means**: [If achieved] You can stop contributing and still retire comfortably at 65. Any savings now accelerates retirement. [If not] You need $X more invested to reach Coast FIRE.
+- [ ] 12–24 Monate Ausgaben in Tagesgeld (Renditefolgerisiko-Puffer)
+- [ ] GKV-Strategie festgelegt (Mindestbeitrag oder PKV-Kosten budgetiert)
+- [ ] Entnahmereihenfolge dokumentiert (Depot → bAV → GRV)
+- [ ] DRV Rentenauskunft angefordert und Entgeltpunkte geprüft
+- [ ] Freiwillige GRV-Beiträge geprüft (45 Beitragsjahre für Rente mit 63?)
+- [ ] Freistellungsauftrag bei allen Depots gesetzt (max. €1,000 single / €2,000 verheiratet)
+- [ ] Steuerstrategie für FIRE-Einkommen (Günstigerprüfung, Anlage KAP)
+- [ ] Kein Konsumkredit / Dispo offen
+- [ ] Berufsunfähigkeitsversicherung (BU) bis Rentenalter oder FIRE-Alter abgesichert
+- [ ] Testamentarische Dokumente aktuell
 
-## Barista FIRE Plan
-
-- **Annual expenses portfolio needs to cover:** $X (after part-time income)
-- **Barista FI Number:** $X (X% less than full FIRE)
-- **Years to Barista FI:** XX
-- **Recommended part-time work:** [employer with healthcare benefits like Starbucks, Costco, REI; or freelance covering $X/yr]
-
-## Geographic Arbitrage Opportunities
-
-If location is flexible, consider:
-| Move | Estimated COL Reduction | New Savings Rate | New Years to FIRE |
-|------|-------------------------|------------------|--------------------|
-| Stay current | 0% | XX% | XX yrs |
-| Mid-COL US city | -20% | XX% | XX yrs |
-| Low-COL US city | -35% | XX% | XX yrs |
-| International (Portugal, Mexico, Thailand) | -50% | XX% | XX yrs |
-
-## Withdrawal Strategy Recommendation
-
-Given your timeline (XX years in FIRE) and risk tolerance:
-
-**Recommended: [4% rule / 3.5% rule / Guyton-Klinger / Dynamic]**
-
-| Strategy | SWR | FI Number | Success Rate (50yr) |
-|----------|-----|-----------|---------------------|
-| 4% Rule | 4.0% | $X | ~85% |
-| 3.5% Rule | 3.5% | $X | ~95% |
-| Guyton-Klinger | 5.0% start | $X | ~95% (with adjustments) |
-| Dynamic (4% of current) | varies | $X | 100% (income varies) |
-
-## Sequence of Returns Risk Mitigation
-
-In the 5 years before AND after FIRE date:
-1. Build 2-3 years living expenses in cash/HYSA
-2. Hold 5-7 years expenses in bonds (intermediate-term)
-3. Plan flexible vs essential spending (cut variable in down years)
-4. Consider Barista phase as bridge in early years
-5. Don't sell stocks in bear markets — spend from cash/bonds
-
-## Asset Allocation for FIRE
-
-| Phase | Stocks | Bonds | Cash | Rationale |
-|-------|--------|-------|------|-----------|
-| Accumulation (now to FIRE-5) | 85% | 10% | 5% | Maximize growth |
-| Pre-FIRE (5 yrs before) | 70% | 25% | 5% | Build bond tent |
-| Early FIRE (years 1-5) | 60% | 30% | 10% | Sequence risk peak |
-| Late FIRE (years 6+) | 70% | 25% | 5% | Re-extend horizon |
-
-## Pre-FIRE Checklist (Year of FIRE)
-- [ ] 2 years cash buffer in HYSA
-- [ ] Healthcare plan locked (ACA exchange / spouse / Barista job)
-- [ ] No high-interest debt
-- [ ] Mortgage paid down or refinanced low
-- [ ] Roth conversion ladder plan written
-- [ ] Withdrawal order documented
-- [ ] Side income optionality (consulting, freelance)
-- [ ] Estate documents updated
-
-## Roth Conversion Ladder (Tax Hack for Early Retirees)
-Pre-59.5 access to retirement money without 10% penalty:
-1. Roll Traditional 401k → Traditional IRA in year 1 of FIRE
-2. Convert $X/year from Traditional IRA → Roth IRA (taxed at low income brackets)
-3. After 5-year seasoning, withdraw converted amount penalty-free from Roth
-4. Live on taxable + already-converted Roth funds during seasoning years
-
-## Healthcare Strategy (Pre-65)
-- **ACA Exchange**: Plan income to maximize subsidies (manage MAGI)
-- **HSA**: Max contributions during working years ($X/yr); save receipts for tax-free withdrawals decades later
-- **Health Sharing Ministries**: Not insurance, but lower-cost option for healthy individuals
-- **Barista FIRE for benefits**: Starbucks, REI, Costco, UPS all offer health insurance to part-timers
-
-## Action Plan
-
-### This Month
-1. Calculate current REAL savings rate (use net income, count all savings)
-2. Identify $500/month of expense cuts → boost savings rate by X%
-3. Open Roth IRA if not yet (highest-priority tax-advantaged for FIRE)
-
-### This Quarter
-1. Optimize tax-advantaged stack: 401k match → HSA → Roth IRA → 401k max → taxable
-2. Plan geographic arbitrage move (if applicable)
-3. Build first month of cash buffer
-
-### This Year
-1. Increase savings rate by 5+ percentage points
-2. Review allocation toward FIRE-appropriate equity/bond split
-3. Read: "The Simple Path to Wealth" (Collins), "Early Retirement Now" SWR series
-
-## Risks & Watch Items
-- Sequence of returns in first 5 years post-FIRE
-- Healthcare cost overruns (biggest FIRE risk)
-- Long-term care need
-- Tax law changes (Roth treatment, capital gains rates)
-- Sustained inflation above 3%
-- Lifestyle inflation reversing your math
-- Loss of identity / community when work stops (plan the "retire to" not just "retire from")
+## Risiken & Hinweise
+- Renditefolgerisiko in den ersten 5 Jahren nach FIRE (größtes strukturelles Risiko)
+- GKV-Beitragsanstieg wenn Kapital- oder Mieteinnahmen wachsen
+- PKV-Prämienanstieg mit zunehmendem Alter
+- Inflation über 3% p.a. dauerhaft — zehrt an realem Entnahmewert
+- Rentenrechtsänderungen (Rentenalter, Entgeltpunkte-Bewertung)
+- Steuerrechtsänderungen (Abgeltungsteuer, Sparerpauschbetrag)
+- Lifestyle-Inflation kehrt FIRE-Mathematik um
+- Soziale Identität — planen Sie "wofür" Sie in Rente gehen, nicht nur "wovon"
 
 ---
-**DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor before making decisions.**
+**DISCLAIMER: Nur zu Informations- und Bildungszwecken. Keine Anlage- oder Steuerberatung. Konsultieren Sie einen zugelassenen Finanzberater und Steuerberater, bevor Sie Entscheidungen treffen.**
 ```
 
-## Output Standards
-- Always show the famous savings-rate → years-to-FIRE table
-- Calculate ALL four variants (Lean, Fat, Coast, Barista)
-- Geographic arbitrage scenarios when relevant
-- Specific withdrawal strategy recommendation with reasoning
-- Pre-FIRE checklist for the year of pulling the trigger
+## Quality Standards
+- Always calculate FIRE-Zahl both unadjusted AND GRV-adjusted; show both
+- Always quantify GKV costs in early retirement (freiwillig versichert vs. PKV)
+- Always run Rentenversicherung gap analysis (current Entgeltpunkte → projected pension at 63 and 67)
+- Always include savings rate sensitivity table
+- Always include the withdrawal sequence (Depot first, then bAV/Riester/Rürup, then GRV)
+- All amounts in EUR; no USD, no US account types, no US geographic arbitrage cities
+- Reference 2026 values from german-context.md (€39.32 Rentenwert, €1,178 GKV Mindestbemessungsgrundlage, €12,096 Grundfreibetrag, €1,000 Sparerpauschbetrag)
+- Flag any assumption made due to missing data
 
 ## Handoff
 After writing FINANCE-FIRE.md:
-1. State the user's FI number and years to FIRE
-2. Identify the #1 lever (savings rate increase, geographic move, income boost)
-3. Suggest `/finance budget` if savings rate needs to climb
-4. Suggest `/finance retirement` for traditional retirement comparison
+1. State the user's FIRE-Zahl (both variants) and years to FIRE
+2. Identify the #1 lever (Sparquote increase, geographic move, or GRV bridge strategy)
+3. Suggest `/finance budget` if Sparquote needs to climb
+4. Suggest `/finance retirement` for full statutory retirement comparison
+5. Suggest `/finance networth` if Vermögen data was incomplete
 
-**DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor before making decisions.**
+**DISCLAIMER: Nur zu Informations- und Bildungszwecken. Keine Anlage- oder Steuerberatung. Konsultieren Sie einen zugelassenen Finanzberater und Steuerberater, bevor Sie Entscheidungen treffen.**
