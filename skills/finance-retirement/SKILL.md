@@ -1,326 +1,471 @@
 ---
 name: finance-retirement
-description: Retirement projection with Monte Carlo simulation logic. Calculates required nest egg via 4% rule and 25x expenses, projected vs needed gap, contribution recommendations, asset allocation by age, Social Security claim optimization, healthcare cost projections, and withdrawal sequence planning. Use when the user says "/finance retirement", "am I on track for retirement", "how much do I need to retire", "Social Security timing", or any retirement question.
+description: Retirement projection for German Angestellte. Calculates gesetzliche Rente (GRV) based on Entgeltpunkte, projects bAV (Direktversicherung/Pensionskasse/Pensionsfonds) and Riester payout, computes Rentenlücke, and produces a Handlungsplan by age band. Covers KVdR eligibility in retirement, Rentenbesteuerungsanteil, and early retirement via Altersrente für besonders langjährig Versicherte. Use when the user says "/finance retirement", "Wie viel Rente bekomme ich", "Bin ich auf Kurs für die Rente", "Wann kann ich in Rente gehen", "Rentenlücke berechnen", "bAV optimieren", "Riester lohnt sich", or any retirement planning question in a German context.
 ---
 
-# Finance Retirement — Retirement Readiness Projection
+# Finance Retirement — Deutsche Rentenplanung für Angestellte
 
-You are the retirement planning specialist. Project the user's retirement trajectory across multiple scenarios and produce a gap analysis.
+You are the retirement planning specialist for German Angestellte. Project the user's retirement income across the three pillars of the German system (GRV, bAV, private Vorsorge), calculate the Rentenlücke, and produce a prioritised Handlungsplan.
 
-**DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor before making decisions.**
+**DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed Rentenberater or Steuerberater before making decisions.**
 
-## When to Use
+## When to Run
 
 Trigger when the user says:
 - `/finance retirement`
-- "Am I on track for retirement"
-- "How much do I need to retire"
-- "When can I retire"
-- "Social Security timing"
-- "401k vs Roth"
-- "Withdrawal strategy"
+- "Wie viel Rente bekomme ich"
+- "Bin ich auf Kurs für die Rente"
+- "Wann kann ich in Rente gehen"
+- "Rentenlücke berechnen"
+- "bAV optimieren" / "Direktversicherung"
+- "Riester lohnt sich" / "Riester kündigen"
+- "Rürup Rente"
+- "Altersrente für besonders langjährig Versicherte"
+- Any German retirement planning question
 
 ## Data Collection
 
-**Demographics**
-1. Current age
-2. Target retirement age
-3. Spouse age and retirement age (if applicable)
-4. Life expectancy assumption (default age 95; longer if family history)
-5. State for retirement (tax implications)
+Ask the following questions. Collect all answers before proceeding to analysis.
 
-**Current Retirement Assets**
-6. 401k / 403b / TSP balance and contribution
-7. Traditional IRA balance and contribution
-8. Roth IRA balance and contribution
-9. Roth 401k portion (if applicable)
-10. HSA balance and contribution (treated as retirement account if maxed)
-11. Taxable brokerage earmarked for retirement
-12. Pension (annual benefit at retirement, COLA y/n)
-13. Real estate equity earmarked for retirement
+**Demografie**
+1. Geburtsjahr (and current age)
+2. Familienstand (single / verheiratet / eingetragene Lebenspartnerschaft) — affects spousal Riester Zulagen and tax splitting
+3. Anzahl Kinder mit Kindergeldberechtigung (relevant for Riester Kinderzulage)
+4. Target retirement age (Angestrebtes Rentenalter) — default 67 (Regelrentenalter); flag if user wants 63 (requires 45 Beitragsjahre)
 
-**Income & Contributions**
-14. Employee contribution rate (% or $)
-15. Employer match formula and current capture rate
-16. Annual raises expected
-17. Catch-up contributions if 50+
+**Gesetzliche Rentenversicherung (GRV)**
+5. Bekannte Entgeltpunkte from the Deutsche Rentenversicherung Kontoauszug — prompt user: "Bitte rufen Sie Ihren aktuellen Rentenbescheid oder Renteninformation unter rentenversicherung.de (Mein DRV) ab. Dort finden Sie Ihre bisherigen Entgeltpunkte."
+6. Years of Beitragszahlung to date (Beitragsjahre)
+7. Current gross annual income (Bruttojahresgehalt, EUR) — used to project future Entgeltpunkte
+8. Any Lücken in the Rentenversicherungsverlauf (Auslandsaufenthalte, Studium ohne Beiträge, Selbstständigkeit)
 
-**Retirement Spending**
-18. Expected annual spending in retirement (today's dollars)
-19. Mortgage paid off by retirement? (changes spending)
-20. Healthcare plan (Medicare + supplement, ACA, employer retiree)
-21. Travel / lifestyle changes
+**Betriebliche Altersvorsorge (bAV)**
+9. bAV vorhanden? Ja / Nein
+10. If yes: bAV type — Direktversicherung / Pensionskasse / Pensionsfonds / Direktzusage / Unterstützungskasse
+11. Monthly employee contribution (Eigenbeitrag per Entgeltumwandlung, EUR)
+12. Employer Zuschuss (pflichtgemäß ≥15% on converted amounts since 2022; confirm actual %)
+13. Current bAV Guthaben (EUR) if known
+14. Expected bAV payout form preference: monthly Rente or Einmalauszahlung
 
-**Social Security**
-22. Estimated benefit at full retirement age (from SSA.gov)
-23. Spouse's estimated benefit
-24. Years worked (must be 35 for max benefit)
+**Riester-Rente**
+15. Riester-Vertrag vorhanden? Ja / Nein
+16. If yes: Anbieter, Vertragstyp (Rentenversicherung / Banksparplan / Fondssparplan / Wohn-Riester), accumulated Guthaben (EUR)
+17. Jährliche Eigenbeiträge currently paid; confirm whether Zulagenansprüche (Grundzulage + Kinderzulagen) are being fully claimed
+18. Förderquote: has the user confirmed the Zulageantrag is filed automatically via the Anbieter or manually?
 
-## Calculation Methodology
+**Rürup-Rente (Basisrente)**
+19. Rürup-Vertrag vorhanden? Ja / Nein; if yes: Guthaben (EUR), annual contribution
 
-### Required Nest Egg
+**Krankenversicherung**
+20. GKV or PKV currently?
+21. If GKV: which Kasse, current Zusatzbeitrag?
+22. If PKV: monthly premium, Anwartschaft for KVdR transition?
 
-**Method 1: 25x Rule (4% Safe Withdrawal Rate)**
+**Rentenbedarf**
+23. Monthly net income target in retirement (Rentenbedarf, EUR — in today's Euros)
+24. Is Eigenheim paid off by retirement? (reduces Wohnkosten)
+25. Other expected income in retirement: Mieteinnahmen, part-time work, inheritance, etc. (EUR/month)
+
+## Retirement Framework
+
+Before analysis, read `.claude/skills/shared/german-context.md` for 2026 German financial constants.
+
+### 1. Rentenversicherung (GRV) Projection
+
+**Current Entgeltpunkte from user's DRV Kontoauszug (EP_known)**
+
+**Project future Entgeltpunkte:**
 ```
-Nest Egg Needed = Annual Spending × 25
-```
-Example: $80,000 spending × 25 = $2,000,000
+EP per year = User's Bruttolohn / Durchschnittsentgelt
+Durchschnittsentgelt 2026 = ~€45,358/year
 
-**Method 2: Subtract Other Income**
-```
-Nest Egg = (Annual Spending - Social Security - Pension) × 25
-```
-Example: ($80k - $30k SS - $0) × 25 = $1,250,000
-
-**Method 3: Inflation-Adjusted**
-For target retirement year, multiply today's needed spending by inflation factor:
-```
-Future Spending = Today's Spending × (1.03)^years_to_retirement
-Future Nest Egg = Future Spending × 25
-```
-Example: $80k × (1.03)^25 = $167,500 → × 25 = $4,187,500 at retirement
-
-Report nest egg in BOTH today's dollars and future dollars.
-
-### Projected Nest Egg
-
-Use compound growth formula across three scenarios:
-
-```
-FV = PV × (1+r)^n + PMT × [((1+r)^n - 1) / r]
-Where:
-  PV = current balance
-  PMT = annual contribution
-  r = real return rate
-  n = years to retirement
+EP at retirement = EP_known + (EP_per_year × years_remaining_to_retirement)
 ```
 
-**Conservative**: 5% real return (3% above inflation)
-**Moderate**: 6% real return
-**Aggressive**: 7% real return
+- If user earns exactly the Durchschnittsentgelt: 1.0 EP/year
+- Scale up/down proportionally to actual income vs €45,358
+- Note: contributions capped at Beitragsbemessungsgrenze (BBG West 2026: €96,600/year); maximum EP per year = ~2.13
 
-### Gap Analysis
+**Monthly GRV pension (Regelaltersrente):**
 ```
-Gap = Needed - Projected
-Required Additional Monthly Contribution = Gap / [((1+r)^n - 1) / r] / 12
+Monthly Rente = Total EP × aktueller Rentenwert West
+Aktueller Rentenwert West 2026 = €39.32/month per EP
 ```
 
-### Monte Carlo Logic (Simulated)
-Without running thousands of trials, present a "Monte Carlo-style" outcome range:
-- **90th percentile (great markets)**: Nest egg = projected × 1.5
-- **50th percentile (median)**: Nest egg = projected × 1.0
-- **10th percentile (poor markets)**: Nest egg = projected × 0.6
-- **Probability of success at current trajectory**: estimate based on (projected / needed) ratio:
-  - Ratio >1.3: ~95% success
-  - Ratio 1.0-1.3: ~80% success
-  - Ratio 0.8-1.0: ~60% success
-  - Ratio 0.6-0.8: ~35% success
-  - Ratio <0.6: <20% success
+**Early retirement option — Altersrente für besonders langjährig Versicherte (age 63):**
+- Requires 45 Beitragsjahre (count Pflichtbeiträge, Kindererziehungszeiten, Pflegezeiten; exclude ALG-II periods)
+- Abzug: 0.3% per month before Regelrentenalter 67 = max 14.4% permanent reduction (48 months × 0.3%)
+- Example: retiring at 63 with Regelrentenalter 67 → 14.4% Abzug applied permanently to all future pension payments
+- Check whether user has 45 Beitragsjahre or is on track; flag shortfall
 
-### Asset Allocation by Age
+**Rentenbesteuerungsanteil (income tax on pension):**
+| Renteneintritt (Jahr) | Steuerpflichtiger Anteil |
+|---|---|
+| 2026 | 83% |
+| 2027 | 84% |
+| 2028 | 85% |
+| 2030 | 87% |
+| 2035 | 92% |
+| 2040+ | 100% |
 
-| Age | Stocks | Bonds | Cash | Notes |
-|-----|--------|-------|------|-------|
-| 20-30 | 90% | 5% | 5% | Aggressive accumulation |
-| 30-40 | 85% | 10% | 5% | High growth, time horizon long |
-| 40-50 | 75% | 20% | 5% | Begin de-risking |
-| 50-60 | 65% | 30% | 5% | Sequence risk mitigation begins |
-| 60-65 | 55% | 35% | 10% | "Bond tent" to protect first 5 years |
-| 65-75 | 50% | 40% | 10% | Withdrawal phase |
-| 75+ | 40% | 50% | 10% | Capital preservation |
+Model gross GRV pension → apply taxable share → estimate income tax using progressive Einkommensteuer (Grundfreibetrag 2026: €12,096 single / €24,192 married).
 
-Rule of thumb: Stocks % = 110 - age (moderate); 120 - age (aggressive); 100 - age (conservative).
+### 2. bAV Projection and Payout
 
-### Social Security Optimization
+**Project bAV Guthaben at retirement:**
+```
+FV_bAV = PV_bAV × (1 + r)^n + (monthly_contribution × 12) × [((1+r)^n - 1) / r]
+```
+Use r = 2.5% (conservative, typical Direktversicherung/Pensionskasse guaranteed rate) and r = 4% (moderate with profit sharing).
 
-**Claiming ages**:
-- Age 62: Earliest, ~75% of FRA benefit (permanent reduction)
-- Age 67 (FRA for those born 1960+): 100% of benefit
-- Age 70: 132% of FRA benefit (8% annual delayed retirement credits stop at 70)
+**bAV payout options:**
+- **Monthly Rente**: Lifelong annuity from insurer; amount depends on actuarial factors at retirement
+- **Einmalauszahlung** (lump sum): Not always available; depends on contract type; check Vertragsunterlagen
 
-**Breakeven analysis**:
-- Age 62 vs 67: Breakeven around age 78
-- Age 67 vs 70: Breakeven around age 82-83
-- Age 62 vs 70: Breakeven around age 80
+**Tax treatment:**
+- Direktversicherungsrente / Pensionskassen-Rente: fully taxable as Sonstige Einkünfte (§22 EStG) — 100% income tax on full payout amount (not just Ertragsanteil)
+- Model combined tax: GRV (taxable share) + bAV full amount → apply progressive Einkommensteuer
 
-**Recommendation logic**:
-- Longevity in family + don't need cash → delay to 70
-- Health issues / shorter life expectancy → claim early
-- Spouse: file-and-suspend strategies; survivor benefit = higher of two
-- Working between 62-67 → earnings test reduces benefits
+**KVdR health insurance contributions on bAV (critical):**
+- GKV retirees subject to KVdR pay GKV contributions on bAV payouts
+- Rate: 14.6% + Zusatzbeitrag (approx. ~16.3% total) on bAV Rente
+- No employer subsidy on bAV portion — retiree bears full contribution
+- PKV retirees: no KVdR contributions; pay full PKV premium from own income
 
-### Healthcare Cost Projection
-- Average couple needs $315,000 in retirement for healthcare (Fidelity, today's dollars)
-- Pre-Medicare (retiring before 65): ACA subsidies, COBRA, retiree plans
-- Medicare starts age 65: Parts A free, B ~$175/month, D varies, supplement (Medigap) $150-400/month
-- HSA is most tax-efficient bucket for healthcare (triple tax advantage)
+**Arbeitgeberzuschuss compliance check:**
+- Employer must pay ≥15% Zuschuss on salary-converted bAV amounts (Pflicht since 2022 for all contracts)
+- Verify user is receiving this; if not, flag as immediate action item
+- Total steuerfreier bAV limit 2026: €7,728/year (8% of BBG West €96,600)
 
-### Withdrawal Sequence (Order of Spending)
-Most tax-efficient order:
-1. **Required Minimum Distributions (RMDs)** from Traditional 401k/IRA (start age 73)
-2. **Taxable accounts** (capital gains rates, harvest losses)
-3. **Tax-deferred** (Traditional 401k/IRA) — fill low brackets
-4. **Roth** (last, lets it grow tax-free longest)
+### 3. Riester Projection
 
-**Roth conversion ladder** between retirement and age 73: Fill 12-22% brackets with Trad → Roth conversions to reduce future RMDs.
+**Annual Riester subsidy (Zulagen) calculation:**
+```
+Grundzulage: €175/year (per Riester saver)
+Kinderzulage: €185/child (born before 2008) or €300/child (born 2008+)
+Total Zulage = Grundzulage + (Kinderzulage × Anzahl Kinder)
+```
 
-## Output: FINANCE-RETIREMENT.md
+**Mindestbeitrag to receive full Zulage:**
+```
+Eigenbeitrag_required = (4% of prior-year Bruttolohn) − Zulagen
+Minimum Eigenbeitrag: €60/year
+Maximum für Steuerförderung: €2,100/year (Eigenbeitrag + Zulagen combined)
+```
 
-Write to the current working directory:
+**Project Riester Guthaben at retirement:**
+```
+FV_Riester = PV_Riester × (1 + r)^n + annual_contribution × [((1+r)^n - 1) / r]
+```
+Use r = 2% conservative (Riester products often have low guaranteed returns) and r = 4% moderate.
+
+**Riester payout rules:**
+- Earliest payout age: 60 (for contracts concluded before 2012); 62 for newer contracts
+- 30% Einmalauszahlung allowed at start of payout phase (Teilkapitalauszahlung); remaining 70%+ paid as lifelong annuity
+- Wohn-Riester (Eigenheimrente) alternative: tax-free use for owner-occupied property; Wohnförderkonto taxed at retirement
+- Full taxation: Riester payouts taxed as Sonstige Einkünfte — 100% subject to income tax (no Ertragsanteil method for state-subsidised Riester annuity)
+- Schädliche Verwendung: if emigrating to non-EU/EEA country, all Zulagen must be repaid (Rückforderung)
+
+**Riester attractiveness check:**
+- Assess Förderquote (subsidy as % of own contribution) — strongest for low earners with children
+- Flag if Riester costs (fees, low returns) outweigh Zulagen benefit; suggest reviewing Anbieter
+
+### 4. Rentenlücke Calculation
+
+```
+Monthly GRV net (after tax, after KVdR) = GRV_gross × (1 − taxable_share) adjusted for tax rate
+Monthly bAV net (after tax and KVdR) = bAV_Rente − income_tax_share − KVdR_contribution
+Monthly Riester net = Riester_annuity − income_tax_share
+Other income = Mieteinnahmen + etc.
+
+Total projected monthly net = GRV_net + bAV_net + Riester_net + Other_income
+
+Rentenlücke (monthly) = Rentenbedarf − Total projected monthly net
+Rentenlücke (annual) = Rentenlücke_monthly × 12
+```
+
+**Capital needed to close the gap (private savings / ETF Depot):**
+```
+Capital needed = Annual Rentenlücke × 25  (4% Entnahmeplan / withdrawal rate)
+```
+
+Show how much additional Kapital must be accumulated by retirement to fund the gap via a Entnahmeplan from a Wertpapierdepot.
+
+**Savings rate needed:**
+```
+Required monthly savings = Capital_needed / [((1+r)^n − 1) / r] / 12
+```
+Use r = 5% real (equity ETF portfolio assumption, after inflation, net of Abgeltungsteuer partial effect via Teilfreistellung).
+
+### 5. GKV in Rente — Pflichtversicherung der Rentner (KVdR)
+
+**KVdR eligibility:**
+- Must have spent 9/10 of the second half of working life in GKV (statutory health insurance)
+- Rule of thumb: requires approximately 22+ years of GKV membership in the last 44 years of working life
+- If eligible: enrolled automatically in KVdR upon pension claim
+
+**KVdR contributions:**
+- Rate: 14.6% Basissatz + Kasse-specific Zusatzbeitrag (~1.7% avg 2026) = ~16.3% total
+- Base: gross GRV pension amount only (bAV and Riester payouts are added separately)
+- Employer equivalent (Deutsche Rentenversicherung) pays half of 14.6% base — retiree pays the other half of base plus full Zusatzbeitrag
+- On bAV payout: retiree pays full 16.3% with no employer subsidy
+- Pflegeversicherung additionally: 3.4% (childless) or 3.05% (with children) on all income sources in retirement
+
+**If not KVdR-eligible (freiwillig versichert):**
+- Freiwillige Mitgliedschaft at full 16.3% on all income sources (GRV + bAV + Riester + Mieteinnahmen + Kapitalerträge above Sparerpauschbetrag €1,000)
+- Minimum contribution base: €1,178/month → minimum GKV contribution ~€193/month
+- Model this in the net pension calculation if KVdR eligibility is at risk
+
+**PKV retirees:**
+- PKV continues in retirement; no KVdR; no income-based premium
+- Full PKV premium paid from own income (no Arbeitgeberzuschuss in retirement; Deutsche Rentenversicherung pays a fixed Zuschuss of ~half the average GKV rate)
+- Flag: PKV premiums often increase substantially in retirement; model premium risk
+
+### 6. Rentenbesteuerung — Net Pension After Tax
+
+Build a simple combined income calculation at retirement:
+
+```
+Gesamteinkünfte = GRV_gross × taxable_share + bAV_Rente_full + Riester_Rente_full + Mieteinnahmen + Kapitalerträge_above_Sparerpauschbetrag
+
+Estimate Einkommensteuer using progressive rate:
+  − Grundfreibetrag: €12,096 (single) / €24,192 (married)
+  − 14% rate begins above Grundfreibetrag, rising to 42% at ~€66,761
+  − Sonderausgaben: Krankenversicherungsbeiträge in Rente are deductible
+
+Net pension = Gesamteinkünfte − Einkommensteuer − KVdR/Pflegeversicherung
+```
+
+Present as a table: Gross GRV | taxable share | bAV gross | Riester gross | Total gross | Estimated tax | KVdR | Net monthly.
+
+### 7. Handlungsempfehlungen by Age Band
+
+**Under 40 — Aufbauphase:**
+- Verify full employer Arbeitgeberzuschuss ≥15% on bAV is being paid — if not, demand correction immediately (legal entitlement since 2022)
+- Maximize steuerfreie bAV contributions up to €7,728/year if cash flow allows
+- Start Riester if Kinderzulage applies (especially for lower-to-mid earners with children) — strong positive Förderquote
+- Check Entgeltpunkte trajectory: if income is below Durchschnittsentgelt, build up extra private savings to compensate
+- Prioritize ETF Depot (iShares MSCI World SWDA or equivalent UCITS ETF) for long-term gap-closing Kapitalaufbau
+- Ensure no Lücken in GRV accumulating (e.g., career breaks, part-time work)
+
+**40–55 — Aufholphase:**
+- Run formal Rentenlücke calculation using actual DRV Rentenauskunft (request online at rentenversicherung.de)
+- For high earners (Bruttolohn > €73,800): evaluate Rürup-Rente for tax efficiency — contributions fully deductible up to €29,344/year (2026); compare net cost after Steuerersparnis vs bAV
+- Review Riester performance: if Riester costs are high and Förderquote is low (no children, high income), consider Wechsel to better-performing contract or evaluate stopping Eigenbeiträge at minimum to retain Zulagen only
+- Model exact GRV Abzüge if considering retirement before 67 — 14.4% permanent cut for age 63 retirement is substantial
+- If PKV: model future premium trajectory and KVdR eligibility risk
+- Accelerate ETF Depot savings to close projected Rentenlücke
+
+**55+ — Finalphase:**
+- Request formal Rentenauskunft from Deutsche Rentenversicherung (mandatory first step — not optional)
+- Model exact bAV payout scenarios: monthly Rente vs Einmalauszahlung; tax implications of each; timing options
+- Consider freiwillige Beiträge zur Rentenversicherung (voluntary additional contributions) to top up Entgeltpunkte — useful if Beitragsjahre are slightly below 45-year threshold for Altersrente für besonders langjährig Versicherte or to increase monthly Rente
+- GKV members: verify KVdR eligibility formally with your Krankenkasse; ensure 9/10 rule is met
+- PKV members: request PKV premium projection to age 85+ from Versicherer; model worst-case premium
+- Finalize Riester payout timing: earliest at 60/62; decide 30% Einmalauszahlung vs 100% annuity
+
+## Output
+
+Write a file called `FINANCE-RETIREMENT.md` to the current working directory with this structure:
 
 ```markdown
-# Retirement Readiness Analysis
-**Prepared:** [Date]
-**Current Age:** XX | **Target Retirement Age:** XX | **Years to Retirement:** XX
+# Deutsche Rentenplanung — Projektion und Rentenlückenanalyse
+**Erstellt:** [Date]
+**Geburtsjahr:** XXXX | **Aktuelles Alter:** XX | **Angestrebtes Rentenalter:** XX | **Jahre bis Rente:** XX
 
-## Executive Summary
-- **Retirement Score:** XX/100
-- **Required Nest Egg (today's $):** $X,XXX,XXX
-- **Required Nest Egg (future $):** $X,XXX,XXX
-- **Projected Nest Egg (moderate):** $X,XXX,XXX
-- **Gap:** $X,XXX,XXX
-- **Required Monthly Contribution to Close Gap:** $X,XXX
-- **Probability of Success at Current Trajectory:** XX%
-- **Verdict:** ✅ On track / ⚠️ Behind / 🚨 Critical gap
-
-## Inputs Summary
-| Item | Value |
-|------|-------|
-| Current age | XX |
-| Target retirement age | XX |
-| Current retirement assets | $X |
-| Annual contribution (you + employer) | $X |
-| Expected annual spending in retirement | $X (today's $) |
-| Expected Social Security | $X/yr at age XX |
-| Pension | $X/yr |
-
-## Required Nest Egg (3 Methods)
-
-| Method | Today's $ | Future $ (at retirement) |
-|--------|-----------|--------------------------|
-| 25x Annual Spending | $X | $X |
-| Spending - SS - Pension × 25 | $X | $X |
-| Custom (with assumptions) | $X | $X |
-
-## Projection Scenarios
-
-| Scenario | Real Return | Nest Egg at Retirement | Years Lasts (4% withdrawal) |
-|----------|-------------|------------------------|------------------------------|
-| Conservative | 5% | $X | XX years |
-| Moderate | 6% | $X | XX years |
-| Aggressive | 7% | $X | XX years |
-
-## Year-by-Year Projection Table
-
-| Age | Year | Annual Contribution | Balance (Moderate) | Real Income at 4% |
-|-----|------|---------------------|--------------------|--------------------|
-| Current | YYYY | $X | $X | $X |
-| ... | | | | |
-| Retirement | YYYY | $0 | $X | $X |
-| 75 | YYYY | $0 | $X | $X |
-| 85 | YYYY | $0 | $X | $X |
-
-## Monte Carlo Outcome Range
-
-| Percentile | Nest Egg | Status |
-|------------|----------|--------|
-| 90th (great markets) | $X | Excellent |
-| 50th (median) | $X | Base case |
-| 10th (poor markets) | $X | Risk scenario |
-
-**Probability of meeting goal:** XX%
-
-## Gap Analysis & Required Action
-
-Current trajectory falls short by $X,XXX,XXX.
-To close the gap, ONE of these is needed:
-- **Option A**: Increase contributions by $X/month (total: $X/month)
-- **Option B**: Delay retirement by X years (to age XX)
-- **Option C**: Reduce retirement spending by $X/yr (to $X/yr)
-- **Option D**: Higher returns via more equity exposure (if risk tolerance allows)
-- **Combination**: Most realistic mix
-
-## Contribution Optimization Stack
-
-Follow this order each year:
-1. **401k to employer match** (free money — capture 100%)
-2. **HSA max** ($X/yr if HDHP) — triple tax advantage
-3. **Roth IRA max** ($X/yr; $X if 50+) — if income allows
-4. **401k to max** ($X/yr; $X if 50+)
-5. **Backdoor Roth** if income too high for direct Roth
-6. **Mega Backdoor Roth** if plan allows (after-tax 401k → Roth)
-7. **Taxable brokerage** with tax-efficient index funds
-
-## Asset Allocation Recommendation
-
-**Current age (XX):**
-- Stocks: XX% ([XX% US, XX% international])
-- Bonds: XX%
-- Cash: XX%
-
-**Glidepath to age 65:**
-- Reduce stocks by ~1% per year until age 65
-- Build "bond tent" 5-10 years pre-retirement to protect against sequence risk
-- At age 65: 55/35/10 stock/bond/cash
-
-## Social Security Optimization
-
-| Claim Age | Monthly Benefit | Annual | Lifetime (to age 85) |
-|-----------|-----------------|--------|----------------------|
-| 62 | $X | $X | $X |
-| 67 (FRA) | $X | $X | $X |
-| 70 | $X | $X | $X |
-
-**Recommendation:** [Age based on health, longevity, cash needs]
-**Reasoning:** [breakeven analysis + family longevity + spousal coordination]
-
-## Healthcare Cost Plan
-- Pre-65 (ages XX-65): [ACA / COBRA / retiree plan] estimated $X/month
-- Post-65: Medicare Parts A/B/D + Medigap estimated $X/month
-- Total retirement healthcare reserve needed: $XXX,XXX (today's $)
-- HSA contribution priority: $X/year currently → max to $X/year
-
-## Withdrawal Sequence Plan (Ages 65-95)
-
-| Age | RMDs | Taxable | Trad 401k/IRA | Roth | Total Withdrawal |
-|-----|------|---------|---------------|------|------------------|
-| 65-72 | $0 | $X | $X | $0 | $X |
-| 73-80 | $X | $X | $X | $0 | $X |
-| 80+ | $X | $0 | $X | $X | $X |
-
-**Roth Conversion Ladder Plan:** Convert $X/yr between ages XX-72 to fill the 22% bracket and reduce future RMDs.
-
-## Risks & Watch Items
-- Sequence of returns risk in first 5 years
-- Inflation higher than 3% long-term
-- Healthcare cost overruns
-- Long-term care need (avg cost $108k/yr nursing home)
-- Longevity beyond age 95
-- Social Security benefit cuts (consider 80% baseline scenario)
-
-## Action Plan
-1. **This week**: Increase 401k contribution to capture full match
-2. **This month**: Open/fund Roth IRA for current year
-3. **This quarter**: Rebalance allocation to target glidepath
-4. **This year**: Get SSA.gov benefit estimate; map out claim strategy
-5. **Annual**: Review and increase contribution by 1% of salary minimum
+**DISCLAIMER: Nur zu Informations- und Bildungszwecken. Keine Finanzberatung. Bitte konsultieren Sie einen zugelassenen Rentenberater oder Steuerberater.**
 
 ---
-**DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor before making decisions.**
+
+## Zusammenfassung
+
+| | Wert |
+|---|---|
+| Monatlicher Rentenbedarf (Netto, heutige EUR) | €X,XXX |
+| Projizierte monatliche GRV (Brutto) | €X,XXX |
+| Projizierte monatliche bAV | €X,XXX |
+| Projizierte monatliche Riester-Rente | €X,XXX |
+| Sonstige Einnahmen | €X,XXX |
+| **Projiziertes Gesamteinkommen (Netto nach Steuer/KVdR)** | **€X,XXX** |
+| **Rentenlücke (monatlich)** | **€X,XXX** |
+| Kapital zur Schließung der Lücke (25× Jahres-Lücke) | €XXX,XXX |
+| Erforderliche monatliche Ersparnis (Depot) | €X,XXX |
+
+---
+
+## Eingaben und Annahmen
+
+| Parameter | Wert |
+|---|---|
+| Geburtsjahr | XXXX |
+| Bekannte Entgeltpunkte (DRV Kontoauszug) | X.XX EP |
+| Beitragsjahre bisher | XX Jahre |
+| Aktuelles Bruttojahresgehalt | €XX,XXX |
+| EP pro Jahr (aktuelles Gehalt / €45,358) | X.XX EP |
+| Angestrebtes Rentenalter | XX |
+| Verbleibende Jahre bis Rente | XX |
+| Aktueller Rentenwert West 2026 | €39.32/EP |
+| Renteneintrittskohorte — Besteuerungsanteil | XX% |
+| GKV / PKV | [GKV/PKV] |
+| KVdR-berechtigt (voraussichtlich) | [Ja/Nein/Prüfen] |
+
+---
+
+## Projektionstabelle: Drei Säulen
+
+| Säule | Brutto/Monat | Steuer/KVdR-Abzug | Netto/Monat |
+|---|---|---|---|
+| GRV (gesetzliche Rente) | €X,XXX | €XXX | €X,XXX |
+| bAV (Direktversicherung) | €XXX | €XXX (KVdR + Steuer) | €XXX |
+| Riester-Rente | €XXX | €XXX (Steuer) | €XXX |
+| Sonstige Einnahmen | €XXX | — | €XXX |
+| **Gesamt** | **€X,XXX** | **€XXX** | **€X,XXX** |
+
+---
+
+## GRV Detailprojektion
+
+| Szenario | Gesamte EP bei Renteneintritt | Monatliche Brutto-Rente (€39.32/EP) |
+|---|---|---|
+| Konservativ (0.8 EP/Jahr) | XX.X EP | €X,XXX |
+| Moderat (X.X EP/Jahr bei aktuellem Gehalt) | XX.X EP | €X,XXX |
+| Optimistisch (Gehaltserhöhung 2%/Jahr) | XX.X EP | €X,XXX |
+
+**Frührentenfaktor (Rente mit 63):**
+- Abzug: 14.4% (48 Monate × 0.3%)
+- Monatliche Rente nach Abzug: €X,XXX (statt €X,XXX)
+- Jahreseinbuße: €X,XXX | Lebenszeiteinbuße (bis 85): €XX,XXX
+- 45 Beitragsjahre erreicht: [Ja / Nein / XX Jahre fehlend]
+
+---
+
+## bAV Projektion
+
+| Annahme | Guthaben bei Rente | Monatliche Rente (geschätzt) |
+|---|---|---|
+| Konservativ (r = 2.5%) | €XXX,XXX | €XXX |
+| Moderat (r = 4%) | €XXX,XXX | €XXX |
+
+**KVdR-Abzug auf bAV:** ~16.3% auf Brutto-bAV-Rente = €XX/Monat
+**Steuerbelastung:** [vollständige Einkommensteuerpflicht als Sonstige Einkünfte]
+**Arbeitgeberzuschuss-Status:** [✅ ≥15% gezahlt / ⚠️ unter 15% — Handlungsbedarf]
+
+---
+
+## Riester Projektion
+
+| Parameter | Wert |
+|---|---|
+| Aktuelles Guthaben | €XX,XXX |
+| Grundzulage | €175/Jahr |
+| Kinderzulagen | €XXX/Jahr |
+| Förderquote | XX% |
+| Guthaben bei Rente (r = 2%) | €XXX,XXX |
+| Guthaben bei Rente (r = 4%) | €XXX,XXX |
+| Monatliche Riester-Rente (geschätzt) | €XXX |
+| 30%-Einmalauszahlung bei Rentenbeginn | €XX,XXX |
+
+---
+
+## Rentenlückenanalyse
+
+```
+Monatlicher Rentenbedarf:            €X,XXX
+./. GRV netto:                       €X,XXX
+./. bAV netto:                       €XXX
+./. Riester netto:                   €XXX
+./. Sonstige Einnahmen:              €XXX
+= Rentenlücke (monatlich):           €X,XXX
+= Rentenlücke (jährlich):            €X,XXX
+
+Kapital zur Lückenschließung:
+  Jahres-Lücke × 25 (4%-Entnahmeplan) = €XXX,XXX
+
+Erforderliche monatliche Ersparnis (XX Jahre, 5% real):
+  €X,XXX/Monat in ETF-Depot
 ```
 
-## Output Standards
-- Always show today's dollars AND future dollars (inflation matters)
-- Multiple scenarios (conservative/moderate/aggressive)
-- Specific contribution numbers, not just percentages
-- Social Security claim age justified, not guessed
-- Withdrawal sequence is tax-optimized
+---
+
+## Steuern und KVdR in der Rente (Zusammenfassung)
+
+| Einkommensart | Brutto/Monat | Steuerpflichtig | Steuer (geschätzt) |
+|---|---|---|---|
+| GRV | €X,XXX | XX% (Kohorte 2026) | €XXX |
+| bAV | €XXX | 100% (Sonstige Einkünfte) | €XXX |
+| Riester | €XXX | 100% (Sonstige Einkünfte) | €XXX |
+| **KVdR/Pflegeversicherung gesamt** | — | — | **€XXX** |
+| **Netto gesamt** | — | — | **€X,XXX** |
+
+---
+
+## Krankenversicherung in der Rente
+
+| Status | Beitrag |
+|---|---|
+| KVdR-berechtigt (GKV) | ~8.15% auf GRV + 16.3% auf bAV/Riester |
+| Nicht KVdR-berechtigt (freiwillig GKV) | 16.3% auf alle Einkommensarten (mind. €193/Monat) |
+| PKV-Rentner | Volles PKV-Beitrag; DRV-Zuschuss ~Hälfte des GKV-Satzes |
+| Pflegeversicherung | 3.4% (kinderlos) / 3.05% (mit Kindern) |
+
+---
+
+## Handlungsplan nach Altersband
+
+### [Unter 40 / 40–55 / 55+ — je nach Alter des Nutzers]
+
+**Sofortmaßnahmen (diese Woche):**
+1. Rentenauskunft unter rentenversicherung.de abrufen und Entgeltpunkte prüfen
+2. bAV-Unterlagen prüfen: Arbeitgeberzuschuss ≥15%? Vertragskonditionen verstehen
+3. Riester-Zulageantrag für laufendes Jahr gestellt?
+
+**Kurzfristig (dieses Quartal):**
+4. [Age-specific action]
+5. [Age-specific action]
+
+**Mittelfristig (dieses Jahr):**
+6. [Age-specific action]
+7. [Age-specific action]
+
+**Jährlich:**
+8. Renteninformation von DRV auswerten (wird automatisch zugesandt ab 27. Lebensjahr)
+9. Riester-Guthaben und Fondsperformance überprüfen
+10. Rentenlückenberechnung aktualisieren bei Gehaltsänderungen
+
+---
+
+## Risiken und Hinweise
+
+- **Rentenbesteuerung steigt:** Kohorten ab 2040+ zahlen 100% Einkommensteuer auf GRV — frühzeitige private Ergänzung wichtig
+- **KVdR-Lücke:** Lücken in GKV-Mitgliedschaft (PKV-Jahre) können KVdR-Berechtigung gefährden
+- **bAV KVdR-Beitrag:** Auf bAV-Renten wird voller GKV-Beitrag fällig — netto bAV-Wert kann erheblich geringer sein als erwartet
+- **Riester Schädliche Verwendung:** Auswanderung in Nicht-EU-/EWR-Staat → Zulagen-Rückforderung
+- **Langlebigkeit:** Rentenplanung bis Alter 90+ sicherstellen; GRV ist lebenslang, privates Depot kann aufgebraucht werden
+- **PKV-Prämienrisiko:** PKV-Prämien steigen oft stark im Rentenalter; Rückkehr zur GKV nur unter engen Bedingungen möglich
+- **Inflation:** Monatlicher Rentenbedarf in heutigen EUR — realer Bedarf bei 2% Inflation über 20 Jahre ~50% höher
+
+---
+
+**DISCLAIMER: Nur zu Informations- und Bildungszwecken. Keine Finanzberatung. Bitte konsultieren Sie einen zugelassenen Rentenberater oder Steuerberater.**
+```
+
+## Quality Standards
+
+- Always show GRV projection in EP and EUR; show impact of Abzüge for early retirement
+- Always calculate KVdR contributions separately — they significantly reduce net bAV income
+- Show Rentenbesteuerungsanteil for user's specific retirement cohort (2026 = 83%; increases annually)
+- Rentenlücke must be shown in monthly EUR (today's money) and as capital target (25× annual gap)
+- Include Riester Förderquote — critical to assess whether Riester is worth continuing
+- Flag immediately if Arbeitgeberzuschuss ≥15% is not being paid (legal entitlement)
+- KVdR eligibility check is mandatory for every GKV member — missed eligibility is a costly surprise
+- No dollar amounts; no US product names; all figures in EUR
 
 ## Handoff
-After writing FINANCE-RETIREMENT.md:
-1. State the gap and the single most important lever
-2. Top 3 actions
-3. Suggest `/finance fire` if savings rate is high and user is interested in early retirement
-4. Suggest `/finance analyze` for full picture
 
-**DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor before making decisions.**
+After writing FINANCE-RETIREMENT.md:
+1. State the Rentenlücke (monthly EUR) and the single highest-leverage action to close it
+2. Top 3 concrete next steps (e.g., DRV Kontoauszug abrufen, bAV-Zuschuss prüfen, Depot-Sparplan einrichten)
+3. Suggest `/finance analyze` for a full financial picture across all pillars
+4. Suggest `/finance goals` if the user wants to model early retirement (Frühverrentung) scenarios in detail
+
+**DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed Rentenberater or Steuerberater.**
