@@ -38,6 +38,7 @@ echo ""
 echo -e "${YELLOW}This will remove the following from ${PWD}/.claude/:${NC}"
 echo "  • skills/finance/        (orchestrator + scripts + venv)"
 echo "  • skills/finance-*/      (all 15 sub-skills)"
+echo "  • skills/shared/         (German financial context)"
 echo "  • agents/finance-*.md"
 echo ""
 
@@ -76,6 +77,13 @@ if [ -d "${SKILLS_DIR}" ]; then
       removed_count=$((removed_count + 1))
     fi
   done
+fi
+
+# Remove shared German context
+if [ -d "${SKILLS_DIR}/shared" ]; then
+  rm -rf "${SKILLS_DIR}/shared"
+  echo -e "${GREEN}✓${NC} Removed skills/shared/"
+  removed_count=$((removed_count + 1))
 fi
 
 # Remove all finance-* agents
