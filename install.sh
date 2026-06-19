@@ -197,7 +197,7 @@ install_agents() {
 }
 
 install_scripts() {
-  local src="${SOURCE_DIR}/scripts"
+  local src="${SOURCE_DIR}/finance/scripts"
   if [ ! -d "$src" ]; then
     warn "No scripts/ folder at ${src}, skipping."
     return
