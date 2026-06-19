@@ -1,224 +1,392 @@
 ---
 name: finance-compare
-description: Side-by-side comparison of two financial scenarios (buy vs rent, new job vs stay, payoff house vs invest, Roth vs Traditional, lease vs buy car, etc). Projects each scenario over 10 years, compares total cost, opportunity cost, risk profile, and produces a structured recommendation. Output saved as FINANCE-COMPARE.md.
+description: Side-by-side comparison of two financial decisions for German clients. Trigger phrases: "soll ich kaufen oder mieten", "rent vs buy Germany", "GKV oder PKV", "ETF vs Fonds", "leasing vs kaufen Auto", "should I lease or buy", "is it worth buying a home in [German city]", "Preis-Miet-Verhältnis", "lohnt sich kaufen", "compare financial options Germany". Collects German-specific inputs (Bundesland, Kaufpreis, JAEG threshold, TER, Leasingrate), runs cost and opportunity-cost modelling with German tax and cost assumptions, and saves a structured recommendation to FINANCE-COMPARE.md.
 ---
 
-# /finance compare — Side-by-Side Scenario Comparison
+# Finance Compare — Finanzentscheidungen vergleichen
 
-**DISCLAIMER: For educational/informational purposes only. Not financial advice.**
+**DISCLAIMER: For educational and informational purposes only. Not financial, tax, or legal advice. Consult a licensed Steuerberater, Finanzberater, or Rechtsanwalt before making major financial decisions. All projections rely on assumptions that may not hold.**
 
-## Purpose
+## When to Run
 
-Help the user make better financial decisions by modeling two paths side-by-side over a 10-year horizon. Surfaces total cost, opportunity cost, risk, and a clear recommendation with reasoning.
-
-## When To Trigger
-
+- User asks "soll ich kaufen oder mieten?" or any rent-vs-buy question in a German city
+- User asks "GKV oder PKV — was lohnt sich für mich?"
+- User wants to compare an ETF against an actively managed fund (Fonds)
+- User asks whether to lease or buy (finance/bar) a car in Germany
+- User asks "should I X or Y?" where both are financial choices with German context
 - User types `/finance compare <scenario1> <scenario2>`
-- User asks "should I X or Y?" where both are financial choices
-- User is weighing a major decision: housing, job, debt, investing, retirement vehicle, vehicle purchase, education
 
-## Supported Scenario Pairs
+## Data Collection
 
-The skill handles any two financial paths. Common pairs:
+Ask only what is needed for the chosen scenario. Identify the comparison type first, then collect the relevant inputs.
 
-| Decision | Scenario A | Scenario B |
-|----------|------------|------------|
-| Housing | Buy home | Continue renting |
-| Career | Take new job ($X salary) | Stay current job |
-| Debt strategy | Pay off mortgage early | Invest the extra cash |
-| Retirement vehicle | Roth IRA | Traditional IRA / 401k |
-| Vehicle | Buy new car | Lease |
-| Vehicle | Buy used cash | Finance new |
-| Education | Graduate degree | Stay working |
-| Geographic | Move to lower-cost city | Stay in current city |
-| Business | W-2 employment | Self-employment / 1099 |
-| Investing | Pay down debt | Invest in index funds |
+**Step 1 — What are they comparing?**
 
-## Required Inputs
+| Code | Comparison |
+|------|-----------|
+| RvB | Mieten vs Kaufen (rent vs buy) |
+| GvP | GKV vs PKV |
+| EvF | ETF vs aktiv gemanagter Fonds |
+| LvK | Auto: Leasing vs Kauf (Finanzierung oder bar) |
+| OTH | Other — describe both options |
 
-Ask the user to specify:
+**Step 2 — Scenario-specific inputs**
 
-1. **The two scenarios** (one sentence each)
-2. **Time horizon** (default 10 years; some decisions warrant 20-30)
-3. **Key financial assumptions per scenario:**
-   - Initial cost / down payment
-   - Recurring monthly cost
-   - Expected appreciation/return rate
-   - Tax treatment
-   - End-state value (if applicable: home equity, vehicle value, account balance)
-4. **User's marginal tax rate** (for tax-aware comparisons)
-5. **User's discount rate** (default: 7% — long-run S&P 500 real return)
+**For Mieten vs Kaufen (RvB):**
+- Kaufpreis der Immobilie (€)
+- Equivalent Kaltmiete for the same property (€/month)
+- Bundesland (required for Grunderwerbsteuer)
+- Available down payment / Eigenkapital (€)
+- Planned tenure / Wohndauer (years)
+- Current mortgage rate offer if known (otherwise use 3.5–4.5% range from shared context)
+- Is a Makler involved? (affects buyer's Maklercourtage)
 
-If user doesn't know assumptions, use reasonable defaults and label them clearly:
-- Home appreciation: 3.5%/yr
-- Rent inflation: 3%/yr
-- Stock market real return: 7%/yr
-- Bond real return: 2%/yr
-- Inflation: 3%/yr
-- Mortgage rate: current market (ask user or use 7% as 2026 default)
-- Property tax: 1.1% of home value/yr
-- Maintenance: 1% of home value/yr
-- Insurance: 0.5% of home value/yr
+**For GKV vs PKV:**
+- Annual gross income / Jahresbruttolohn (€) — must exceed JAEG €73,800 to be PKV-eligible
+- Age (Alter)
+- Health status (gut, Vorerkrankungen?)
+- Family situation: Kinder? Ehepartner berufstätig oder nicht?
+- Employment type: Angestellte/r or Selbstständige/r?
+- PKV offer already received? (monthly premium, Leistungsniveau)
 
-## Calculation Framework
+**For ETF vs aktiv gemanagter Fonds (EvF):**
+- Current fund name and ISIN
+- Current fund TER (%)
+- Current fund Ausgabeaufschlag (%)
+- Fund performance gross over 5–10 years (if available)
+- Comparison ETF (or use iShares MSCI World SWDA as default)
+- Investment amount and horizon (€, years)
 
-For each scenario, compute year-by-year:
+**For Auto: Leasing vs Kauf (LvK):**
+- Fahrzeugwert / Listenpreis (€)
+- Leasingrate per month (€) and Sonderzahlung upfront (€)
+- Laufzeit (months) and Restwert at end (€)
+- Kilometergrenze per year and penalty per excess km (€/km)
+- Alternative: cash purchase available? Or financing (Effektivzins, Laufzeit)?
+- Usage: private only, or partly business (>50% business triggers 1%-Methode / Fahrtenbuch)
 
-1. **Cash outflow** — All money leaving (down payment, monthly costs, taxes)
-2. **Cash inflow / equity buildup** — Principal paydown, appreciation, investment returns
-3. **Net worth impact** — End-state value minus cumulative cash spent
-4. **Opportunity cost** — What would the cash outflows have earned if invested at 7%?
+## Comparison Framework
 
-### Total Cost (10-year)
+Before analysis, read `.claude/skills/shared/german-context.md` for German real estate costs, tax rates, and benchmarks.
+
+---
+
+### 1. Mieten vs Kaufen (Rent vs Buy)
+
+This is the most consequential comparison for most German clients. Germany has one of the lowest homeownership rates in the EU (~45%); renting long-term is a legitimate and often financially rational choice.
+
+#### Key metric: Preis-Miet-Verhältnis (P/M-Verhältnis)
+
 ```
-total_cost = sum(annual_cash_outflow) - end_state_asset_value
+P/M-Verhältnis = Kaufpreis ÷ (Kaltmiete × 12)
 ```
 
-### Opportunity Cost
+This is the price-to-rent ratio expressed in years of rent. It is the primary filter before detailed modelling.
+
+**German city benchmarks (2026, approximate):**
+
+| City | Typical P/M range | Interpretation |
+|------|------------------|----------------|
+| München | 38–50× | Almost always better to rent financially |
+| Hamburg | 30–38× | Renting favoured; buying needs long horizon |
+| Berlin | 28–38× | Renting favoured in most districts |
+| Frankfurt | 28–35× | Renting favoured |
+| Köln | 25–32× | Borderline; depends on horizon and rate |
+| Düsseldorf | 24–30× | Borderline |
+| Smaller cities, rural | 15–25× | Buying often makes sense |
+
+**Rule of thumb:**
+- P/M > 30 and planned tenure < 10 years → renting almost always financially superior
+- P/M < 20 and planned tenure > 10 years → buying often makes financial sense
+- P/M 20–30 → detailed break-even modelling required
+
+#### Buy-side costs
+
+**One-off Kaufnebenkosten (non-recoverable at purchase):**
+
+| Cost | Rate | Notes |
+|------|------|-------|
+| Grunderwerbsteuer | BY 3.5% / HH 4.5% / BE, HB, NI, SN 5.0% / BW, HE, SL, ST 5.0% / BB, MV, NW, RP, SA, SH, TH 6.5% | Applied to Kaufpreis |
+| Notar + Grundbucheintrag | ~1.5–2% of Kaufpreis | Mandatory |
+| Maklercourtage (buyer share) | ~1.785% incl. MwSt | Only if Makler involved; 50/50 split since Dec 2020 |
+| **Total Kaufnebenkosten** | **~7–12%** | Varies by Bundesland and Makler involvement |
+
+These costs are sunk immediately and must be recouped through appreciation or rent savings before the purchase breaks even.
+
+**Ongoing monthly buy costs:**
+
+| Cost | Estimate | Notes |
+|------|----------|-------|
+| Annuität (Zins + Tilgung) | From mortgage offer | Sollzins 3–4.5% range; use shared context |
+| Grundsteuer | ~€100–300/month for typical apartment | Highly variable; reform values in effect 2025 |
+| Hausgeld / WEG-Rücklage | ~€2–4/m² monthly | For Eigentumswohnung in WEG |
+| Instandhaltungsrücklage (self-managed house) | ~€10–15/m²/year | Spread monthly |
+
+**Tax note for primary residence:** Mortgage interest is NOT tax-deductible for a primary residence (Eigennutzung). No equivalent to a mortgage interest deduction exists in Germany. Do not include this in any calculation.
+
+#### Rent-side costs
+
+| Cost | Estimate |
+|------|----------|
+| Kaltmiete | User-provided |
+| Betriebskosten / Nebenkosten | ~€2–3/m² monthly (heating, water, Müll, Hausmeister) |
+
+**Opportunity cost of capital:** The down payment and Kaufnebenkosten not spent on buying can be invested. Use 7% real return (MSCI World ETF long-run assumption) as the opportunity cost rate. This is the most important variable that favours renting in high-P/M cities.
+
+#### Break-even analysis
+
+Model year-by-year:
+1. Cumulative cost of buying (Kaufnebenkosten + monthly buy costs − equity buildup from Tilgung)
+2. Cumulative cost of renting + opportunity cost of invested capital foregone
+3. Estimate German property appreciation (conservative: 2–3% real in most cities; do not assume higher without local data)
+4. Break-even year = year when net-worth position of buyer equals or exceeds that of renter
+
+Present as: "At current assumptions, buying breaks even at year N. If you plan to stay fewer than N years, renting is financially superior."
+
+#### Sensitivity table for Mieten vs Kaufen
+
+| Assumption change | Effect on break-even |
+|-------------------|---------------------|
+| Mortgage rate rises 1% | Break-even shifts ~2–3 years later |
+| Property appreciates 0% real | Break-even shifts 5–8 years later |
+| Rent inflation 3%/yr | Favours buying (rent costs grow faster) |
+| Investment return drops to 4% | Favours buying (opportunity cost falls) |
+| Tenure < 7 years | Almost always favours renting given Kaufnebenkosten |
+
+---
+
+### 2. GKV vs PKV
+
+**Eligibility gate:** PKV is only available to Angestellte earning above the JAEG (€73,800/year gross in 2026). Confirm this first. Beamte and Selbstständige have different rules.
+
+**GKV cost:**
+- Rate: 14.6% base + ~1.7% Zusatzbeitrag = ~16.3% total (employee share ~8.15%)
+- Capped at BBG West: €96,600/year → max employee GKV contribution ~€7,870/year (~€656/month)
+- Non-working spouse and children covered for free under Familienversicherung
+- Minimum GKV contribution base for voluntarily insured: €1,178/month
+
+**PKV cost:**
+- Depends on age, health, and chosen Tarif
+- Young, healthy, single: ~€300–600/month = €3,600–7,200/year — often cheaper than GKV contribution at high income
+- Each family member requires own policy (no Familienversicherung)
+- Premiums increase significantly with age and claims history
+- Beitragsrückerstattung available in some Tarife for claim-free years
+
+**Key structural differences:**
+
+| Factor | GKV | PKV |
+|--------|-----|-----|
+| Premium basis | Income-linked (capped at BBG) | Risk-based (age, health, Tarif) |
+| Family coverage | Free for non-working spouse and children | Separate policy per person |
+| Leistungsumfang | Standardised, lower | Customisable, typically better |
+| Rückkehr zu GKV | Possible before 55 if income drops below JAEG | Extremely difficult after 55 |
+| Altersrückstellungen | None | Built into PKV premium; partially portable |
+| Beitragsanpassungen | Follows political decisions | Can rise substantially with age/inflation |
+
+**Verdict framework:**
+- Young, healthy, single, high income, no plans for children → PKV may be cheaper short-term; model premium trajectory to age 67
+- Family, children, or non-working partner → GKV almost always wins due to Familienversicherung savings
+- Over 40 or with Vorerkrankungen → GKV usually superior; PKV premiums accelerate
+- Approaching 55 without clear GKV re-entry path → factor in lock-in risk explicitly
+
+**Always model:** total lifetime premium trajectory to Rentenalter (67), including projected premium increases of ~4–6%/year in PKV.
+
+---
+
+### 3. ETF vs aktiv gemanagter Fonds
+
+**Cost comparison:**
+
+| Cost item | Active fund (typical) | UCITS ETF (typical) |
+|-----------|----------------------|---------------------|
+| TER | 1.5–2.5%/year | 0.05–0.30%/year |
+| Ausgabeaufschlag | 3–5% upfront | 0% (via broker) |
+| Transaction cost | Included in spread | Broker fee or Sparplan rate |
+
+**Compounding effect of TER difference (illustrative):**
+
+€10,000 invested at 7% gross annual return over 20 years:
+- ETF at 0.20% TER → net return ~6.80% → ~€36,200
+- Active fund at 1.80% TER → net return ~5.20% → ~€27,700
+- Difference: ~€8,500 (~24% less wealth from the active fund)
+
+Scale this to the user's actual investment amount and horizon.
+
+**Performance evidence:** Per SPIVA Europe Reports, 80–90% of actively managed equity funds underperform their benchmark index after fees over 10-year periods. This is a structural headwind for active funds.
+
+**German tax treatment is identical** for both: Abgeltungsteuer 25% + Soli (effective ~26.375%), with 30% Teilfreistellung on equity funds and equity ETFs. Vorabpauschale applies to accumulating funds; broker handles automatically.
+
+**Verdict:** For long-term wealth building (horizon ≥ 10 years), low-cost UCITS ETFs (Ireland or Luxembourg domicile) outperform most active funds after costs for most investors. The burden of proof is on the active fund to demonstrate consistent alpha net of fees.
+
+**Reference ETFs from shared context:** iShares MSCI World SWDA (TER 0.20%), Xtrackers MSCI World XDWD (TER 0.13%), Vanguard FTSE All-World VWRL distributing (TER 0.22%).
+
+---
+
+### 4. Auto: Leasing vs Finanzierung vs Barkauf
+
+**Leasing total cost:**
 ```
-opportunity_cost = FV(monthly_diff, 7%, 10yr) where monthly_diff = scenario_A_cost - scenario_B_cost
+Total Leasing Cost = (Leasingrate × Laufzeit) + Sonderzahlung
 ```
+At end: nothing owned. Car returned. Additional charges for Kilometerüberschreitung (typically €0.10–0.20/km over limit) and Verschleißschäden.
 
-### Risk Profile
-Score each scenario 1-10 on:
-- **Liquidity risk** — Can you get your money out?
-- **Concentration risk** — Is too much net worth tied up here?
-- **Income/job risk** — Does it require stable employment?
-- **Market risk** — Sensitive to interest rates, housing market, equity market?
-- **Reversibility** — Can you undo this decision easily?
+**Finanzierung (Ratenkredit) total cost:**
+```
+Total Financing Cost = Kaufpreis + Total Interest (Effektivzins × Laufzeit)
+```
+At end: car owned, has residual value.
 
-## Output Format
+**Barkauf total cost:**
+```
+Total Cash Purchase Cost = Kaufpreis − Opportunity Cost of Capital
+Opportunity Cost = Kaufpreis × (investment return rate) × years
+```
+Cheapest in nominal terms if capital is available and not needed for higher-return uses.
 
-Save to `FINANCE-COMPARE.md` in current working directory.
+**Key comparison metric:** total-cost-of-ownership over Laufzeit, then divide by months for monthly equivalent.
+
+**German tax consideration (business use only):**
+- If car used >50% for business: can apply 1%-Methode (1% of Listenpreis/month as taxable benefit) or Fahrtenbuch
+- For purely private use: no tax deduction; this variable is irrelevant
+- Elektroauto: 0.25%-Methode if Listenpreis ≤ €70,000 (check current BMF guidance)
+
+**Verdict framework:**
+- Private use, capital available: Barkauf or low-Effektivzins Finanzierung almost always cheapest
+- Leasing is rational when: new car every 3 years is a preference, business deduction applies, or working capital must be preserved
+- Never compare Leasingrate alone to loan payment — this ignores that leasing builds zero equity
+
+---
+
+## Output
+
+Save to `FINANCE-COMPARE.md` in the current working directory.
 
 ```markdown
-# Financial Scenario Comparison
+# Finanzentscheidung: [Scenario A] vs [Scenario B]
 
-**Decision:** [One-sentence framing]
-**Time Horizon:** [X] years
-**Generated:** [Date]
+**Vergleich:** [One-sentence framing in English]
+**Zeithorizont:** [X] Jahre
+**Erstellt:** [Date]
+**Bundesland / Standort:** [if applicable]
 
-> **DISCLAIMER:** For educational/informational purposes only. Not financial advice.
+> **DISCLAIMER:** For educational and informational purposes only. Not financial, tax, or legal advice.
 
 ---
 
 ## Executive Summary
 
-**Recommendation:** [Scenario A or B] — [one-sentence reason]
+**Empfehlung:** [Option A or B] — [one-sentence reason]
 **Confidence:** [High / Medium / Low]
-**Key Driver:** [The single number that tips the decision]
-
-## Scenario A: [Name]
-
-**Assumptions:**
-- [List each assumption with value]
-
-**10-Year Projection:**
-| Year | Cash Out | Equity/Value | Cumulative Net |
-|------|----------|--------------|----------------|
-| 1    | $X       | $Y           | $Z             |
-| 5    | $X       | $Y           | $Z             |
-| 10   | $X       | $Y           | $Z             |
-
-**Total Cost (10yr):** $X
-**End-State Value:** $Y
-**Net Position:** $Z
-
-## Scenario B: [Name]
-
-[Same structure as A]
-
-## Side-by-Side
-
-| Metric | Scenario A | Scenario B | Winner |
-|--------|------------|------------|--------|
-| Total Cost (10yr) | $X | $X | A/B |
-| End-State Value | $X | $X | A/B |
-| Net Position (10yr) | $X | $X | A/B |
-| Monthly Cash Flow | $X | $X | A/B |
-| Opportunity Cost | $X | $X | A/B |
-| Tax Drag (annual) | $X | $X | A/B |
-| Liquidity (1-10) | X | X | A/B |
-| Concentration Risk | X | X | A/B |
-| Reversibility | X | X | A/B |
-
-## Opportunity Cost Analysis
-
-If the higher-cost scenario costs $X more per month, investing that difference at 7% real return over 10 years would compound to **$Y**.
-
-That is the true cost of choosing [scenario].
-
-## Risk Profile
-
-**Scenario A Risks:**
-- [Specific risk + magnitude]
-- [Specific risk + magnitude]
-
-**Scenario B Risks:**
-- [Specific risk + magnitude]
-- [Specific risk + magnitude]
-
-## Break-Even Analysis
-
-Scenario A becomes cheaper than B at **year [N]** if [assumption holds].
-Scenario A becomes WORSE than B if [trigger condition].
-
-## Sensitivity Analysis
-
-What changes the answer?
-
-| If This Changes | Recommendation Flips To |
-|-----------------|-------------------------|
-| Stock returns < 4%/yr | [Scenario] |
-| Home appreciation < 2%/yr | [Scenario] |
-| You move within 5 years | [Scenario] |
-| Tax bracket changes | [Scenario] |
-
-## Recommendation
-
-**Choose [Scenario A or B].**
-
-**Reasoning:**
-1. [Primary reason with number]
-2. [Secondary reason]
-3. [Tie-breaker]
-
-**Caveats:**
-- [What would change this]
-- [Personal preference factor]
-
-## Action Steps This Week
-
-1. [Specific concrete action]
-2. [Specific concrete action]
-3. [Specific concrete action]
+**Entscheidender Faktor:** [The single metric that tips the decision]
 
 ---
 
-**DISCLAIMER:** For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor, CPA, or tax professional before making major financial decisions. All projections rely on assumptions that may not hold. Past performance does not guarantee future results.
+## Option A: [Name]
+
+**Annahmen:**
+- [List each assumption with value and source]
+
+**Kosten-Übersicht:**
+| Posten | Einmalig (€) | Monatlich (€) | Über [X] Jahre (€) |
+|--------|-------------|--------------|-------------------|
+| [Item] | | | |
+
+**Endvermögen nach [X] Jahren:** €[X]
+**Gesamtkosten nach [X] Jahren:** €[X]
+**Nettoposition:** €[X]
+
+---
+
+## Option B: [Name]
+
+[Same structure as Option A]
+
+---
+
+## Direktvergleich
+
+| Kennzahl | Option A | Option B | Besser |
+|----------|----------|----------|--------|
+| Gesamtkosten ([X] Jahre) | €X | €X | A/B |
+| Endvermögen / Restwert | €X | €X | A/B |
+| Nettoposition | €X | €X | A/B |
+| Monatliche Belastung | €X | €X | A/B |
+| Opportunitätskosten | €X | €X | A/B |
+| Steuerliche Belastung | €X | €X | A/B |
+| Liquidität (1–10) | X | X | A/B |
+| Konzentrationsrisiko | X | X | A/B |
+| Reversibilität | X | X | A/B |
+
+---
+
+## Opportunitätskostenanalyse
+
+[If Option A costs €X more per month than Option B, investing that difference at 7% real return over N years compounds to €Y. That is the true cost of choosing Option A.]
+
+---
+
+## Break-Even-Analyse
+
+[Option A becomes cheaper than Option B at year N, assuming [key assumption]. Break-even shifts to year M if [sensitivity condition].]
+
+---
+
+## Sensitivitätsanalyse
+
+| Wenn sich dies ändert | Empfehlung ändert sich zu |
+|-----------------------|--------------------------|
+| [Assumption change] | [Option] |
+| [Assumption change] | [Option] |
+| [Assumption change] | [Option] |
+
+---
+
+## Empfehlung
+
+**Wähle [Option A oder B].**
+
+**Begründung:**
+1. [Primary reason with number]
+2. [Secondary reason]
+3. [Tie-breaker or non-financial factor]
+
+**Caveats:**
+- [What would change this recommendation]
+- [Non-financial factors the model cannot capture: lifestyle, Lebensplanung, job security, family plans]
+- [Model limitations and assumptions that may not hold]
+
+---
+
+## Nächste Schritte
+
+1. [Specific, concrete action — e.g., "Request personalised mortgage offer from Interhyp or Dr. Klein"]
+2. [Specific, concrete action]
+3. [Specific, concrete action]
+
+---
+
+**DISCLAIMER:** For educational and informational purposes only. Not financial, tax, or legal advice. Consult a licensed Steuerberater, unabhängiger Finanzberater (with Honorarberatung), or Rechtsanwalt before making major financial decisions. All projections rely on assumptions that may not hold.
 ```
 
-## Common Pitfalls To Avoid
+## Quality Standards
 
-- **Don't ignore taxes** — Roth vs Traditional flips entirely on future vs current tax rate
-- **Don't ignore transaction costs** — Buying a home incurs ~6% selling fees later
-- **Don't double-count appreciation** — If you assume 7% returns, don't also assume 7% home appreciation (housing is closer to 3-4% long run)
-- **Don't ignore behavioral factors** — Forced savings via mortgage may beat "invest the difference" if user won't actually invest it
-- **Don't assume linear costs** — Cars depreciate non-linearly; homes have lumpy maintenance
+- All monetary amounts in € (euros). No dollar amounts.
+- All cost rates sourced from `.claude/skills/shared/german-context.md` or labelled as estimates.
+- Grunderwerbsteuer must use the correct Bundesland rate — never a generic figure.
+- P/M-Verhältnis must be computed and stated explicitly for any Mieten vs Kaufen comparison.
+- Opportunity cost of down payment must be shown separately, not omitted.
+- For GKV vs PKV: confirm JAEG eligibility before modelling. Flag Familienversicherung implications clearly.
+- For ETF vs Fonds: show the compounding TER difference table at the user's actual investment amount.
+- Do not assume mortgage interest is tax-deductible for primary residence (it is not in Germany).
+- Do not reference HOA fees (no German equivalent; use Hausgeld / WEG-Rücklage instead).
+- State which assumptions are most uncertain and how sensitive the recommendation is to them.
+- Label the confidence level (High / Medium / Low) based on data quality and scenario reversibility.
 
-## Scenario-Specific Templates
+## Handoff
 
-### Buy vs Rent
-Track: mortgage P&I, property tax, insurance, maintenance, opportunity cost of down payment, vs rent + investing the down payment.
-Key flip: years lived in home. Under 5 years usually favors rent.
-
-### Pay Off Mortgage vs Invest
-Compare: mortgage APR (after tax deduction) vs expected market return. If mortgage is 7% and expected return is 7%, the guaranteed return wins.
-
-### Roth vs Traditional
-Compare: current marginal tax rate vs expected retirement tax rate. Higher now → Traditional. Lower now → Roth.
-
-### New Job vs Stay
-Factor: salary delta, equity comp, retirement match, benefits cost difference, commute, career trajectory.
-
-**DISCLAIMER: For educational/informational purposes only. Not financial advice.**
+After saving FINANCE-COMPARE.md, summarise in 3–5 bullet points:
+- The recommended option and the single most important reason
+- The break-even year (for RvB) or primary cost difference
+- The biggest assumption the recommendation depends on
+- One non-financial factor the model cannot capture
+- Suggested next concrete action (e.g., get mortgage pre-approval at Interhyp, request PKV offer from independent Makler, switch fund at broker)
