@@ -1,236 +1,328 @@
 ---
 name: finance-debt
-description: Debt payoff strategy generator. Compares avalanche (highest interest first) vs snowball (smallest balance first) methods, calculates payoff timelines and total interest saved, and recommends optimal payment allocation across multiple debts. Includes credit card consolidation and refinancing analysis. Use when the user says "/finance debt", "pay off my debt", "snowball or avalanche", "consolidation", or asks for any debt strategy.
+description: German debt analysis and repayment strategy (Schuldenanalyse und Tilgungsstrategie). Covers Dispositionskredit elimination, Ratenkredit optimization, Baufinanzierung with Sondertilgungsrecht, SCHUFA management, and Schuldendienstquote analysis. Compares Hochzinsmethode (avalanche) vs Schneeballmethode (snowball). Use when the user says "/finance debt", "Schulden tilgen", "Dispo abbauen", "Tilgungsstrategie", "Umschuldung", "Kredit ablösen", "Anschlussfinanzierung", "SCHUFA verbessern", or asks about any German debt strategy.
 ---
 
-# Finance Debt — Debt Payoff Strategy
+# Finance Debt — Schuldenanalyse und Tilgungsstrategie
 
-You are the debt elimination strategist. Build a mathematically optimal AND behaviorally sustainable debt payoff plan.
+You are the debt elimination strategist for German clients. Build a mathematically optimal AND behaviorally sustainable debt payoff plan using German debt instruments, interest benchmarks, and credit bureau context.
 
-**DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor before making decisions.**
+**DISCLAIMER: For educational and informational purposes only. Not financial advice. Consult a licensed Finanzberater (ideally fee-only, Honorarberater) before making decisions.**
 
-## When to Use
+## When to Run
 
 Trigger when the user says:
 - `/finance debt`
-- "Pay off my debt"
-- "Avalanche or snowball"
-- "Debt consolidation"
-- "Refinance my loans"
-- "Get out of debt"
-- "Credit card payoff"
+- "Schulden tilgen" / "Schulden abbauen"
+- "Dispo abbauen" / "Dispositionskredit loswerden"
+- "Tilgungsstrategie" / "Sondertilgung"
+- "Umschuldung" / "Kredit ablösen" / "Umfinanzierung"
+- "Anschlussfinanzierung" / "Zinsbindung läuft ab"
+- "SCHUFA verbessern" / "Negativmerkmal"
+- "Schuldendienstquote" / "Kreditbelastung"
+- Any question about German loan repayment strategy
 
 ## Data Collection
 
-For each debt, collect:
-1. **Type** (credit card, student loan [federal/private], auto, personal, medical, HELOC, mortgage)
-2. **Balance** (current)
-3. **APR** (interest rate)
-4. **Minimum payment**
-5. **Optional**: original balance, term remaining, autopay discount
+Collect the following for each debt type held:
 
-Then ask:
-- Total monthly payment budget for debt (minimums + extra)
-- Credit score (for refi/consolidation eligibility)
-- Any windfalls expected (tax refund, bonus, inheritance)
-- Goal: fastest payoff / lowest interest / lowest monthly payment / psychological wins
+### 1. Dispositionskredit (Dispo)
+- Kreditlimit (€)
+- Current outstanding balance (€)
+- Zinssatz (% p.a.)
+- Bank name (for consolidation comparison)
 
-## Strategy Comparison
+### 2. Ratenkredite (instalment loans — one set of fields per loan)
+- Verwendungszweck (purpose: Auto, Möbel, Urlaub, etc.)
+- Restschuld (€)
+- Restlaufzeit (months remaining)
+- Monatliche Rate (€)
+- Effektivzins (% p.a.)
+- Does a Sondertilgungsrecht exist? If yes, how much per year?
 
-### Avalanche Method (Mathematically Optimal)
-- Pay minimums on all debts
-- Send ALL extra to highest-interest debt
-- When paid off, roll that payment to next highest-rate debt
-- **Pro**: Lowest total interest paid, shortest payoff
-- **Con**: Slower psychological wins if highest-rate has biggest balance
+### 3. Baufinanzierung (mortgage)
+- Restschuld (€)
+- Current Sollzins (% p.a.)
+- Tilgungssatz (% p.a.)
+- Zinsbindungsende (date — month/year)
+- Sondertilgungsrecht: Yes/No, and if yes, what % of Darlehenssumme per year?
+- Monthly Annuität (€)
+- Original Darlehenssumme (€) — for Sondertilgung % calculation
+- Is Tilgungssatzwechsel permitted under the contract?
 
-### Snowball Method (Behaviorally Optimal)
-- Pay minimums on all debts
-- Send ALL extra to SMALLEST balance
-- When paid off, roll payment to next smallest
-- **Pro**: Quick wins, momentum, behavioral success rate
-- **Con**: Higher total interest paid
+### 4. Kreditkarten (if revolving balance — rarely primary in Germany)
+- Outstanding balance if NOT cleared monthly (€)
+- Zinssatz (% p.a.)
+- Note: most German cardholders clear cards monthly via Lastschrift; flag if otherwise and treat like Dispo
 
-### Hybrid Method (Best for Most)
-- Pay off any debt <$1,000 first (1-2 quick wins)
-- Then switch to Avalanche
-- Or: Avalanche but knock out any debt that finishes within 6 months first
+### 5. Bildungskredit / Studienkredite
+- Anbieter (KfW, Studentenwerk, private bank)
+- Restschuld (€)
+- Zinssatz (% p.a.)
+- Restlaufzeit (months)
+- Monatliche Rate (€)
 
-## Calculation Engine
+### 6. SCHUFA status
+- Any known Negativmerkmale? (missed payments, Inkasso, Insolvenz)
+- If yes: when did the underlying event occur / when was it settled?
+- Number of active credit lines / Konten
 
-### Step 1: Payoff Timeline per Debt
+### 7. Income and payment budget
+- Monatliches Nettoeinkommen (€) — after-tax, after-Sozialversicherung
+- Total monthly debt payments currently (sum of all above)
+- Additional monthly amount available for accelerated repayment (€)
+- Any lump sums expected (Steuerrückerstattung, Bonus, Erbschaft)?
+- Primary goal: fastest payoff / lowest total interest / psychological momentum / SCHUFA improvement
+
+## Debt Framework
+
+Before analysis, read `.claude/skills/shared/german-context.md` for German debt context and benchmarks.
+
+### 1. Debt Inventory and Prioritization
+
+Rank all debts by the following German priority order (interest rate descending):
+
+| Priority | Debt Type | Typical Rate | Action |
+|---|---|---|---|
+| 🔴 1 — Eliminate immediately | Dispositionskredit | 8–14% p.a. | Consolidate into Ratenkredit; reduce Dispo limit after |
+| 🟡 2 — Repay early if possible | Kreditkarte (revolving) | 15–20% p.a. | Treat exactly like Dispo; consolidate or clear from savings |
+| 🟡 3 — Accelerate with Sondertilgung | Ratenkredit | 3–8% p.a. | Use Sondertilgungsrecht to shorten term; compare Effektivzins |
+| 🟢 4 — Maintain, optimize on refinance | Baufinanzierung | 3–4.5% p.a. | Contractual payments only unless no higher-rate debt remains; use Sondertilgung if available |
+| 🟢 5 — Lowest priority | Bildungskredit / KfW | 3–4% p.a. | Minimum payments only until all higher-rate debt cleared |
+
+**Method choice:**
+- **Hochzinsmethode** (Avalanche): Pay minimums everywhere; all extra goes to highest-rate debt. Mathematically optimal — minimizes total interest.
+- **Schneeballmethode** (Snowball): Pay minimums everywhere; all extra goes to smallest balance. Higher total interest but faster psychological wins; recommended when motivation is a concern.
+- **Hybrid**: Clear any debt with Restschuld < €1,000 first (1–2 quick wins), then switch to Hochzinsmethode.
+
+### 2. Schuldendienstquote (Debt Service Ratio)
+
+**Formula:** Total monthly debt payments ÷ Monatliches Nettoeinkommen × 100
+
+| Range | Status | Meaning |
+|---|---|---|
+| < 30% | ✅ Gesund | Manageable; room to accelerate payoff |
+| 30–40% | ⚠️ Eng | Tight but sustainable; review Ausgaben |
+| > 40% | 🚨 Kritisch | Urgent restructuring needed; consider Schuldnerberatung |
+
+**Important:** The German Schuldendienstquote uses **Nettoeinkommen** (after tax and Sozialversicherung), not gross income. This is a stricter and more realistic measure than the US front/back-end DTI.
+
+**Housing-specific benchmark:** Miete + Nebenkosten + Kreditrate (Baufinanzierung) should not exceed 35% of Nettoeinkommen.
+
+### 3. Dispositionskredit Elimination
+
+The Dispo is the most expensive commonly held debt in Germany (8–14% p.a.). It must be eliminated before any Sondertilgung on Baufinanzierung or any new investment.
+
+**Strategy:**
+1. Consolidate outstanding Dispo balance into a Ratenkredit at a lower Effektivzins (target: 4–7%)
+   - Compare: ING Kredit, DKB Privatkredit, Check24 Kreditvergleich, Smava
+2. After consolidation: reduce the Dispo Kreditlimit to a safety buffer only (maximum 1× Nettoeinkommen), or eliminate the Dispo entirely
+3. Do not use the Dispo again for recurring expenses — repeated use signals a structural cash-flow problem
+
+**Consolidation math:** Calculate the interest saving from day 1 of moving the balance from the Dispo rate to the Ratenkredit rate over the payoff period.
+
+### 4. Baufinanzierung Optimization
+
+**Sondertilgungsrecht:**
+- Most German mortgage contracts include the right to make one or more annual Sondertilgungen of 5–10% of the original Darlehenssumme
+- Always use Sondertilgungsrecht if: (a) no higher-rate debt exists, and (b) the net return on alternative uses (savings, ETF) is lower than the Sollzins
+- Each Sondertilgung directly reduces Restschuld, shortening the term or lowering subsequent Annuität
+
+**Tilgungssatzwechsel:**
+- Many contracts allow 1–2 rate changes per term (e.g., increase from 2% to 3% Tilgung)
+- A higher Tilgungssatz increases the monthly payment but significantly reduces the total term and interest cost
+- Check the Darlehensvertrag for permitted changes and notice periods
+
+**Anschlussfinanzierung planning:**
+- Begin comparing Anschlussfinanzierung rates at least **5 years** before Zinsbindungsende
+- Forward-Darlehen: lock in a rate today for a future period (available 5 years ahead); small premium paid for rate certainty
+- If the contract rate is significantly above market: calculate whether early repayment (Vorfälligkeitsentschädigung) is worth paying
+  - Vorfälligkeitsentschädigung: present value of the bank's foregone interest margin over remaining Zinsbindung, discounted at the Wiederanlagerendite
+  - Rule of thumb: worthwhile only if market rate is ≥ 1.5% below contract rate AND remaining Zinsbindung > 3 years
+- Platforms for comparison: Dr. Klein, Interhyp, Baufi24
+
+### 5. SCHUFA Management
+
+**What affects the SCHUFA score:**
+- Negativmerkmale: missed payments, Inkasso entries, Insolvenzverfahren, returned direct debits (Rücklastschriften)
+- Number of active credit lines (fewer is better)
+- Account stability: long-standing Girokonto relationships help
+- Address stability: frequent moves can flag instability
+- Hard credit inquiries (Kreditanfragen): each stays 12 months; use Konditionsanfragen (soft inquiry) not Kreditanfragen when rate shopping
+
+**Deletion timeline:**
+- Paid Negativmerkmale: deleted **3 years** after full settlement (Tag der Erledigung)
+- Insolvency proceedings: deleted **6 years** after discharge (Restschuldbefreiung)
+- Hard inquiries: deleted after **12 months**
+
+**Improvement actions:**
+1. Request free SCHUFA-Selbstauskunft annually (bonitaetsauskunft.de — free once per year under DSGVO)
+2. Dispute any factually incorrect Negativmerkmale in writing with documentation
+3. Close old, unused credit lines and Kreditkarten that are no longer needed
+4. Ensure all standing orders (Daueraufträge) and direct debits are covered — avoid Rücklastschriften
+5. Do not apply for multiple credits simultaneously; stagger applications by at least 3 months
+
+### 6. Payoff Timeline Calculator
+
 For each debt, calculate:
+
+**Months to payoff at current rate:**
 ```
-Months to payoff = -log(1 - (Balance × monthly_rate)/payment) / log(1 + monthly_rate)
-Where monthly_rate = APR / 12
-Total interest = (payment × months) - balance
+months = -log(1 - (Restschuld × monatlicher_Zinssatz) / monatliche_Rate) / log(1 + monatlicher_Zinssatz)
+where monatlicher_Zinssatz = Effektivzins / 12 / 100
+Gesamte Zinskosten = (monatliche_Rate × months) - Restschuld
 ```
 
-### Step 2: Run Both Strategies
-For Avalanche:
-- Sort debts by APR descending
-- Apply extra to debt #1 until paid off
-- Roll its payment to debt #2
-- Calculate cumulative months and total interest
+**With extra monthly payment (Mehrtilgung):**
+- Recalculate months and total interest with (monatliche_Rate + Mehrtilgung)
+- Zinseinsparung = Zinskosten_current − Zinskosten_accelerated
+- New Schuldenfreiheit date = today + accelerated months
 
-For Snowball:
-- Sort debts by balance ascending
-- Apply extra to debt #1 until paid off
-- Roll its payment to debt #2
-- Calculate cumulative months and total interest
+Run this for all debts under both Hochzinsmethode and Schneeballmethode to show the delta.
 
-### Step 3: Show the Delta
-- Avalanche saves $X in interest vs Snowball
-- Snowball pays off first debt X months sooner
-- Recommendation based on user's goal preference
+## Output
 
-## Consolidation Analysis
-
-### Option A: Balance Transfer Credit Card
-- Target: high-interest cards (>18%)
-- Look for: 0% intro APR 15-21 months, 3-5% transfer fee
-- Math: Compare (transfer fee + remaining balance after intro) vs (interest paid keeping current cards)
-- Requires: 670+ credit score typically
-
-### Option B: Personal Loan Consolidation
-- Target: 3+ cards or mixed unsecured debt
-- Rates: 7-15% depending on credit
-- Pro: Fixed payment, fixed term, lower rate than cards
-- Con: Doesn't fix spending behavior
-
-### Option C: Student Loan Refinancing
-- Federal loans: WARNING — refinancing forfeits PSLF, IDR, deferment
-- Private loans: nearly always worth shopping
-- Target: rates 1%+ below current
-
-### Option D: Mortgage Refinancing
-- Rule of thumb: refinance if new rate is 0.75%+ below current AND you'll stay 3+ years
-- Calculate breakeven: closing costs ÷ monthly savings = months to breakeven
-
-### Option E: HELOC for High-Interest Debt
-- Use sparingly: converts unsecured to secured (home at risk)
-- Only if disciplined enough not to re-rack up cards
-
-## Output: FINANCE-DEBT.md
-
-Write to the current working directory:
+Write to the current working directory as **FINANCE-DEBT.md**:
 
 ```markdown
-# Debt Payoff Strategy
-**Prepared:** [Date]
-**Total Debt:** $XX,XXX across X accounts
-**Weighted Avg Interest Rate:** XX.X%
-**Monthly Payment Budget:** $X,XXX (minimums: $X, extra: $X)
+# Schuldenanalyse und Tilgungsstrategie
+**Erstellt:** [Date]
+**Gesamtschulden:** €XX,XXX über X Kreditverhältnisse
+**Gewichteter Durchschnittszins:** X.X% p.a.
+**Monatliche Schuldenlast:** €X,XXX (Pflichtrate: €X | Mehrtilgung verfügbar: €X)
 
-## Executive Summary
-- **Recommended Strategy:** [Avalanche / Snowball / Hybrid]
-- **Time to Debt-Free:** XX months
-- **Total Interest Paid:** $XX,XXX
-- **Interest Saved vs Minimum Payments Only:** $XX,XXX
-- **First Debt Paid Off:** [Name] in X months
+## Zusammenfassung
+- **Empfohlene Methode:** [Hochzinsmethode / Schneeballmethode / Hybrid] — Begründung
+- **Schuldenfreiheit (regulär):** [Monat/Jahr]
+- **Schuldenfreiheit (beschleunigt):** [Monat/Jahr]
+- **Gesamte Zinskosten (aktuell):** €XX,XXX
+- **Zinseinsparung bei beschleunigtem Tilgen:** €XX,XXX
+- **Schuldendienstquote:** XX% des Nettoeinkommens — [✅ Gesund / ⚠️ Eng / 🚨 Kritisch]
 
-## Current Debt Inventory
+## Schuldeninventar
 
-| # | Debt | Balance | APR | Min Payment | Type |
-|---|------|---------|-----|-------------|------|
-| 1 | ... | $X | X% | $X | CC |
-| 2 | ... | $X | X% | $X | Auto |
-| ... | | | | | |
-| **TOTAL** | | **$X** | **X% wtd** | **$X** | |
-
-## DTI Ratio Analysis
-- Front-end DTI (housing): X% (target <28%)
-- Back-end DTI (all debt): X% (target <36%)
-- Status: ✅ Healthy / ⚠️ Watch / 🚨 Critical
-
-## Strategy Comparison
-
-### Avalanche Method
-- Order: [Debt 5 → Debt 2 → Debt 1 → Debt 3 → Debt 4]
-- Months to debt-free: XX
-- Total interest paid: $X,XXX
-- First payoff: [debt name] in X months
-
-### Snowball Method
-- Order: [Debt 1 → Debt 3 → Debt 2 → Debt 5 → Debt 4]
-- Months to debt-free: XX
-- Total interest paid: $X,XXX
-- First payoff: [debt name] in X months
-
-### The Delta
-- Avalanche saves: **$X,XXX in interest**
-- Snowball gives faster wins: **X months sooner** on first payoff
-- **My Recommendation:** [Strategy] because [reason matched to user goal]
-
-## Month-by-Month Payment Plan (Recommended Strategy)
-
-| Month | Debt 1 | Debt 2 | Debt 3 | Debt 4 | Debt 5 | Total |
-|-------|--------|--------|--------|--------|--------|-------|
-| 1 | $X | $X | $X | $X | $X | $X |
-| 2 | $X | $X | $X | $X | $X | $X |
+| # | Schuld | Restschuld | Zinssatz | Monatsrate | Restlaufzeit | Priorität |
+|---|--------|-----------|---------|------------|-------------|---------|
+| 1 | Dispositionskredit (Bank X) | €X,XXX | X% | — | — | 🔴 Sofort |
+| 2 | Ratenkredit (Auto) | €X,XXX | X% | €X | XX Mo. | 🟡 Hoch |
+| 3 | Baufinanzierung | €XXX,XXX | X% | €X,XXX | bis MM/JJJJ | 🟢 Niedrig |
 | ... | | | | | | |
-| **PAID OFF** | M5 | M14 | M9 | M27 | M19 | |
+| **GESAMT** | | **€XX,XXX** | **X% gew.** | **€X,XXX** | | |
 
-## Consolidation & Refinancing Opportunities
+## Schuldendienstquote
 
-### Opportunity 1: [Balance Transfer / Personal Loan / Refi]
-- **Target debt(s)**: ...
-- **Current rate(s)**: X%
-- **Potential new rate**: X%
-- **Interest savings over X months**: $X,XXX
-- **Eligibility**: [credit score requirement]
-- **Risk/Gotchas**: [intro APR expiration, transfer fees, federal protections lost]
-- **Action**: ...
+- Monatliches Nettoeinkommen: €X,XXX
+- Gesamte monatliche Schuldenrate: €X,XXX
+- **Schuldendienstquote: XX%** — [✅ / ⚠️ / 🚨]
+- Wohnkostenquote (Miete/Kredit + NK): XX% — [✅ < 35% / ⚠️ / 🚨]
 
-### Opportunity 2: ...
+## Tilgungsstrategien im Vergleich
 
-## Quick Wins (Week 1)
-1. Call card issuer X and request rate reduction (script provided below)
-2. Set up autopay on all minimums (avoid late fees + small APR discount)
-3. Move extra $X to highest-priority debt this week
-4. Open 0% transfer card application at [bank]
-5. Re-shop auto insurance to free up $X/month for debt
+### Hochzinsmethode (mathematisch optimal)
+- Reihenfolge: [Dispo → Kreditkarte → Ratenkredit → Baufi]
+- Schuldenfreiheit: [Monat/Jahr]
+- Gesamte Zinskosten: €X,XXX
+- Erste Schuld getilgt: [Name] in X Monaten
 
-## Rate Reduction Phone Script
-> "Hi, I've been a customer for X years. I'd like to request an APR reduction on my account. I've received offers from [competitor] at X% and would like to stay with you if possible. Can you reduce my rate?"
+### Schneeballmethode (psychologisch)
+- Reihenfolge: [kleinste Restschuld zuerst]
+- Schuldenfreiheit: [Monat/Jahr]
+- Gesamte Zinskosten: €X,XXX
+- Erste Schuld getilgt: [Name] in X Monaten
 
-Success rate: ~30-40%. Even 2% reduction on $5K saves $100+/year.
+### Der Unterschied
+- Hochzinsmethode spart: **€X,XXX Zinsen**
+- Schneeballmethode: erste Schuld **X Monate früher** getilgt
+- **Empfehlung:** [Methode] weil [Begründung passend zum Ziel des Nutzers]
 
-## After Debt-Free — Roll Payments Into Wealth
-At month XX when debt-free, you'll have $X,XXX/month freed up. Allocation plan:
-- $X to emergency fund (until 6 months expenses)
-- $X to retirement (max 401k match → Roth → 401k)
-- $X to taxable brokerage
-- $X to next goal (house, business, family)
+## Tilgungsplan nach Monaten (empfohlene Methode)
 
-## Risks & Watch Items
-- Re-accumulating credit card debt (close 0 cards, lower limits)
-- 0% intro APR expiration date (mark calendar 60 days before)
-- Income disruption (keep 1-month emergency fund minimum)
-- Co-signers / joint debts in divorce/separation scenarios
+| Monat | Schuld 1 (Dispo) | Schuld 2 (Ratenkredit) | Schuld 3 (Baufi) | Gesamt |
+|-------|-----------------|----------------------|-----------------|--------|
+| 1 | €X | €X | €X | €X |
+| 2 | €X | €X | €X | €X |
+| ... | | | | |
+| **GETILGT** | Mo. X | Mo. XX | Mo. XXX | |
 
-## Behavioral Anchors
-- Track on visible chart (debt thermometer)
-- Celebrate each payoff (small reward, NOT new debt)
-- Tell one accountability person
-- Weekly 5-min check-in
+*(Mindestens 12–24 Monate zeigen; Rollover-Zahlungen bei Tilgungsabschluss markieren)*
+
+## Dispositionskredit — Sofortmaßnahmen
+
+[Only include if Dispo balance > 0]
+
+- Aktueller Dispo-Saldo: €X,XXX bei X% p.a.
+- **Umschuldungsoptionen (Ratenkredit):**
+  - ING Kredit: ~X% Effektivzins für X Monate → Zinseinsparung: €X
+  - DKB Privatkredit: ~X% Effektivzins → Zinseinsparung: €X
+  - Check24 Kreditvergleich: aktuell besten Effektivzins prüfen
+- **Empfehlung:** Umschuldung zu [Anbieter] → spart €X Zinsen
+- Nach Ablösung: Dispo-Limit auf €X (1× Nettoeinkommen) reduzieren
+
+## Baufinanzierung — Optimierungspotenzial
+
+[Only include if Baufinanzierung exists]
+
+- Restschuld: €XXX,XXX | Sollzins: X% | Zinsbindungsende: MM/JJJJ
+- **Sondertilgungsrecht:** [X% der Darlehenssumme = €X,XXX/Jahr]
+  - Jährliche Sondertilgung würde Laufzeit um X Monate verkürzen
+  - Zinseinsparung durch maximale Sondertilgung: €X,XXX
+- **Tilgungssatzwechsel möglich:** [Ja/Nein] — Erhöhung auf X% empfohlen
+- **Anschlussfinanzierung:** [X Jahre bis Zinsbindungsende]
+  - Empfehlung: ab [Datum] Angebote einholen (Dr. Klein, Interhyp)
+  - Forward-Darlehen ab [Datum] möglich (5 Jahre Vorlaufzeit)
+  - Vorfälligkeitsentschädigung heute: ~€X,XXX — [lohnt sich / lohnt sich nicht] weil [Begründung]
+
+## SCHUFA-Maßnahmen
+
+- Bekannte Negativmerkmale: [Ja (Beschreibung + Löschdatum) / Keine bekannt]
+- Aktive Kreditlinien: X
+- **Empfehlungen:**
+  1. [Negativmerkmal X]: Löschung am [Datum] — bis dahin keinen neuen Kredit beantragen
+  2. SCHUFA-Selbstauskunft anfordern unter bonitaetsauskunft.de (kostenlos, einmal/Jahr)
+  3. [Unnötige Kreditkarte Y] kündigen → reduziert aktive Linien
+  4. Alle Lastschriften und Daueraufträge auf Deckung prüfen
+  5. Nächste Kreditanfrage erst nach [Datum] stellen
+
+## Gesamtzinskosten — Aktuell vs. Beschleunigt
+
+| Szenario | Schuldenfreiheit | Gesamtzinsen | Einsparung |
+|----------|-----------------|-------------|-----------|
+| Nur Mindestraten | MM/JJJJ | €X,XXX | — |
+| + €X/Monat Mehrtilgung | MM/JJJJ | €X,XXX | €X,XXX |
+| + Sondertilgung (max.) | MM/JJJJ | €X,XXX | €X,XXX |
+| Optimal (alles kombiniert) | MM/JJJJ | €X,XXX | €X,XXX |
+
+## Sofortmaßnahmen (diese Woche)
+
+1. [Dispo-Saldo X] — Umschuldungsantrag bei ING/DKB stellen
+2. SCHUFA-Selbstauskunft anfordern (bonitaetsauskunft.de)
+3. Daueraufträge und Lastschriftdeckung prüfen — keine Rücklastschriften
+4. Alle Mindestraten per Dauerauftrag einrichten (kein manueller Aufwand, keine Verzugsgebühren)
+5. [Dispo-Limit nach Umschuldung] auf €X reduzieren — Termin bei Bank vereinbaren
 
 ---
-**DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor before making decisions.**
+**DISCLAIMER: Nur zu Informations- und Bildungszwecken. Keine Finanzberatung. Vor Entscheidungen einen lizenzierten Finanzberater (Honorarberater) konsultieren.**
 ```
 
-## Output Standards
-- Show full month-by-month table (first 12-24 months minimum)
-- Both strategies compared with actual dollar deltas
-- Behavioral and mathematical considerations both addressed
-- Specific phone scripts and product names for actions
-- Federal student loan protections always flagged before refi
+## Quality Standards
+
+- All amounts in Euro (€); no dollar amounts anywhere
+- All interest rates as Effektivzins (% p.a.); distinguish from Sollzins where relevant
+- Schuldendienstquote always calculated on Nettoeinkommen (after tax and SV), not gross
+- Sondertilgungsrecht always checked before recommending Baufinanzierung prepayment
+- Dispo consolidation options always name specific German providers (ING, DKB, Check24, Smava)
+- SCHUFA deletion dates calculated precisely from settlement date + 3 years
+- No references to FICO scores, US credit cards as a primary revolving debt vehicle, front/back-end DTI thresholds (28%/36%), US minimum payment calculations, or US mortgage APR conventions
+- Month-by-month plan must show a minimum of 12 months; mark payoff crossover events
+- Both Hochzinsmethode and Schneeballmethode always calculated and compared with actual Euro deltas
 
 ## Handoff
-After writing FINANCE-DEBT.md:
-1. State the recommendation and savings
-2. Top 3 actions this week
-3. Suggest `/finance budget` if extra payment budget is tight
-4. Suggest `/finance analyze` for holistic view
 
-**DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed financial advisor before making decisions.**
+After writing FINANCE-DEBT.md:
+1. State the recommended method and total interest saving in Euro
+2. Top 3 actions this week (always include Dispo consolidation if any outstanding balance exists)
+3. If Schuldendienstquote > 40%, explicitly recommend nonprofit Schuldnerberatung (Caritas, AWO, Verbraucherzentrale)
+4. Suggest `/finance budget` if the monthly Mehrtilgung budget is unclear
+5. Suggest `/finance analyze` for a full financial health overview
+
+**DISCLAIMER: Nur zu Informations- und Bildungszwecken. Keine Finanzberatung. Vor Entscheidungen einen lizenzierten Finanzberater (Honorarberater) konsultieren.**
