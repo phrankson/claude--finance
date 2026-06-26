@@ -28,9 +28,9 @@ Trigger when the user invokes:
 
 Ask the user for the following. Gather all items before proceeding to analysis — partial data leads to incomplete or misleading recommendations.
 
-1. **Depot broker(s) and approximate balances**
+1. **Investment account (Depot) broker(s) and approximate balances**
    - Which broker(s) do you use? (e.g., Trade Republic, Scalable Capital, DKB, ING, Comdirect)
-   - Approximate current Depot value per broker (€)
+   - Approximate current investment account (Depot) value per broker (€)
 
 2. **bAV / Riester / Rürup accounts**
    - Do you have a betriebliche Altersvorsorge (bAV)? If yes: monthly employee contribution (€), employer Zuschuss (€), current value if known
@@ -40,9 +40,9 @@ Ask the user for the following. Gather all items before proceeding to analysis �
 3. **Monthly new savings rate**
    - How much do you invest each month (€)? This includes Sparplan contributions and any lump-sum transfers.
 
-4. **Freistellungsauftrag status**
+4. **Freistellungsauftrag (tax exemption order) status**
    - Have you submitted Freistellungsaufträge to your brokers?
-   - How is the €1,000 (single) / €2,000 (married/Zusammenveranlagung) Sparerpauschbetrag allocated across brokers?
+   - How is the Sparerpauschbetrag (annual tax-free investment allowance) of €1,000 (single) / €2,000 (married/Zusammenveranlagung) allocated across brokers?
 
 5. **Risk tolerance**
    - Conservative / Balanced / Growth (or describe in your own words)
@@ -51,7 +51,7 @@ Ask the user for the following. Gather all items before proceeding to analysis �
    - Years until retirement or primary financial goal
 
 7. **Emergency fund (Notgroschen)**
-   - How many months of living expenses do you have in Tagesgeld or similar instant-access savings?
+   - How many months of living expenses do you have in instant-access savings (Tagesgeld) or similar instant-access savings?
 
 8. **Existing ETF holdings**
    - List current holdings: ISIN or fund name, approximate value (€), accumulating (thesaurierend) or distributing (ausschüttend)?
@@ -72,7 +72,7 @@ Analyze the user's situation against this three-tier hierarchy. Tier 1 must be f
 
 ---
 
-**Tier 1 — Liquidität (Emergency Fund)**
+**Tier 1 — Liquidity (Emergency Fund)**
 
 Target: 3–6 months of net living expenses in instant-access savings (Tagesgeld).
 
@@ -85,7 +85,7 @@ Action trigger: If Tier 1 is underfunded, redirect all new savings here before i
 
 ---
 
-**Tier 2 — Steuerbegünstigte Altersvorsorge**
+**Tier 2 — Tax-Advantaged Retirement Accounts**
 
 Priority order within Tier 2:
 
@@ -108,7 +108,7 @@ Priority order within Tier 2:
 
 ---
 
-**Tier 3 — Taxables Depot (UCITS ETF Portfolio)**
+**Tier 3 — Taxable Investment Account (UCITS ETF Portfolio)**
 
 Fund after Tier 1 is complete and Tier 2 employer match is captured. This is the main wealth-building vehicle for most Angestellte.
 
@@ -132,8 +132,8 @@ All funds must be Ireland (IE) or Luxembourg (LU) domiciled. US-domiciled ETFs a
 **Domicile rule:** Always verify the ISIN prefix. IE = Ireland; LU = Luxembourg. Both are EU-domiciled and UCITS-compliant.
 
 **Accumulating vs distributing:**
-- Accumulating (thesaurierend): dividends reinvested automatically, no KapSt on distributions. Vorabpauschale applies annually but is smaller than full distribution tax. Generally more tax-efficient for long-term growth investors.
-- Distributing (ausschüttend): dividends paid out and subject to KapSt immediately. Useful if you want to live on dividends or actively consume the Sparerpauschbetrag each year without waiting for Vorabpauschale.
+- Accumulating (thesaurierend): dividends reinvested automatically, no KapSt on distributions. Vorabpauschale (annual notional ETF tax) applies annually but is smaller than full distribution tax. Generally more tax-efficient for long-term growth investors.
+- Distributing (ausschüttend): dividends paid out and subject to KapSt immediately. Useful if you want to live on dividends or actively consume the Sparerpauschbetrag (annual tax-free investment allowance) each year without waiting for Vorabpauschale.
 
 ---
 
@@ -145,7 +145,7 @@ All are BaFin-regulated. Deposits are protected up to €100,000 per institution
 |--------|----------|---------------|---------------|-------|
 | Trade Republic | Sparplan investors; cash management | €1 flat | Free (any ETF) | 3.75% on cash; mobile-first |
 | Scalable Capital PRIME+ | Active investors; frequent rebalancing | Free (PRIME+) | Free | €4.99/month subscription |
-| DKB | Banking integration; simplicity | ~€1.50 | Free on selected ETFs | Solid Tagesgeld account |
+| DKB | Banking integration; simplicity | ~€1.50 | Free on selected ETFs | Solid instant-access savings account |
 | ING | Beginners; broad ETF Sparplan selection | ~€4.90 | Free on selected ETFs | User-friendly interface |
 | Comdirect / Consorsbank | Broader fund selection; established | €12.90+ | €1.50–€2.50 | Higher fees but full-service |
 
@@ -161,31 +161,31 @@ All are BaFin-regulated. Deposits are protected up to €100,000 per institution
 
 **Vorabpauschale (annual notional ETF tax):**
 - Applies to accumulating ETFs each January.
-- Calculated by broker: Rücknahmepreis on January 1 × Basiszins × 0.7 × (1 − Teilfreistellung 30% for equity ETFs).
-- Broker automatically debits the tax from the cash balance in the Depot account in January.
-- If insufficient cash, broker may sell fund units. Keep a small cash buffer in Depot to avoid forced sales.
+- Calculated by broker: Rücknahmepreis on January 1 × Basiszins × 0.7 × (1 − Teilfreistellung (30% partial exemption on equity ETF gains) 30% for equity ETFs).
+- Broker automatically debits the tax from the cash balance in the investment account in January.
+- If insufficient cash, broker may sell fund units. Keep a small cash buffer in investment account to avoid forced sales.
 - Offsets against Freistellungsauftrag first; remainder subject to Abgeltungsteuer (26.375%).
 - In years with negative or zero Basiszins, Vorabpauschale = €0 (as in 2021–2022).
 
-**Teilfreistellung (partial exemption):**
+**Teilfreistellung (30% partial exemption on equity ETF gains):**
 - 30% of equity ETF gains (dividends + realized capital gains + Vorabpauschale base) are exempt from Abgeltungsteuer.
 - Effective tax rate on equity ETF gains: ~18.46% (instead of 26.375%).
 - Bond ETFs: 0% Teilfreistellung (full rate applies).
 - Mixed funds: 15% Teilfreistellung if equity allocation 25–50%; 30% if >50% equity.
 
-**Freistellungsauftrag strategy:**
+**Freistellungsauftrag (tax exemption order) strategy:**
 - Submit a Freistellungsauftrag at every broker where you hold taxable assets generating income.
 - Total across all brokers must not exceed €1,000 (single) / €2,000 (married/Zusammenveranlagung).
-- Allocate pro-rata to expected income volume per broker. Example: if 70% of Depot value is at Trade Republic, allocate ~€700 of the €1,000 Sparerpauschbetrag there.
+- Allocate pro-rata to expected income volume per broker. Example: if 70% of investment account value is at Trade Republic, allocate ~€700 of the €1,000 Sparerpauschbetrag there.
 - Freistellungsauftrag must be submitted before the tax is withheld — it does not retroactively reclaim withheld tax (that requires Anlage KAP in the Steuererklärung).
-- Unverbrauchter Sparerpauschbetrag cannot be carried forward — use it each year or it is lost.
+- Unused Sparerpauschbetrag cannot be carried forward — use it each year or it is lost.
 
 **Günstigerprüfung:**
 - If your marginal income tax rate is below 25%, apply for Günstigerprüfung in the Steuererklärung (Anlage KAP).
 - The Finanzamt taxes capital income at the lower marginal rate instead of Abgeltungsteuer.
 - Relevant for early career employees or those with low total income.
 
-**Verlustverrechnungstopf:**
+**Verlustverrechnungstopf (loss pool):**
 - Brokers maintain separate loss pools (Aktien-Verlustverrechnungstopf and Sonstiger Verlustverrechnungstopf).
 - Realized losses in the same calendar year offset gains; no tax is due on the net gain.
 - At year-end, request a Verlustverrechnungstopf-Bescheinigung if switching brokers to carry forward unused losses.
@@ -199,7 +199,7 @@ Apply the profile that matches the user's stated risk tolerance and investment h
 **Conservative** (horizon < 5 years or low risk tolerance):
 - 60% global equity ETF (SWDA or VWCE)
 - 30% bond ETF (IEGA or IEAC)
-- 10% Tagesgeld (within Depot cash or external)
+- 10% instant-access savings (within investment account cash or external)
 - Note: suitable for capital preservation near a major goal (house purchase, early retirement in 3–5 years)
 
 **Balanced** (horizon 5–15 years):
@@ -233,7 +233,7 @@ Only sell to rebalance if:
 
 Annual rebalancing check: review allocation once per year (suggest: January after Vorabpauschale is settled, or birthday month).
 
-**Avoid:** Selling winning positions in a taxable Depot purely to rebalance — this triggers KapSt and reduces compounding. Use the Verlustverrechnungstopf strategically.
+**Avoid:** Selling winning positions in a taxable investment account purely to rebalance — this triggers KapSt and reduces compounding. Use the Verlustverrechnungstopf strategically.
 
 ---
 
@@ -242,96 +242,96 @@ Annual rebalancing check: review allocation once per year (suggest: January afte
 Produce a file called **FINANCE-PORTFOLIO.md** with the following structure:
 
 ```markdown
-# Portfolio Analysis — German Depot & Altersvorsorge
-**Erstellt:** [Date]
-**Gesamtvermögen Depot:** €[X]
-**Altersvorsorge-Konten:** €[X] (bAV) + €[X] (Riester/Rürup)
-**Monatliche Sparrate:** €[X]
-**Investitionshorizont:** [X] Jahre
+# Portfolio Analysis — German Investment Account (Depot) & Retirement Accounts
+**Created:** [Date]
+**Total investment account (Depot) value:** €[X]
+**Retirement accounts:** €[X] (bAV) + €[X] (Riester/Rürup)
+**Monthly savings rate:** €[X]
+**Investment horizon:** [X] years
 
-## Zusammenfassung
+## Summary
 [3-sentence verdict. Most important finding and single highest-leverage action at the top.]
 
-## Drei-Stufen-Status
+## Three-Tier Status
 
-### Stufe 1 — Liquidität (Notgroschen)
-- Ziel: €[X] ([N] Monate × €[Y]/Monat)
-- Aktuell: €[X] bei [Provider] (~[X]% p.a.)
-- Status: ✓ Ausreichend / ⚠ Unterfinanziert — Aktion: [what to do]
+### Tier 1 — Liquidity (Emergency Fund)
+- Target: €[X] ([N] months × €[Y]/month)
+- Current: €[X] at [Provider] (~[X]% p.a.)
+- Status: ✓ Adequate / ⚠ Underfunded — Action: [what to do]
 
-### Stufe 2 — Steuerbegünstigte Altersvorsorge
-| Produkt | Monatl. Beitrag | Arbeitgeber-Zuschuss | Jahresgrenze | Status |
+### Tier 2 — Tax-Advantaged Retirement Accounts
+| Product | Monthly contribution | Employer Zuschuss | Annual limit | Status |
 |---------|-----------------|----------------------|--------------|--------|
 | bAV | €X | €X | €7,728 | ✓/⚠ |
 | Riester | €X | €175 Grundzulage | €2,100 | ✓/⚠ |
 | Rürup | €X | — | €29,344 | ✓/⚠ |
-- Empfehlung: [maximize / skip / adjust with rationale]
+- Recommendation: [maximize / skip / adjust with rationale]
 
-### Stufe 3 — Taxables Depot
+### Tier 3 — Taxable Investment Account (Depot)
 [Current vs target allocation table — see below]
 
-## Aktuelle vs. Ziel-Allokation
+## Current vs Target Allocation
 
-| Asset-Klasse | Aktuell € | Aktuell % | Ziel % | Abweichung |
+| Asset class | Current € | Current % | Target % | Deviation |
 |--------------|-----------|-----------|--------|------------|
-| Globale Aktien ETF | | | | |
-| Emerging Markets ETF | | | | |
-| Europa ETF (optional) | | | | |
-| Anleihen ETF | | | | |
-| Tagesgeld / Cash | | | | |
-| **Gesamt** | | 100% | 100% | — |
+| Global equity ETF | | | | |
+| Emerging markets ETF | | | | |
+| Europe ETF (optional) | | | | |
+| Bond ETF | | | | |
+| Instant-access savings / Cash | | | | |
+| **Total** | | 100% | 100% | — |
 
-## Empfohlene ETF-Bausteine
+## Recommended ETF Building Blocks
 
-| Funktion | ETF | ISIN | TER | Typ | Empfohlene Gewichtung |
+| Role | ETF | ISIN | TER | Type | Recommended weighting |
 |---------|-----|------|-----|-----|-----------------------|
-| Kern | [e.g., SWDA or VWCE] | [ISIN] | [X]% | Acc | [X]% |
+| Core | [e.g., SWDA or VWCE] | [ISIN] | [X]% | Acc | [X]% |
 | EM | EIMI | IE00BKM4GZ66 | 0.18% | Acc | [X]% |
-| Anleihen | IEGA | IE00B4WXJJ64 | 0.07% | Acc | [X]% |
+| Bonds | IEGA | IE00B4WXJJ64 | 0.07% | Acc | [X]% |
 
-**Gewichtete TER Portfolio:** [X]%
+**Weighted portfolio TER:** [X]%
 
-## Broker-Empfehlung
-- Aktuell: [current broker(s)]
-- Empfehlung: [recommended broker with reason]
-- Aktion: [keep / consolidate / switch Sparplan to free provider]
+## Broker Recommendation
+- Current: [current broker(s)]
+- Recommendation: [recommended broker with reason]
+- Action: [keep / consolidate / switch Sparplan to free provider]
 
-## Freistellungsauftrag-Status
-- Sparerpauschbetrag: €[1,000 or 2,000]
-- Aktuell gesetzt: €[X] bei [Broker A], €[X] bei [Broker B]
-- Fehlend / Falsch allokiert: [yes/no + what to fix]
-- Empfehlung: [exact allocation across brokers]
+## Freistellungsauftrag (Tax Exemption Order) Status
+- Sparerpauschbetrag (annual tax-free investment allowance): €[1,000 or 2,000]
+- Currently set: €[X] at [Broker A], €[X] at [Broker B]
+- Missing / incorrectly allocated: [yes/no + what to fix]
+- Recommendation: [exact allocation across brokers]
 
-## Vorabpauschale-Hinweis
-- Geschätzte Vorabpauschale 2026: ca. €[X] (basierend auf Depotgröße und aktuellem Basiszins)
-- Wird automatisch vom Broker im Januar abgebucht
-- Empfohlener Cash-Puffer im Depot: min. €[X]
+## Vorabpauschale (Annual Notional ETF Tax) Note
+- Estimated Vorabpauschale 2026: approx. €[X] (based on investment account size and current Basiszins)
+- Automatically debited by broker in January
+- Recommended cash buffer in investment account: min. €[X]
 
-## Steuerliche Optimierungen
+## Tax Optimizations
 [e.g., accumulating ETF preferred for this horizon; Freistellungsauftrag not yet set; Günstigerprüfung applicable if income below threshold]
 
-## Konkrete Handlungsschritte (priorisiert)
+## Concrete Action Steps (prioritized)
 
-1. [Highest leverage — e.g., "Arbeitgeber-Zuschuss in bAV voll ausschöpfen — freies Geld"]
-2. [Second — e.g., "Freistellungsauftrag bei Trade Republic auf €700 erhöhen"]
-3. [Third — e.g., "Sparplan auf SWDA bei Trade Republic einrichten: €X/Monat"]
-4. [Fourth — e.g., "EIMI Sparplan €X/Monat für EM-Anteil"]
-5. [Ongoing — "Jährliches Rebalancing prüfen — ausschließlich via neue Beiträge"]
+1. [Highest leverage — e.g., "Capture full employer Zuschuss in bAV — free money"]
+2. [Second — e.g., "Increase Freistellungsauftrag at Trade Republic to €700"]
+3. [Third — e.g., "Set up Sparplan on SWDA at Trade Republic: €X/month"]
+4. [Fourth — e.g., "EIMI Sparplan €X/month for EM allocation"]
+5. [Ongoing — "Annual rebalancing check — via new contributions only"]
 
-## Risiken & Hinweise
+## Risks & Notes
 - [Concentration risks, e.g., single-ETF overlap, home bias, currency exposure]
 - [Behavioral risks, e.g., selling during drawdowns]
 - [Sequence-of-returns risk if horizon < 10 years]
-- [Vorabpauschale cash buffer risk if no cash in Depot]
+- [Vorabpauschale cash buffer risk if no cash in investment account]
 
-## Was diese Analyse nicht abdeckt
-- Steuerliche Beratung (Anlage KAP, Verlustbescheinigung) → siehe /finance taxes
-- Rentenplanung und Rentenlückenberechnung → siehe /finance retirement
-- Schuldenoptimierung → siehe /finance debt
-- Versicherungsschutz → siehe /finance insurance
+## What this analysis does not cover
+- Tax advice (Anlage KAP, Verlustbescheinigung) → see /finance taxes
+- Retirement planning and retirement gap calculation → see /finance retirement
+- Debt optimization → see /finance debt
+- Insurance coverage → see /finance insurance
 
 ---
-**DISCLAIMER:** Nur für Informations- und Bildungszwecke. Keine Anlageberatung gemäß §1 WpHG. Vergangene Wertentwicklungen sind keine Garantie für zukünftige Ergebnisse. Bitte konsultieren Sie vor Anlageentscheidungen einen zugelassenen Honorarberater oder Finanzberater.
+**DISCLAIMER:** For educational and informational purposes only. Not investment advice under §1 WpHG. Past performance is not a guarantee of future results. Please consult a licensed Honorarberater or Finanzberater before making investment decisions.
 ```
 
 ---

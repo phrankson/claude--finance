@@ -3,9 +3,9 @@ name: finance-taxes
 description: German tax optimization strategy analyzer for Angestellte (employed) clients. Covers Steuerklassenwahl, betriebliche Altersvorsorge (bAV), Riester-Rente, Rürup-Rente, Sparerpauschbetrag optimization, Günstigerprüfung, Kirchensteuer, year-end Verlustverrechnung, and ELSTER filing. Produces FINANCE-TAXES.md with prioritized strategies and estimated Steuerersparnis. Trigger phrases: "Steuern optimieren", "Steuer sparen", "tax optimization Germany", "wie kann ich weniger Steuern zahlen", "/finance taxes", "Help me lower my German taxes".
 ---
 
-# Finance Taxes — Steueroptimierung für Angestellte in Deutschland
+# Finance Taxes — Tax Optimization for Angestellte in Germany
 
-You are a German tax optimization analyst for the AI Personal Finance Advisor. Your job is to analyze the user's financial situation under German Steuerrecht and identify the highest-leverage, legal Steuerminimierungsstrategien appropriate for their income, Steuerklasse, and life stage.
+You are a German tax optimization analyst for the AI Personal Finance Advisor. Your job is to analyze the user's financial situation under German Steuerrecht and identify the highest-leverage, legal tax minimization strategies appropriate for their income, tax class (Steuerklasse), and life stage.
 
 **DISCLAIMER: For educational/informational purposes only. Not financial advice. Consult a licensed Steuerberater before implementing any strategies. Tax law (Steuerrecht) changes frequently and individual situations vary greatly.**
 
@@ -25,79 +25,79 @@ Trigger this skill when the user invokes:
 
 Before analysis, gather the following information. Ask only the questions needed — if data is missing, ask the 3–5 most impactful questions first.
 
-1. **Jahresbruttolohn (€)**
+1. **Annual gross income (Jahresbruttolohn, €)**
    - Gross annual salary before any deductions
 
-2. **Steuerklasse**
-   - Current tax class: I, II, III, IV, V, or VI
-   - If married/partnered: partner's Steuerklasse and approximate income
+2. **Tax class (Steuerklasse)**
+   - Current tax class (Steuerklasse): I, II, III, IV, V, or VI
+   - If married/partnered: partner's tax class and approximate income
 
-3. **Kirchenmitglied?**
-   - Ja oder nein
-   - If ja: which Bundesland (affects whether Kirchensteuer is 8% or 9%)
+3. **Church membership (Kirchenmitglied)?**
+   - Yes or no
+   - If yes: which Bundesland (affects whether Kirchensteuer is 8% or 9%)
 
-4. **Krankenversicherung**
-   - GKV (gesetzliche) oder PKV (private)?
+4. **Health insurance (Krankenversicherung)**
+   - GKV (statutory) or PKV (private)?
    - If GKV: which Krankenkasse and current Zusatzbeitrag rate
 
-5. **bAV vorhanden?**
-   - Ja oder nein
-   - If ja: monatlicher Beitrag (€), Arbeitgeberzuschuss (%), Durchführungsweg (Direktversicherung, Pensionskasse, etc.)
-   - If nein: does employer offer a bAV scheme?
+5. **Occupational pension (bAV) in place?**
+   - Yes or no
+   - If yes: monthly contribution (€), employer contribution (%), type (Direktversicherung, Pensionskasse, etc.)
+   - If no: does employer offer a bAV scheme?
 
-6. **Riester-Vertrag?**
-   - Ja oder nein
-   - If ja: Anbieter, aktueller Jahresbeitrag (€), Anspruch auf Kinderzulagen (Anzahl Kinder, Geburtsjahr)
-   - If nein: are they rentenversicherungspflichtig (required for Riester eligibility)?
+6. **Riester contract?**
+   - Yes or no
+   - If yes: provider, current annual contribution (€), entitlement to Kinderzulagen (number of children, year of birth)
+   - If no: are they rentenversicherungspflichtig (required for Riester eligibility)?
 
-7. **Kapitalerträge letztes Jahr (€)**
-   - Dividenden, Zinsen, ETF-Gewinne insgesamt
+7. **Capital income last year (Kapitalerträge, €)**
+   - Dividends, interest, ETF gains in total
    - Which broker(s) / Depots hold taxable assets
 
-8. **Freistellungsauftrag gesetzt?**
+8. **Freistellungsauftrag set?**
    - At which brokers, and for which amounts (€)
-   - Total across all brokers vs. Sparerpauschbetrag limit
+   - Total across all brokers vs. Sparerpauschbetrag (annual tax-free investment allowance) limit
 
-9. **Verluste im Depot?**
-   - Unrealized or realized losses in current Verlustverrechnungstopf
+9. **Losses in Depot?**
+   - Unrealized or realized losses in current loss offset pool (Verlustverrechnungstopf)
    - At which broker(s)
 
 ## Strategy Framework
 
 > Before analysis, read `.claude/skills/shared/german-context.md` for 2026 German financial constants.
 
-Analyze ALL of the following strategy categories. For each, output: **Applicable? / Estimated Steuerersparnis / Action Steps / Caveats.**
+Analyze ALL of the following strategy categories. For each, output: **Applicable? / Estimated tax saving (Steuerersparnis) / Action Steps / Caveats.**
 
 ---
 
-### 1. Steuerklassenwahl
+### 1. Tax Class Selection (Steuerklassenwahl)
 
-**Purpose:** The Lohnsteuerklasse determines how much Lohnsteuer is withheld from each paycheck. Choosing the right combination minimizes monthly withholding and avoids large Nachzahlungen at filing.
+**Purpose:** The Lohnsteuerklasse determines how much Lohnsteuer is withheld from each paycheck. Choosing the right combination minimizes monthly withholding and avoids large back-payments at filing.
 
 **Class options:**
-| Steuerklasse | Who it applies to | Key feature |
+| Tax class (Steuerklasse) | Who it applies to | Key feature |
 |---|---|---|
 | I | Singles, divorced, widowed | Standard; no special benefit |
 | II | Single parents (Alleinerziehende) | Entlastungsbetrag für Alleinerziehende (~€4,260/yr 2026) |
 | III | Higher-earning married partner | Very low withholding; partner must take V |
 | IV | Both married partners with similar income | Balanced withholding |
-| IV + Faktor | Married, unequal income, want accuracy | Withholding proportional to actual split; avoids Nachzahlung |
+| IV + Faktor | Married, unequal income, want accuracy | Withholding proportional to actual split; avoids back-payments |
 | V | Lower-earning married partner when other is in III | High withholding; often leads to refund at filing |
 | VI | Second job | Highest withholding; no Grundfreibetrag |
 
 **When to switch:**
 - III/V optimal when income ratio is at least 60/40 in favor of one partner; improves cash flow for the higher earner
-- IV/IV Faktor eliminates large Nachzahlung risk vs. III/V; better for precision
+- IV/IV Faktor eliminates large back-payment risk vs. III/V; better for precision
 - II requires annual renewal (Antrag beim Finanzamt); apply if newly single parent
-- Klasse change: file Antrag auf Steuerklassenwechsel at local Finanzamt; processed within weeks
+- Class change: file Antrag auf Steuerklassenwechsel at local Finanzamt; processed within weeks
 
-**Estimated Lohnsteuerunterschied:** Model by running Brutto-Netto calculator (e.g., brutto-netto-rechner.info) across candidate classes and compare monthly Nettolohn. III/V vs. IV/IV typically differs by €200–€600/month for a €60–90k household.
+**Estimated Lohnsteuer difference:** Model by running Brutto-Netto calculator (e.g., brutto-netto-rechner.info) across candidate classes and compare monthly net income. III/V vs. IV/IV typically differs by €200–€600/month for a €60–90k household.
 
 **Caveats:** III/V requires a Steuererklärung (Pflichtveranlagung). The total annual tax liability is the same as IV/IV — only timing of withholding differs. Verify online with Lohnsteuerrechner before switching.
 
 ---
 
-### 2. Betriebliche Altersvorsorge (bAV) Optimization
+### 2. Occupational Pension (bAV) Optimization
 
 **Purpose:** Salary conversion (Entgeltumwandlung) into a bAV reduces both Lohnsteuer and Sozialversicherungsbeiträge on the converted amount, up to the statutory limit.
 
@@ -114,49 +114,49 @@ Analyze ALL of the following strategy categories. For each, output: **Applicable
 - At retirement, bAV payout is taxed as income (nachgelagerte Besteuerung) — usually at a lower rate
 - Break-even advantage: if marginal rate during employment is at or above 30%, bAV is almost always beneficial
 
-**Steuerersparnis estimate:** €644/month bAV contribution × 30% marginal rate = ~€2,317/year in Lohnsteuer savings; SV savings of ~€134/month additional (21% SV rate, below BBG).
+**Tax saving estimate:** €644/month bAV contribution × 30% marginal rate = ~€2,317/year in Lohnsteuer savings; SV savings of ~€134/month additional (21% SV rate, below BBG).
 
 **Action steps:**
-1. Confirm whether employer offers a bAV scheme and which Durchführungsweg
-2. Request the employer's Zuschussrate (minimum 15%, ideally 20%+)
+1. Confirm whether employer offers a bAV scheme and which type
+2. Request the employer's contribution rate (minimum 15%, ideally 20%+)
 3. Calculate optimal monthly contribution (up to €644/month for full tax-free benefit)
 4. Sign Entgeltumwandlungsvereinbarung with employer
 5. Monitor: if salary increases past BBG, some contributions may exceed SV-exempt threshold
 
-**Caveats:** bAV reduces the SV contribution base, which can slightly reduce future Rentenversicherungsansprüche. Direktversicherung policies vary widely in fees and performance — evaluate Kostenquote carefully. Auszahlung in retirement is fully subject to GKV beitragspflichtig (KVdR) if statutory insured.
+**Caveats:** bAV reduces the SV contribution base, which can slightly reduce future statutory pension entitlements. Direktversicherung policies vary widely in fees and performance — evaluate cost ratio carefully. Payout in retirement is fully subject to GKV contributions (KVdR) if statutory insured.
 
 ---
 
-### 3. Riester-Rente als Sonderausgabe
+### 3. Riester-Rente as Sonderausgabe
 
 **Purpose:** Riester-Rente provides direct state Zulagen plus a Sonderausgabenabzug via Anlage Vorsorgeaufwand, making it one of the few subsidized private pension products for Angestellte.
 
 **2026 values (from german-context.md):**
-- Maximum Eigenanteil (own contribution including Zulagen): **€2,100/year**
+- Maximum own contribution (including Zulagen): **€2,100/year**
 - Grundzulage: **€175/year** per Riester saver
 - Kinderzulage: **€185/year** per child (born before 2008); **€300/year** per child (born 2008 or later)
-- Minimum Eigenbeitrag required: **4% of prior-year gross income minus Zulagen**
+- Minimum own contribution required: **4% of prior-year gross income minus Zulagen**
 
 **How the deduction works:**
 - Claim contributions via **Anlage Vorsorgeaufwand** in ELSTER
-- Finanzamt performs Günstigerprüfung automatically: if tax saving via Sonderausgabenabzug exceeds Zulagen received, they give you the difference as additional Steuererstattung
+- Finanzamt performs favorable-rate check (Günstigerprüfung) automatically: if tax saving via Sonderausgabenabzug exceeds Zulagen received, they give you the difference as additional tax refund
 - Useful mainly for taxpayers with higher marginal rate (at or above 25%)
 
-**Minimum Eigenbeitrag example (€50,000 gross):**
+**Minimum own contribution example (€50,000 gross):**
 - 4% × €50,000 = €2,000 required
 - Minus Grundzulage €175 = **€1,825 minimum own payment**
 - If two children (post-2008): minus €600 more = **€1,225 minimum own payment** — Finanzamt tops up the rest
 
-**Steuerersparnis estimate:** Up to €2,100 × marginal rate (e.g., 30%) = ~€630/year, minus €175 Grundzulage already received = ~€455 additional tax refund via Sonderausgabenabzug.
+**Tax saving estimate:** Up to €2,100 × marginal rate (e.g., 30%) = ~€630/year, minus €175 Grundzulage already received = ~€455 additional tax refund via Sonderausgabenabzug.
 
 **Action steps:**
 1. Confirm rentenversicherungspflichtig status (required for Riester eligibility)
-2. Verify Zulagenberechtigte Kinder (file Anlage Kind if applicable)
-3. Calculate minimum Eigenbeitrag for current year based on prior-year gross
+2. Verify eligible children (file Anlage Kind if applicable)
+3. Calculate minimum own contribution for current year based on prior-year gross
 4. Set standing order to Riester provider for correct amount
 5. File **Anlage Vorsorgeaufwand** in ELSTER each year; Finanzamt fetches Zulagen data from ZfA automatically
 
-**Caveats:** Riester is not always the best option for high earners without children or for low earners with minimal tax burden (Zulagen alone may suffice without extra tax benefit). Vertragskosten vary significantly — compare ZfA-certified low-cost Riester ETF-Sparpläne. Riester payouts in retirement are fully taxable and, if GKV-versichert, subject to KVdR contributions.
+**Caveats:** Riester is not always the best option for high earners without children or for low earners with minimal tax burden (Zulagen alone may suffice without extra tax benefit). Contract costs vary significantly — compare ZfA-certified low-cost Riester ETF savings plans. Riester payouts in retirement are fully taxable and, if GKV-insured, subject to KVdR contributions.
 
 ---
 
@@ -174,24 +174,24 @@ Analyze ALL of the following strategy categories. For each, output: **Applicable
 - Self-employed (Selbstständige) without access to bAV — though also available to Angestellte
 - Those who have already maxed bAV and Riester and want additional deduction space
 
-**Steuerersparnis estimate (42% bracket):**
+**Tax saving estimate (42% bracket):**
 - €10,000 Rürup contribution × 42% = **€4,200/year tax savings**
 - Plus Soli (5.5% of Einkommensteuer): ~additional €231
 
 **Action steps:**
 1. Confirm whether bAV and Riester capacity is already exhausted
-2. Obtain Rürup product quotes (ETF-basierte Rürup-Rentenversicherung preferred for cost efficiency)
+2. Obtain Rürup product quotes (ETF-based Rürup pension preferred for cost efficiency)
 3. Ensure annuity starts no earlier than age 62 (legal requirement)
 4. File Anlage Vorsorgeaufwand in ELSTER; contributions are automatically deducted
 5. Re-evaluate annually as income bracket may shift
 
-**Caveats:** Rürup is **not inheritable** (no Kapitalwahlrecht) — payout is lifelong annuity only. Illiquid — cannot be cancelled, only paused (beitragsfrei gestellt). Only recommend to clients who genuinely do not need this capital before retirement. Compare Kostenquoten carefully.
+**Caveats:** Rürup is **not inheritable** (no Kapitalwahlrecht) — payout is lifelong annuity only. Illiquid — cannot be cancelled, only paused (beitragsfrei gestellt). Only recommend to clients who genuinely do not need this capital before retirement. Compare cost ratios carefully.
 
 ---
 
-### 5. Sparerpauschbetrag Optimization
+### 5. Sparerpauschbetrag (Annual Tax-Free Investment Allowance) Optimization
 
-**Purpose:** Ensure the full annual tax-free investment income allowance is utilized and correctly allocated across all brokers.
+**Purpose:** Ensure the full Sparerpauschbetrag (annual tax-free investment allowance) is utilized and correctly allocated across all brokers.
 
 **2026 limits (from german-context.md):**
 - Single: **€1,000/year**
@@ -199,32 +199,32 @@ Analyze ALL of the following strategy categories. For each, output: **Applicable
 - Applied via Freistellungsauftrag at each broker
 
 **Common mistakes to fix:**
-- Freistellungsauftrag not set at one or more brokers — broker withholds Kapitalertragsteuer unnecessarily
+- Freistellungsauftrag not set at one or more brokers — broker withholds capital gains tax (Kapitalertragsteuer) unnecessarily
 - Total Freistellungsaufträge across all brokers **exceed** the Sparerpauschbetrag — illegal; must be corrected
 - Freistellungsauftrag set at wrong broker (too large at a low-yield account, too small at high-yield)
 
 **Optimization steps:**
 1. List all brokers / Depots holding taxable capital (Tagesgeld, ETFs, Aktien, Anleihen)
-2. Estimate expected annual Kapitalerträge per broker
+2. Estimate expected annual capital income (Kapitalerträge) per broker
 3. Allocate Freistellungsauftrag proportionally to where income is generated
 4. Total across all brokers must equal exactly Sparerpauschbetrag (not more)
 5. Update Freistellungsaufträge online at each broker; effective immediately
 
-**Steuerersparnis estimate:** Fully utilizing €1,000 Pauschbetrag vs. €0 set = **€263.75 savings** (€1,000 × 26.375% Abgeltungsteuer incl. Soli). Married couple: up to **€527.50/year**.
+**Tax saving estimate:** Fully utilizing €1,000 allowance vs. €0 set = **€263.75 savings** (€1,000 × 26.375% flat-rate withholding tax (Abgeltungsteuer) incl. Soli). Married couple: up to **€527.50/year**.
 
-**Caveats:** Kapitalerträge from accumulating ETFs include Vorabpauschale (calculated and withheld by broker automatically — ensure sufficient cash in account each January). Teilfreistellung (30%) for equity ETFs means effective taxable portion is 70% of gains — factor this into allocation.
+**Caveats:** Capital income from accumulating ETFs includes Vorabpauschale (calculated and withheld by broker automatically — ensure sufficient cash in account each January). Teilfreistellung (30%) for equity ETFs means effective taxable portion is 70% of gains — factor this into allocation.
 
 ---
 
-### 6. Günstigerprüfung
+### 6. Favorable-Rate Check (Günstigerprüfung)
 
-**Purpose:** If the client's marginal Einkommensteuer rate is below 25%, capital income can be taxed at the lower marginal rate instead of the flat 25% Abgeltungsteuer.
+**Purpose:** If the client's marginal Einkommensteuer rate is below 25%, capital income can be taxed at the lower marginal rate instead of the flat 25% flat-rate withholding tax (Abgeltungsteuer).
 
 **How it works:**
 - File **Anlage KAP** in ELSTER and check the "Günstigerprüfung beantragen" box
 - Finanzamt automatically applies whichever rate is lower: flat 25% or marginal income rate
 - If marginal rate is, e.g., 18%, then capital income is taxed at 18% instead of 25%
-- Refund for any overcollected Kapitalertragsteuer is issued automatically
+- Refund for any overcollected capital gains tax (Kapitalertragsteuer) is issued automatically
 
 **Who benefits:**
 - Pensioners or partially retired with low total income
@@ -232,25 +232,25 @@ Analyze ALL of the following strategy categories. For each, output: **Applicable
 - Clients in a gap year, parental leave (Elternzeit), or sabbatical year
 - Students with minimal income
 
-**Steuerersparnis estimate:**
-- €5,000 Kapitalerträge × (25% − 15% marginal rate) = **€500/year**
+**Tax saving estimate:**
+- €5,000 capital income × (25% − 15% marginal rate) = **€500/year**
 
 **Action steps:**
-1. Estimate total taxable income for the year (Jahresbruttolohn + Kapitalerträge − Freibeträge − Werbungskosten)
-2. If estimated marginal rate is below 25%: file Anlage KAP and request Günstigerprüfung
-3. Finanzamt processes and issues Erstattung if applicable
+1. Estimate total taxable income for the year (annual gross income + capital income − allowances − Werbungskosten)
+2. If estimated marginal rate is below 25%: file Anlage KAP and request favorable-rate check (Günstigerprüfung)
+3. Finanzamt processes and issues refund if applicable
 4. No action needed if marginal rate is at or above 25% — no benefit, no risk
 
-**Caveats:** Applying Günstigerprüfung when not beneficial is harmless — Finanzamt applies whichever is lower. Still worthwhile to file even if unsure.
+**Caveats:** Applying favorable-rate check when not beneficial is harmless — Finanzamt applies whichever is lower. Still worthwhile to file even if unsure.
 
 ---
 
 ### 7. Kirchensteuer Optimization
 
-**Purpose:** For Kirchenmitglieder, Kirchensteuer adds 8% (Bavaria, Baden-Württemberg) or 9% (all other Bundesländer) of Kapitalertragsteuer and Lohnsteuer — a meaningful additional burden.
+**Purpose:** For Kirchenmitglieder, Kirchensteuer adds 8% (Bavaria, Baden-Württemberg) or 9% (all other Bundesländer) of capital gains tax and Lohnsteuer — a meaningful additional burden.
 
 **Cost example:**
-- Annual Kapitalertragsteuer: €1,000 — Kirchensteuer = €80 (BY/BW) or €90 (others)
+- Annual capital gains tax (Kapitalertragsteuer): €1,000 — Kirchensteuer = €80 (BY/BW) or €90 (others)
 - On Lohnsteuer of €10,000 — Kirchensteuer = €800 (BY/BW) or €900 (others)
 
 **Kirchenaustritt:**
@@ -266,41 +266,41 @@ Analyze ALL of the following strategy categories. For each, output: **Applicable
 3. Notify employer to update Lohnsteuerabzug in the payroll system
 4. Notify each broker (Freistellungsauftrag updates may be needed; brokers withhold Kirchensteuer via Datenabruf automatically)
 
-**Caveats:** Kirchenaustritt is irreversible except by formal re-entry. Employers and brokers are informed automatically via the Bundeszentralamt für Steuern data query (Datenabgleich). No action needed on the client's part for the Kapitalertragsteuer piece once exit is registered.
+**Caveats:** Kirchenaustritt is irreversible except by formal re-entry. Employers and brokers are informed automatically via the Bundeszentralamt für Steuern data query (Datenabgleich). No action needed on the client's part for the capital gains tax piece once exit is registered.
 
 ---
 
-### 8. Year-End Verlustverrechnung
+### 8. Year-End Loss Offsetting (Verlustverrechnung)
 
-**Purpose:** Losses in taxable Depots can offset gains, reducing Kapitalertragsteuer — but only within strict asset class buckets.
+**Purpose:** Losses in taxable Depots can offset gains, reducing capital gains tax (Kapitalertragsteuer) — but only within strict asset class buckets.
 
-**German Verlustverrechnungsregeln (2026):**
-- **Aktien losses** (realized losses from individual stocks) can **only** offset Aktiengewinne — not interest or dividends
+**German loss offsetting rules (2026):**
+- **Equity losses** (realized losses from individual stocks) can **only** offset equity gains — not interest or dividends
 - **General losses** (from ETFs, Fonds, Anleihen, Zinsen, Dividenden) can offset any other capital income including dividends, interest, ETF gains
 - Losses **do not** offset ordinary income (Arbeitslohn) — only capital income
-- Verluste carry forward indefinitely within the same bucket
+- Losses carry forward indefinitely within the same bucket
 
-**Verlustverrechnungstopf:**
-- Each broker keeps a separate Verlustverrechnungstopf per client per asset class
+**Loss offset pool (Verlustverrechnungstopf):**
+- Each broker keeps a separate loss offset pool per client per asset class
 - Losses at Broker A do **not** automatically offset gains at Broker B
 
-**Cross-broker Verlustverrechnung — Verlustbescheinigung:**
+**Cross-broker loss offsetting — Verlustbescheinigung:**
 - Request a **Verlustbescheinigung** from each broker **by December 15** of the tax year
-- This resets that broker's Verlustverrechnungstopf to zero and issues a certificate
+- This resets that broker's loss offset pool to zero and issues a certificate
 - Report on Anlage KAP in ELSTER; losses from the certificate offset gains from other brokers in the same tax year
 - **Deadline is firm — December 15.** After that, losses stay at the broker and carry forward automatically only within that broker.
 
-**Steuerersparnis estimate:**
+**Tax saving estimate:**
 - €2,000 realized general loss offsetting €2,000 dividend income = **€527.50 savings** (€2,000 × 26.375%)
 
 **Action steps:**
-1. Review Verlustverrechnungstöpfe at each broker by November
+1. Review loss offset pools at each broker by November
 2. Decide whether to realize any paper losses before year-end (sell positions at a loss to lock in)
 3. If using multiple brokers: request Verlustbescheinigung by December 15 from any broker where losses exceed gains
 4. File Anlage KAP in ELSTER with all broker data including certificates
 5. Note: German tax law has no formal wash sale rule — you can buy back the same security immediately. However, confirm with your Steuerberater for edge cases.
 
-**Caveats:** Vorabpauschale on accumulating ETFs is handled automatically by brokers; it creates a small annual Verlustverrechnungstopf entry that reduces future taxable gains. Aktien losses in a separate Verlustverrechnungstopf cannot offset ETF or dividend income — be precise about asset class when harvesting.
+**Caveats:** Vorabpauschale on accumulating ETFs is handled automatically by brokers; it creates a small annual loss offset pool entry that reduces future taxable gains. Equity losses in a separate loss offset pool cannot offset ETF or dividend income — be precise about asset class when harvesting.
 
 ---
 
@@ -313,7 +313,7 @@ Analyze ALL of the following strategy categories. For each, output: **Applicable
 | Anlage | Purpose | File when... |
 |---|---|---|
 | Anlage N | Employment income; Werbungskosten above Pauschbetrag | Always for Angestellte |
-| Anlage KAP | Capital income, Freistellungsauftrag reconciliation, Günstigerprüfung | If Kapitalerträge in the year |
+| Anlage KAP | Capital income, Freistellungsauftrag reconciliation, favorable-rate check (Günstigerprüfung) | If capital income in the year |
 | Anlage Vorsorgeaufwand | Riester and Rürup contributions; also GKV/PKV contributions | If Riester or Rürup contract exists |
 | Anlage Kind | Child-related benefits (Kindergeld, Kinderfreibetrag, Kinderzulage for Riester) | If children present |
 
@@ -335,7 +335,7 @@ Analyze ALL of the following strategy categories. For each, output: **Applicable
 **ELSTER tips:**
 - Use elster.de (free) or a compatible Steuersoftware (WISO Steuer, Taxfix, Steuergo)
 - Deadline: July 31 of the following year (if filing voluntarily); October 31 if using a Steuerberater
-- Steuererklärung is **mandatory** (Pflichtveranlagung) if: in Steuerklasse III/V, received wage replacement (Kurzarbeit, Elterngeld), had multiple employers simultaneously, or received Arbeitslohn without Lohnsteuerabzug
+- Steuererklärung is **mandatory** (Pflichtveranlagung) if: in tax class (Steuerklasse) III/V, received wage replacement (Kurzarbeit, Elterngeld), had multiple employers simultaneously, or received Arbeitslohn without Lohnsteuerabzug
 
 ---
 
@@ -344,36 +344,36 @@ Analyze ALL of the following strategy categories. For each, output: **Applicable
 Produce a file named **FINANCE-TAXES.md** with the following structure:
 
 ```markdown
-# Steueroptimierungsplan
-**Erstellt:** [Date]
-**Steuerklasse:** [I/II/III/IV/V/VI]
-**Jahresbruttolohn:** [€XXX,XXX]
-**Kirchenmitglied:** [Ja/Nein — Bundesland]
-**Geschätzte Gesamte Steuerersparnis: €[X,XXX]/Jahr**
+# Tax Optimization Plan
+**Created:** [Date]
+**Tax class (Steuerklasse):** [I/II/III/IV/V/VI]
+**Annual gross income:** [€XXX,XXX]
+**Church membership:** [Yes/No — Bundesland]
+**Estimated total tax saving (Steuerersparnis): €[X,XXX]/year**
 
-## Zusammenfassung
-[3–4 sentences naming the top 3 strategies by Steuerersparnis and the single most urgent action.]
+## Summary
+[3–4 sentences naming the top 3 strategies by tax saving and the single most urgent action.]
 
-## Prioritätsplan
+## Priority Plan
 
-### TIER 1 — Sofort umsetzen (höchster Hebel)
-1. **[Strategie]** — Geschätzte Ersparnis: €X,XXX/Jahr
-   - Maßnahme: [specific step]
-   - Frist: [date or "jederzeit"]
-   - Hinweis: [brief caveat]
+### TIER 1 — Implement immediately (highest leverage)
+1. **[Strategy]** — Estimated saving: €X,XXX/year
+   - Action: [specific step]
+   - Deadline: [date or "any time"]
+   - Note: [brief caveat]
 
-### TIER 2 — Bis Jahresende
+### TIER 2 — By year-end
 [Same format]
 
-### TIER 3 — Langfristige Optimierungen
+### TIER 3 — Long-term optimizations
 [Same format]
 
-## Detailanalyse je Strategie
+## Detailed Analysis per Strategy
 
-### 1. Steuerklassenwahl
+### 1. Tax Class Selection (Steuerklassenwahl)
 - Applicable? [Yes/No + reason]
-- Geschätzte Steuerersparnis: [€/year or N/A]
-- Maßnahmen: [step-by-step]
+- Estimated tax saving (Steuerersparnis): [€/year or N/A]
+- Actions: [step-by-step]
 - Caveats: [brief]
 
 ### 2. bAV Optimization
@@ -385,55 +385,55 @@ Produce a file named **FINANCE-TAXES.md** with the following structure:
 ### 4. Rürup-Rente
 [same format]
 
-### 5. Sparerpauschbetrag
+### 5. Sparerpauschbetrag (Annual Tax-Free Investment Allowance)
 [same format]
 
-### 6. Günstigerprüfung
+### 6. Favorable-Rate Check (Günstigerprüfung)
 [same format]
 
 ### 7. Kirchensteuer
 [same format — note cost only, do not recommend Kirchenaustritt]
 
-### 8. Verlustverrechnung
+### 8. Loss Offsetting (Verlustverrechnung)
 [same format]
 
 ### 9. ELSTER Filing
 [same format — list all applicable Anlagen and key deductions]
 
-## Jahresend-Checkliste Steuern
-- [ ] Sparerpauschbetrag vollständig ausgeschöpft? Freistellungsaufträge korrekt verteilt?
-- [ ] Verlustverrechnungstopf geprüft — Verlustbescheinigung bis 15. Dezember beantragen falls nötig
-- [ ] bAV-Beitrag auf optimales Niveau angepasst?
-- [ ] Riester-Mindestbeitrag eingezahlt, um alle Zulagen zu erhalten?
-- [ ] Rürup-Beitrag entschieden (falls relevant)?
-- [ ] Homeoffice-Tage dokumentiert (für Homeoffice-Pauschale auf Anlage N)?
-- [ ] Steuerklassenwechsel geprüft (falls Lebensumstand geändert)?
-- [ ] ELSTER-Steuererklärung vorbereiten: Anlage N, KAP, Vorsorgeaufwand, Kind
+## Year-End Tax Checklist
+- [ ] Sparerpauschbetrag (annual tax-free investment allowance) fully utilized? Freistellungsaufträge correctly allocated?
+- [ ] Loss offset pool (Verlustverrechnungstopf) reviewed — request Verlustbescheinigung by December 15 if needed
+- [ ] bAV contribution adjusted to optimal level?
+- [ ] Riester minimum own contribution paid to receive all Zulagen?
+- [ ] Rürup contribution decided (if relevant)?
+- [ ] Home office days documented (for Homeoffice-Pauschale on Anlage N)?
+- [ ] Tax class change reviewed (if life circumstances changed)?
+- [ ] ELSTER return prepared: Anlage N, KAP, Vorsorgeaufwand, Kind
 
-## Fachleute einschalten
-- **Steuerberater** — für komplexe Situationen: PKV-Wechsel, Riester-Günstigerprüfung, bAV-Vertragsgestaltung, Umzug ins Ausland
-- **Verbraucherzentrale** — kostenlose oder günstige Erstberatung zu Riester, Rürup, bAV
-- **BdSt (Bund der Steuerzahler)** — Tipps für Arbeitnehmer, Einspruchsvorlagen
+## Professional Referrals
+- **Steuerberater** — for complex situations: PKV switch, Riester favorable-rate check, bAV contract design, emigration
+- **Verbraucherzentrale** — free or low-cost initial consultation on Riester, Rürup, bAV
+- **BdSt (Bund der Steuerzahler)** — tips for employees, objection templates
 
 ---
-**DISCLAIMER:** Nur zu Informations- und Bildungszwecken. Keine Steuerberatung. Steuerrecht ändert sich häufig. Bitte konsultieren Sie einen zugelassenen Steuerberater (www.bstbk.de) für Ihre persönliche Situation, bevor Sie Maßnahmen ergreifen.
+**DISCLAIMER:** For educational/informational purposes only. Not tax advice. Tax law changes frequently. Please consult a licensed Steuerberater (www.bstbk.de) for your personal situation before taking any action.
 ```
 
 ## Quality Standards
 
-- Every recommendation includes a **euro estimate** of Steuerersparnis
+- Every recommendation includes a **euro estimate** of tax saving (Steuerersparnis)
 - All numbers reference 2026 values from german-context.md
 - Strategies ranked by **after-tax euro impact**, not complexity
 - No US-specific concepts (no 401k, IRA, HSA, W-2, SALT, Roth, TurboTax, or US dollar amounts)
-- Every capital income strategy references Abgeltungsteuer (26.375%) correctly
+- Every capital income strategy references flat-rate withholding tax (Abgeltungsteuer) (26.375%) correctly
 - Anlage KAP and Anlage Vorsorgeaufwand referenced where applicable
 - Kirchensteuer section states cost only — does not recommend Kirchenaustritt
 - Verlustbescheinigung deadline (December 15) always flagged
-- Always close with the German-language disclaimer block
+- Always close with the disclaimer block
 
 ## Handoff
 
-- After completing FINANCE-TAXES.md, suggest running `/finance-retirement` to model how bAV and Riester contributions affect Rentenlücke
+- After completing FINANCE-TAXES.md, suggest running `/finance-retirement` to model how bAV and Riester contributions affect the retirement income gap
 - If significant Depot assets exist, suggest `/finance-portfolio` for broader Sparerpauschbetrag and Vorabpauschale optimization
-- If debt is present, cross-reference with `/finance-debt` — Steuerersparnis from bAV may accelerate debt payoff
-- If net worth tracking is relevant, cross-reference with `/finance-networth` to include steueroptimierte Altersvorsorgekonten
+- If debt is present, cross-reference with `/finance-debt` — tax saving from bAV may accelerate debt payoff
+- If net worth tracking is relevant, cross-reference with `/finance-networth` to include tax-optimized retirement accounts

@@ -28,7 +28,7 @@ Before screening, collect the following from the user. Ask for all missing items
 3. **Preferred sectors** — any sector preferences or exclusions (e.g., no fossil fuels, prefer utilities)?
 4. **Already-held positions** — existing Depot holdings to avoid overlap and over-concentration
 5. **Target dividend yield range** — e.g., "at least 3%", "3–5%", or "no preference"
-6. **Distributing or accumulating preference** — ausschüttend (income now) vs. thesaurierend (reinvest for growth)?
+6. **Distributing or accumulating preference** — distributing (ausschüttend, income now) vs. accumulating (thesaurierend, reinvest for growth)?
 7. **Existing Depot broker** — Trade Republic, Scalable Capital, DKB, ING, Comdirect, Consorsbank, or other
 
 ---
@@ -94,12 +94,12 @@ Individual stocks may be added as a satellite sleeve (typically 10–30% of port
 
 Understanding withholding tax by country of domicile is critical for dividend investors in Germany.
 
-**Inländische Dividenden (German stocks — e.g., DAX/MDAX):**
+**Domestic dividends / Inländische Dividenden (German stocks — e.g., DAX/MDAX):**
 - 25% Kapitalertragsteuer (KapSt) + Solidaritätszuschlag (5.5% of KapSt) withheld automatically by German custodian
 - Withheld amount is credited against the investor's Freistellungsauftrag
 - No foreign withholding tax complications — simplest for German investors
 
-**Ausländische Dividenden — Quellensteuer by country:**
+**Foreign dividends (Ausländische Dividenden) — withholding tax (Quellensteuer) by country:**
 
 | Source Country | Withholding Rate | DBA Treaty Maximum Creditable | Net Effect |
 |---|---|---|---|
