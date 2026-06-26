@@ -3,9 +3,9 @@ name: finance-insurance
 description: Insurance coverage advisor for German clients. Analyzes GKV vs PKV decision, Berufsunfähigkeitsversicherung (BU), Risikolebensversicherung, Haftpflichtversicherung, Rechtsschutzversicherung, and Hausratversicherung. Triggered by: /finance insurance, "Brauche ich PKV?", "BU Versicherung", "Versicherungscheck", "welche Versicherungen brauche ich?"
 ---
 
-# Finance Insurance — Versicherungscheck für Angestellte
+# Finance Insurance — Insurance Review for Angestellte
 
-**DISCLAIMER: For educational/informational purposes only. Not insurance advice. Consult a licensed unabhängiger Versicherungsmakler (not a tied agent/Ausschließlichkeitsvertreter) before purchasing any insurance product.**
+**DISCLAIMER: For educational/informational purposes only. Not insurance advice. Consult a licensed independent insurance broker (unabhängiger Versicherungsmakler) (not a tied agent (Ausschließlichkeitsvertreter)) before purchasing any insurance product.**
 
 ---
 
@@ -28,13 +28,13 @@ Trigger when user says:
 
 ## Data Collection
 
-Ask in this order. For Angestellte below JAEG, skip GKV/PKV comparison — they have no choice.
+Ask in this order. For Angestellte below the income threshold for PKV eligibility (JAEG), skip GKV/PKV comparison — they have no choice.
 
-**Profil**
-1. Employment type — Angestellter/Angestellte oder Selbstständige/r?
+**Profile**
+1. Employment type — Angestellter/Angestellte or Selbstständige/r?
 2. Age (date of birth for precision)
 3. Gross annual income (Bruttojahreseinkommen)
-4. Family status — single / verheiratet (partner's income?) / Kinder (how many, ages)
+4. Family status — single / married (partner's income?) / children (how many, ages)
 5. Is spouse/partner employed and earning their own income?
 6. Current health insurance — GKV or PKV? Which Krankenkasse / Versicherung? Monthly premium?
 7. General health — no pre-existing conditions / some minor conditions / significant conditions?
@@ -42,14 +42,14 @@ Ask in this order. For Angestellte below JAEG, skip GKV/PKV comparison — they 
 9. Early retirement intent — plan to retire before 60? FIRE target?
 10. Own or rent (Mieter oder Eigentümer)? City/region?
 
-**Bestehende Versicherungen (ask all at once)**
-11. Haftpflichtversicherung — vorhanden?
-12. Berufsunfähigkeitsversicherung — vorhanden? Monthly Rente? Waiting period (Karenzzeit)?
-13. Risikolebensversicherung — vorhanden? Sum insured? Term?
-14. Hausratversicherung — vorhanden? Includes Elementarschaden?
-15. Rechtsschutzversicherung — vorhanden? Which modules?
+**Existing Insurance (ask all at once)**
+11. Personal liability insurance (Haftpflichtversicherung) — in place?
+12. Occupational disability insurance (BU/Berufsunfähigkeitsversicherung) — in place? Monthly benefit? Waiting period (Karenzzeit)?
+13. Term life insurance (Risikolebensversicherung) — in place? Sum insured? Term?
+14. Contents insurance (Hausratversicherung) — in place? Includes Elementarschaden?
+15. Legal expenses insurance (Rechtsschutzversicherung) — in place? Which modules?
 16. Other: Pflegezusatz, Zahnzusatz, KFZ?
-17. Gewerkschaft membership? (relevant for Rechtsschutz)
+17. Trade union (Gewerkschaft) membership? (relevant for Rechtsschutz)
 
 ---
 
@@ -59,12 +59,12 @@ Ask in this order. For Angestellte below JAEG, skip GKV/PKV comparison — they 
 
 ### Insurance Priority Ranking for Standard Angestellte
 
-1. 🔴 **Haftpflichtversicherung** — absolutely essential, lowest cost-to-risk ratio
-2. 🔴 **BU (Berufsunfähigkeitsversicherung)** — most critical for income protection while working
-3. 🟡 **Risikolebensversicherung** — essential only if dependents (children, partner relying on income)
-4. 🟡 **Hausratversicherung** — recommended for renters
-5. 🟡 **Rechtsschutzversicherung** — valuable for Angestellte and renters
-6. 🟢 **Krankenversicherung (GKV/PKV)** — mandatory; analysis focuses on optimization
+1. 🔴 **Personal liability insurance (Haftpflichtversicherung)** — absolutely essential, lowest cost-to-risk ratio
+2. 🔴 **Occupational disability insurance (BU/Berufsunfähigkeitsversicherung)** — most critical for income protection while working
+3. 🟡 **Term life insurance (Risikolebensversicherung)** — essential only if dependents (children, partner relying on income)
+4. 🟡 **Contents insurance (Hausratversicherung)** — recommended for renters
+5. 🟡 **Legal expenses insurance (Rechtsschutzversicherung)** — valuable for Angestellte and renters
+6. 🟢 **Health insurance (GKV/PKV)** — mandatory; analysis focuses on optimization
 
 ---
 
@@ -74,9 +74,9 @@ Ask in this order. For Angestellte below JAEG, skip GKV/PKV comparison — they 
 
 | Situation | Options |
 |-----------|---------|
-| Angestellter, Bruttolohn **below** JAEG (2026: €73,800/yr) | GKV mandatory — no choice |
-| Angestellter, Bruttolohn **above** JAEG for current + prior year | Can choose GKV (freiwillig) or PKV |
-| Selbstständige/r | Always free to choose GKV (freiwillig) or PKV |
+| Angestellter, gross income **below** income threshold for PKV eligibility (JAEG) (2026: €73,800/yr) | GKV mandatory — no choice |
+| Angestellter, gross income **above** JAEG for current + prior year | Can choose GKV (voluntarily) or PKV |
+| Selbstständige/r | Always free to choose GKV (voluntarily) or PKV |
 | Beamte | Typically PKV + Beihilfe — not covered in this skill |
 
 **JAEG 2026: €73,800 gross/year (€6,150/month)** — verify annual update at bmas.de.
@@ -85,7 +85,7 @@ If user is Angestellter below JAEG: skip to Section 1c (GKV Optimization), then 
 
 ---
 
-#### 1a. Kostenvergleich — Angestellte Above JAEG
+#### 1a. Cost Comparison — Angestellte Above JAEG
 
 **GKV cost for Angestellter:**
 
@@ -93,7 +93,7 @@ If user is Angestellter below JAEG: skip to Section 1c (GKV Optimization), then 
 Beitragsbemessungsgrenze (BBG) KV 2026: €8,050/month gross (€96,600/year)
 GKV avg total rate 2026: ~16.3% (14.6% Basisbeitrag + ~1.7% avg Zusatzbeitrag)
 Employee share: 8.15% of gross income (up to BBG)
-Employer share (AG-Anteil): 8.15% of gross (up to BBG)
+Employer share: 8.15% of gross (up to BBG)
 
 Monthly GKV employee cost:
   If gross <= €8,050/mo: gross × 8.15%
@@ -104,15 +104,15 @@ Monthly GKV employee cost:
 
 ```
 PKV premium: risk-rated at entry (age, sex, health status)
-Employer contribution (AG-Zuschuss): min(50% of PKV premium, AG-Anteil GKV equivalent)
+Employer contribution: min(50% of PKV premium, employer GKV equivalent)
   Effectively: employer pays up to 50% of your PKV premium, or the GKV equivalent — whichever is lower.
 
-Net PKV cost = PKV gross premium - AG-Zuschuss
+Net PKV cost = PKV gross premium - employer contribution
 ```
 
 **Rough PKV premium estimates (2026, Angestellter, good health, office profession, no pre-existing conditions):**
 
-| Age | Monthly PKV premium | AG-Zuschuss (est.) | Net employee cost |
+| Age | Monthly PKV premium | Employer contribution (est.) | Net employee cost |
 |-----|--------------------|--------------------|-------------------|
 | 25 | ~€280–380 | ~€140–190 | ~€140–190 |
 | 30 | ~€320–440 | ~€160–220 | ~€160–220 |
@@ -128,7 +128,7 @@ Net PKV cost = PKV gross premium - AG-Zuschuss
 GKV employee cost: €6,667/mo × 8.15% = €543/month
 
 PKV gross premium: ~€380/month (example)
-AG-Zuschuss: min(€190, €543) = €190
+Employer contribution: min(€190, €543) = €190
 PKV net employee cost: €190/month
 
 Monthly savings with PKV: €543 - €190 = €353/month
@@ -139,14 +139,14 @@ Compute this for user's actual income and estimated PKV range.
 
 ---
 
-#### 1b. GKV/PKV Entscheidungsmatrix
+#### 1b. GKV/PKV Decision Matrix
 
 **Do NOT recommend PKV if any of these apply:**
 
-| Risikofaktor | Gewichtung | Erläuterung |
+| Risk factor | Weight | Explanation |
 |--------------|------------|-------------|
-| Non-working spouse / Familienversicherung beneficial | 🚨 Critical | PKV requires separate policy per family member. A family of 4 in PKV = 4× premium. GKV co-insures Ehepartner (not earning above Geringfügigkeitsgrenze: €556/month) and all children FREE. |
-| Pre-existing conditions | 🚨 Critical | PKV kann Vorerkrankungen ausschließen, Risikozuschläge erheben oder Antrag ablehnen. GKV cannot. |
+| Non-working spouse / Familienversicherung beneficial | 🚨 Critical | PKV requires separate policy per family member. A family of 4 in PKV = 4× premium. GKV co-insures spouse (not earning above Geringfügigkeitsgrenze: €556/month) and all children FREE. |
+| Pre-existing conditions | 🚨 Critical | PKV can exclude pre-existing conditions, apply risk surcharges, or reject application. GKV cannot. |
 | Income stability uncertain (may drop below JAEG) | 🔴 High | Returning to GKV as Angestellter after PKV exit is very difficult once above 55. |
 | Early retirement / FIRE intent | 🔴 High | No employer subsidy in retirement. Full PKV premium alone can be €600–1,200+/month. GKV → KVdR very favorable if 9/10 of working life in GKV. |
 | Profession with high physical risk | 🟠 Medium | PKV premiums for Handwerker, nurses, physical professions much higher. |
@@ -158,14 +158,14 @@ Compute this for user's actual income and estimated PKV range.
 - Young (under 35 ideally; under 40 acceptable)
 - Excellent health, no significant pre-existing conditions
 - Stable high income, no intention to reduce hours
-- Office/academic profession (low BU risk class for PKV)
+- Office/academic profession (low disability risk class for PKV)
 - No early retirement plan within GKV KVdR window
 - Income firmly and sustainably above JAEG
 - Self-employed where employer subsidy isn't a factor anyway
 
 **PKV quality tier matters:** Not all PKV plans are equal. Key criteria:
 - Beitragsrückerstattung (premium refund for claim-free years)
-- Beitragsentwicklung (premium increase history — check with unabhängigem Makler or **pkv.de**)
+- Beitragsentwicklung (premium increase history — check with independent insurance broker or **pkv.de**)
 - Chefarztbehandlung and Einbettzimmer: standard in most full tariffs
 - Krankentagegeld: must be separately insured
 
@@ -177,7 +177,7 @@ Compute this for user's actual income and estimated PKV range.
 
 All GKV funds provide the same statutory benefits (Pflichtleistungen per SGB V). They compete on:
 - **Zusatzbeitrag**: varies from ~0.5% to ~2.5% — difference on €4,000/month gross = €40–80/month
-- **Zusatzleistungen**: dental bonus programmes, alternative medicine, sports courses (§20 SGB V), Bonusprogramme
+- **Additional benefits**: dental bonus programmes, alternative medicine, sports courses (§20 SGB V), Bonusprogramme
 - **Service quality**: app, response times, specialist referrals
 
 **Well-rated GKV funds (check current Zusatzbeitrag at gesetzliche-krankenkassen.de):**
@@ -188,21 +188,21 @@ All GKV funds provide the same statutory benefits (Pflichtleistungen per SGB V).
 
 **Action:** Compare current Krankenkasse Zusatzbeitrag vs cheapest alternative. Switching costs nothing and takes 2 months notice. On €5,000/month gross: 1% Zusatzbeitrag difference = €50/month = €600/year saved.
 
-**Supplemental insurance within GKV (empfehlenswert):**
+**Supplemental insurance within GKV (recommended):**
 - **Zahnzusatzversicherung**: GKV covers only 60–70% of dental/prosthetics costs; gap can be thousands. Cost: ~€10–30/month. Worth it for most people.
 - **Auslandskrankenversicherung**: GKV covers EU travel emergencies only. For travel outside EU or longer stays: ~€10–20/year (very cheap, very important).
 - **Krankenhaustagegeld**: compensates income loss during hospital stay beyond Lohnfortzahlung.
 
 ---
 
-#### 1d. Selbstständige — Besonderheiten
+#### 1d. Selbstständige — Special Considerations
 
 For Selbstständige, no employer contributes to GKV. Full rate falls on them:
 
-**GKV as Selbstständige/r (freiwillig versichert):**
+**GKV as Selbstständige/r (voluntarily insured):**
 ```
 GKV total rate 2026: ~16.3%
-Mindestbemessungsgrundlage 2026: €1,178/month
+Minimum assessment base 2026: €1,178/month
 Minimum GKV monthly contribution: €1,178 × 16.3% = ~€193/month
   (This is the floor; actual income above this = higher contribution)
 
@@ -211,7 +211,7 @@ If monthly income €5,000: GKV = €5,000 × 16.3% = €815/month
 If monthly income €8,050+: capped at BBG = €8,050 × 16.3% = ~€1,312/month
 ```
 
-*Verify Mindestbemessungsgrundlage annually at gkv-spitzenverband.de*
+*Verify minimum assessment base annually at gkv-spitzenverband.de*
 
 **PKV for Selbstständige:**
 - No employer subsidy available
@@ -223,13 +223,13 @@ If monthly income €8,050+: capped at BBG = €8,050 × 16.3% = ~€1,312/month
 - GKV pays Krankengeld after 6 weeks — but Selbstständige need special opt-in Wahltarif (§ 53 SGB V) for Krankengeld, otherwise no income replacement
 - PKV holders must separately buy Krankentagegeld tariff
 - Recommendation: minimum €50–70/day Krankentagegeld coverage if self-employed
-- This starts from Day 1, 8, 15, 29, or 43 depending on Karenzzeit chosen (longer wait = lower premium)
+- This starts from Day 1, 8, 15, 29, or 43 depending on waiting period chosen (longer wait = lower premium)
 
 ---
 
 #### 1e. Retirement Healthcare Impact — Critical for Long-Term Planning
 
-**GKV → KVdR (Krankenversicherung der Rentner):**
+**GKV → statutory health insurance in retirement (KVdR):**
 - Requirement: 9/10 of the second half of working life in GKV (Vorversicherungszeit)
 - For someone working from age 25 to 67: second half = ages 46–67 = 21 years. Must have 19 of those in GKV.
 - KVdR rates: contribution on GRV pension only (not capital income) — very favorable
@@ -243,69 +243,69 @@ If monthly income €8,050+: capped at BBG = €8,050 × 16.3% = ~€1,312/month
 - No exit to GKV after age 55 in most circumstances
 - Exception: Standardtarif / Basistarif (legal fallback options) — much reduced benefits
 
-**Rückkehrrecht:** Once in PKV, returning to GKV as Angestellter above 55 is nearly impossible. Factor this permanently into the decision.
+**Return right:** Once in PKV, returning to GKV as Angestellter above 55 is nearly impossible. Factor this permanently into the decision.
 
 **Verdict on retirement impact:** For anyone who is not firmly committed to staying in PKV throughout their entire career AND has a non-earning spouse or retirement lifestyle concerns: GKV provides substantial long-term security.
 
 ---
 
-### Section 2: Berufsunfähigkeitsversicherung (BU)
+### Section 2: Occupational Disability Insurance (BU/Berufsunfähigkeitsversicherung)
 
 **The most critical private insurance for working-age Germans.** No other single insurance has a higher impact-to-cost ratio for most Angestellte and Selbstständige.
 
-#### Why BU Is Critical
+#### Why Disability Insurance (BU) Is Critical
 
 **Statutory protection is dangerously low:**
 
-| Schutz | Zahlung | Voraussetzung |
+| Protection | Payment | Requirement |
 |--------|---------|---------------|
-| Lohnfortzahlung (Arbeitgeber) | 100% gross | First 6 weeks of illness only |
+| Lohnfortzahlung (employer) | 100% gross | First 6 weeks of illness only |
 | Krankengeld (GKV) | 70% of gross (max ~€120/day) | Weeks 7–78 of continuous illness |
-| Erwerbsminderungsrente volle (GRV) | **~30–40% of last net income** | Cannot work >3h/day in ANY job |
-| Erwerbsminderungsrente teilweise (GRV) | **~half of volle EMR** | Cannot work >6h/day in ANY job |
+| Full reduced earnings capacity pension (GRV) | **~30–40% of last net income** | Cannot work >3h/day in ANY job |
+| Partial reduced earnings capacity pension (GRV) | **~half of full pension** | Cannot work >6h/day in ANY job |
 
-**Key problem with EMR:**
-- It is NOT profession-specific — if you can work as a cashier for 3 hours/day, you may not qualify for volle EMR, even if you can no longer work as a surgeon or software engineer
+**Key problem with reduced earnings capacity pension:**
+- It is NOT profession-specific — if you can work as a cashier for 3 hours/day, you may not qualify for the full pension, even if you can no longer work as a surgeon or software engineer
 - Requires at least 5 years of Pflichtbeiträge to GRV — recent graduates and early-career Selbstständige may not qualify at all
-- Average volle EMR: ~€960/month (new recipients). Varies widely by contribution history.
+- Average full reduced earnings capacity pension: ~€960/month (new recipients). Varies widely by contribution history.
 - Source: Deutsche Rentenversicherung Rentenversicherungsbericht
 
-**BU insurance covers:** Inability to work in your **specific profession** at >50% capacity (Berufsunfähigkeitsgrad 50%), regardless of whether you could theoretically do other work. The Leistungsdefinition bedingungsgemäß ties the payout to your actual occupation — not a hypothetical alternative.
+**Disability insurance (BU) covers:** Inability to work in your **specific profession** at >50% capacity (Berufsunfähigkeitsgrad 50%), regardless of whether you could theoretically do other work. The benefit definition ties the payout to your actual occupation — not a hypothetical alternative.
 
-#### BU Gap Calculation
+#### Disability Gap Calculation
 
 ```
 Step 1: Monthly net income current = gross - taxes - Sozialabgaben
-Step 2: Target income replacement (Zielrente) = 70–80% of monthly net
-Step 3: Expected EMR benefit = ~€900–1,100/month (estimate; use actual DRV projection if available)
-         For those without 5 GRV years: EMR = €0
-Step 4: BU monthly benefit needed = Target income - EMR
-Step 5: BU monthly benefit minimum = should not be less than €1,500/month
+Step 2: Target income replacement = 70–80% of monthly net
+Step 3: Expected reduced earnings capacity pension = ~€900–1,100/month (estimate; use actual DRV projection if available)
+         For those without 5 GRV years: pension = €0
+Step 4: Monthly BU benefit needed = Target income - expected pension
+Step 5: Monthly BU benefit minimum = should not be less than €1,500/month
 ```
 
-**Wartezeit (Karenzzeit):** Standard BU policies begin paying after a 6-month continuous inability to work. Factor this into emergency fund planning — 6 months of expenses should be in reserve.
+**Waiting period (Karenzzeit):** Standard disability (BU) policies begin paying after a 6-month continuous inability to work. Factor this into emergency fund planning — 6 months of expenses should be in reserve.
 
 **Example:**
 ```
 Gross: €5,000/month → Net ~€3,100/month (Angestellter, GKV, no church tax)
-Zielrente (75% of net): €2,325/month
-Expected EMR: €1,000/month
-BU needed: €1,325/month
+Target replacement (75% of net): €2,325/month
+Expected reduced earnings capacity pension: €1,000/month
+BU benefit needed: €1,325/month
 
-Recommended BU Rente: €1,500–2,000/month (round up; EMR estimate may not materialize)
+Recommended BU monthly benefit: €1,500–2,000/month (round up; pension estimate may not materialize)
 ```
 
-#### BU Premium Ranges (Rough Estimates, 2026)
+#### Disability Insurance (BU) Premium Ranges (Rough Estimates, 2026)
 
 Premium depends heavily on: age, profession risk class, sum, term, health history. Always get individual quotes.
 
 **Profession risk classes (illustrative — varies by insurer):**
-- **Klasse 1 (lowest risk)**: Software developer, analyst, teacher (Gymnasium), Bürokaufmann
-- **Klasse 2**: Arzt, Anwalt, Ingenieur, Kaufmännische Berufe
-- **Klasse 3**: Krankenpfleger, Erzieher, Einzelhandel
-- **Klasse 4–5 (highest risk)**: Handwerker, Maurer, Elektriker, körperliche Berufe
+- **Class 1 (lowest risk)**: Software developer, analyst, teacher (Gymnasium), Bürokaufmann
+- **Class 2**: Arzt, Anwalt, Ingenieur, Kaufmännische Berufe
+- **Class 3**: Krankenpfleger, Erzieher, Einzelhandel
+- **Class 4–5 (highest risk)**: Handwerker, Maurer, Elektriker, physical occupations
 
-**Rough monthly premiums, Klasse 1 profession, non-smoker, BU Rente €2,000/month, term to 67:**
+**Rough monthly premiums, Class 1 profession, non-smoker, BU monthly benefit €2,000, term to 67:**
 
 | Age | Monthly premium |
 |-----|----------------|
@@ -315,26 +315,26 @@ Premium depends heavily on: age, profession risk class, sum, term, health histor
 | 40 | ~€140–230 |
 | 45 | ~€210–360 |
 
-*For Klasse 3–4 professions: 2–4× these amounts. Source: BU market surveys from Morgen & Morgen, franke-bornberg.de*
+*For Class 3–4 professions: 2–4× these amounts. Source: BU market surveys from Morgen & Morgen, franke-bornberg.de*
 
-#### BU Quality Criteria (What to Check in a Policy)
+#### Disability Insurance (BU) Quality Criteria (What to Check in a Policy)
 
 - **Verzicht auf abstrakte Verweisung (§ 163 VVG)**: Insurer may NOT redirect you to a different profession you could theoretically do. **Critical** — verify explicitly. This is the single most important clause. Policies without this exclusion are substantially inferior.
-- **Leistungsdefinition bedingungsgemäß**: Benefit triggered on your agreed occupation, not a theoretical one
+- **Benefit definition**: Benefit triggered on your agreed occupation, not a theoretical one
 - **Nachversicherungsgarantie**: Ability to increase BU benefit without new health check (marriage, children, income rise)
 - **Rückwirkende Leistung**: Benefit paid retroactively if delay in determination
-- **6-Monats-Prognose vs Dauerprognose**: 6-month prognosis preferred (begins paying sooner)
-- **Weltweite Geltung**: Should apply globally
-- **Nettobeitrag vs Tarifbeitrag**: Always compare **Nettobeitrag** (actual charged premium) not Tarifbeitrag (maximum insurer can charge). Ask insurer for 10-year Nettobeitrag history.
+- **6-month prognosis vs. permanent prognosis**: 6-month prognosis preferred (begins paying sooner)
+- **Worldwide coverage**: Should apply globally
+- **Net premium vs. tariff premium**: Always compare **net premium (Nettobeitrag)** (actual charged premium) not tariff premium (Tarifbeitrag) (maximum insurer can charge). Ask insurer for 10-year net premium history.
 - **Rating**: Check Morgen & Morgen or franke-bornberg.de rating (aim for ★★★★★ providers: Allianz, MünchenerVerein, AXA, Zurich, LV1871, Condor for budget options)
 
 **Combination products to AVOID:**
-- BU + Kapitallebensversicherung: overpriced, inflexible
-- BU + Altersvorsorge: keep insurance and investment separate
+- Disability insurance (BU) + Kapitallebensversicherung: overpriced, inflexible
+- Disability insurance (BU) + retirement savings: keep insurance and investment separate
 
 ---
 
-### Section 3: Risikolebensversicherung (Term Life)
+### Section 3: Term Life Insurance (Risikolebensversicherung)
 
 **When needed:** Any person with financial dependents (spouse, children) who rely on their income.
 
@@ -344,7 +344,7 @@ Premium depends heavily on: age, profession risk class, sum, term, health histor
 
 ```
 Method 1 (Income replacement):
-  Mindest-Deckungssumme: 10× annual net income
+  Minimum coverage: 10× annual net income
   Optimal: 10–15× annual net income
 
 Method 2 (Needs-based):
@@ -354,28 +354,28 @@ Method 2 (Needs-based):
            + funeral + admin costs (~€15–25k)
 ```
 
-**Risikolebensversicherung is cheap in Germany:**
+**Term life insurance (Risikolebensversicherung) is cheap in Germany:**
 - 35-year-old, non-smoker, good health, €300,000 sum, 20-year term
 - Premium: ~€15–25/month
 
-**Always choose Risikolebensversicherung (term) NOT Kapitallebensversicherung (whole life):** Kapitallebens is an overpriced savings product with historically low returns (~2%). Insurance and investment should be separate.
+**Always choose term life insurance (Risikolebensversicherung) NOT whole life (Kapitallebensversicherung):** Kapitallebens is an overpriced savings product with historically low returns (~2%). Insurance and investment should be separate.
 
-**Restschuldversicherung vs. standalone Risikolebensversicherung:**
+**Restschuldversicherung vs. standalone term life insurance:**
 - Restschuldversicherung: tied to the loan, sold by bank at point of mortgage — typically overpriced and restricted
-- A standalone Risikolebensversicherung is almost always better value: more flexible, independent of bank, can cover more than just the mortgage balance
+- A standalone term life insurance is almost always better value: more flexible, independent of bank, can cover more than just the mortgage balance
 - Use annuitätisch fallende Versicherungssumme if covering mortgage only — cheaper premium as sum matches declining balance
 
 **Verbundene Lebensversicherung für Paare**: Both partners insured in one policy; payout on first death. Cheaper than two separate policies but only pays once — evaluate carefully if both partners are primary earners.
 
 ---
 
-### Section 4: Haftpflichtversicherung (Personal Liability Insurance) — CRITICAL
+### Section 4: Personal Liability Insurance (Haftpflichtversicherung) — CRITICAL
 
-**Why essential:** In Germany, you are personally liable for all damages you cause (§ 823 BGB). There is no statutory cap. One serious accident — injuring someone as a cyclist, accidentally causing a fire, a child causing damage — can result in claims running into the millions. Without Haftpflichtversicherung, your entire net worth is at risk.
+**Why essential:** In Germany, you are personally liable for all damages you cause (§ 823 BGB). There is no statutory cap. One serious accident — injuring someone as a cyclist, accidentally causing a fire, a child causing damage — can result in claims running into the millions. Without personal liability insurance (Haftpflichtversicherung), your entire net worth is at risk.
 
-**If client has NO Haftpflichtversicherung → flag as critical gap requiring immediate action.**
+**If client has NO personal liability insurance → flag as critical gap requiring immediate action.**
 
-#### Minimum Deckungssumme
+#### Minimum Coverage Sum
 
 - **€10 million** for Personenschäden (bodily injury), Sachschäden (property damage), and Vermögensschäden (financial loss)
 - Do not accept policies below €5 million; €10 million is the current market standard for good policies
@@ -408,21 +408,21 @@ ARAG, Allianz, HUK-Coburg, Gothaer, Cosmos Direkt — compare via Check24 or Ver
 
 ---
 
-### Section 5: Rechtsschutzversicherung (Legal Expenses Insurance) — Situational
+### Section 5: Legal Expenses Insurance (Rechtsschutzversicherung) — Situational
 
-**What it covers:** Legal costs (Anwalts-, Gerichts-, Sachverständigenkosten) for disputes across key modules.
+**What it covers:** Legal costs (attorney, court, expert witness fees) for disputes across key modules.
 
 #### Key Coverage Modules
 
-| Modul | Inhalt | Relevanz für Angestellte |
+| Module | Content | Relevance for Angestellte |
 |-------|--------|--------------------------|
-| Arbeitsrecht | Employment disputes — Kündigung, Abmahnung, unfair dismissal | Sehr hoch |
-| Verkehrsrecht | Traffic disputes, accidents, Bußgeld-Einspruch | Hoch (Autofahrer) |
-| Mietrechtsschutz | Landlord-tenant disputes, Nebenkosten, Kündigung | Hoch (Mieter) |
-| Vertragsrecht | Consumer disputes, online purchases | Mittel |
-| Strafrecht (passiv) | Defense costs in criminal proceedings | Situational; check policy |
+| Employment law (Arbeitsrecht) | Employment disputes — Kündigung, Abmahnung, unfair dismissal | Very high |
+| Traffic law (Verkehrsrecht) | Traffic disputes, accidents, Bußgeld-Einspruch | High (car drivers) |
+| Tenancy law (Mietrechtsschutz) | Landlord-tenant disputes, utility costs, Kündigung | High (renters) |
+| Contract law (Vertragsrecht) | Consumer disputes, online purchases | Medium |
+| Criminal law — passive (Strafrecht) | Defense costs in criminal proceedings | Situational; check policy |
 
-**Wartezeit:** Typically 3 months after policy start — you cannot buy after a dispute has arisen. Plan ahead.
+**Waiting period:** Typically 3 months after policy start — you cannot buy after a dispute has arisen. Plan ahead.
 
 #### Cost
 
@@ -431,34 +431,34 @@ ARAG, Allianz, HUK-Coburg, Gothaer, Cosmos Direkt — compare via Check24 or Ver
 
 #### When it IS worth it
 
-- Renting in Germany (Mietrechtsstreitigkeiten are very common)
-- Employed in a large company (Arbeitsrechtschutz is highly valuable — labor disputes in Germany can be lengthy)
-- Car owner (Verkehrsrecht module)
-- Self-employed with frequent contracts (Vertragsrecht)
+- Renting in Germany (tenancy disputes are very common)
+- Employed in a large company (employment law coverage is highly valuable — labor disputes in Germany can be lengthy)
+- Car owner (traffic law module)
+- Self-employed with frequent contracts (contract law)
 
 #### When to SKIP
 
-- Already a **Gewerkschaft** member: trade union provides Rechtsschutz for Arbeitsrecht free of charge — no need to duplicate this module
+- Already a **Gewerkschaft** member: trade union provides legal expenses coverage for employment law free of charge — no need to duplicate this module
 - Emergency fund large enough to self-insure moderate legal costs (most single disputes: €1,000–5,000)
 - If no car, no rental situation, and union covers employment: marginal value
 
 ---
 
-### Section 6: Hausratversicherung (Contents Insurance) — Recommended for Renters
+### Section 6: Contents Insurance (Hausratversicherung) — Recommended for Renters
 
 #### What it covers
 
-- **Einbruchdiebstahl** (burglary and theft)
-- **Feuer** (fire, lightning, explosion)
-- **Leitungswasser** (burst pipes, water damage)
-- **Sturm und Hagel** (storm and hail — typically from wind force 8 / Windstärke 8 or above)
+- **Burglary and theft (Einbruchdiebstahl)**
+- **Fire (Feuer)** (fire, lightning, explosion)
+- **Burst pipes and water damage (Leitungswasser)**
+- **Storm and hail (Sturm und Hagel)** (typically from wind force 8 / Windstärke 8 or above)
 
 #### What it does NOT cover (standard policy)
 
 - **Flooding from outside** (Hochwasser, Überschwemmung) — requires Elementarschadenversicherung add-on
 - Foundation water ingress
 - Intentional damage
-- Items outside the home (unless explicitly covered — check Fahrraddiebstahl clause)
+- Items outside the home (unless explicitly covered — check bicycle theft clause)
 
 #### Elementarschadenversicherung (Add-on)
 
@@ -469,12 +469,12 @@ Covers: flooding, earth movement, landslides, snow pressure, Rückstau (backflow
 - Cost add-on: typically €30–80/year additional, depending on location risk zone
 - Check **Zürs** (Zonierungssystem Überschwemmung, Rückstau und Starkregen) for property risk zone
 
-#### Versicherungssumme
+#### Coverage Sum
 
-- Insure at **Neuwert** (replacement cost), not Zeitwert (current market value)
+- Insure at **replacement cost (Neuwert)**, not current market value (Zeitwert)
 - Estimate contents: use ~€650/sqm as a rule of thumb (e.g., 75sqm flat: ~€48,750 estimated contents value)
 - **Always include Unterversicherungsverzicht clause**: insurer cannot invoke the proportional reduction rule (Unterversicherung) if you have declared in good faith. Without this clause, if your declared sum is 80% of actual value, the insurer pays only 80% of any claim.
-- Fahrraddiebstahl: typically requires explicit clause and sometimes minimum lock specification
+- Bicycle theft: typically requires explicit clause and sometimes minimum lock specification
 
 #### Cost
 
@@ -483,8 +483,8 @@ Covers: flooding, earth movement, landslides, snow pressure, Rückstau (backflow
 
 #### Renters vs. Owners
 
-- **Mieter (renters)**: Hausratversicherung is highly recommended. Building structure is covered by Wohngebäudeversicherung, which is the Vermieter's or WEG's responsibility — not the tenant's.
-- **Eigentümer**: Need both Hausratversicherung (contents) and either contribute to WEG's Wohngebäudeversicherung (in a Wohnungseigentümergemeinschaft) or take their own Wohngebäudeversicherung (for a Haus).
+- **Renters (Mieter)**: Contents insurance is highly recommended. Building structure is covered by Wohngebäudeversicherung, which is the landlord's or WEG's responsibility — not the tenant's.
+- **Owners (Eigentümer)**: Need both contents insurance (Hausratversicherung) and either contribute to WEG's Wohngebäudeversicherung (in a Wohnungseigentümergemeinschaft) or take their own Wohngebäudeversicherung (for a house).
 
 ---
 
@@ -493,212 +493,212 @@ Covers: flooding, earth movement, landslides, snow pressure, Rückstau (backflow
 Write FINANCE-INSURANCE.md to current working directory with the following structure:
 
 ```markdown
-# Versicherungsanalyse
-**Erstellt:** [Datum]
-**Profil:** [Angestellter/Selbstständiger], [Alter], [Familienstand]
-**Krankenversicherung aktuell:** [GKV/PKV, Kasse/Versicherung, monatlich €X]
+# Insurance Analysis
+**Created:** [Date]
+**Profile:** [Angestellter/Selbstständiger], [Age], [Marital status]
+**Current health insurance:** [GKV/PKV, Kasse/Versicherung, monthly €X]
 
-> **DISCLAIMER:** Informations- und Bildungszwecke. Keine Beratung im Sinne des VVG.
-> Für GKV/PKV-Entscheidungen und BU-Abschluss: unabhängigen Versicherungsmakler konsultieren.
+> **DISCLAIMER:** For educational/informational purposes only. Not advice under VVG.
+> For GKV/PKV decisions and disability insurance (BU): consult an independent insurance broker (unabhängiger Versicherungsmakler).
 
 ---
 
-## Prioritätsübersicht
+## Priority Overview
 
-| Priorität | Versicherung | Status | Handlungsbedarf |
+| Priority | Insurance | Status | Action needed |
 |-----------|-------------|--------|-----------------|
-| 🔴 1 | Haftpflichtversicherung | ✅ / ❌ | [Sofort / OK] |
-| 🔴 2 | Berufsunfähigkeitsversicherung | ✅ / ❌ / ⚠️ | [Lücke €X/Mo / OK] |
-| 🟡 3 | Risikolebensversicherung | ✅ / ❌ / N/A | [Lücke €X / OK / Keine Abhängigen] |
-| 🟡 4 | Hausratversicherung | ✅ / ❌ | [Empfohlen / OK] |
-| 🟡 5 | Rechtsschutzversicherung | ✅ / ❌ | [Prüfen / OK] |
-| 🟢 6 | Krankenversicherung (GKV/PKV) | [GKV/PKV] | [Optimierung / OK] |
+| 🔴 1 | Personal liability insurance (Haftpflichtversicherung) | ✅ / ❌ | [Immediate / OK] |
+| 🔴 2 | Occupational disability insurance (BU/Berufsunfähigkeitsversicherung) | ✅ / ❌ / ⚠️ | [Gap €X/mo / OK] |
+| 🟡 3 | Term life insurance (Risikolebensversicherung) | ✅ / ❌ / N/A | [Gap €X / OK / No dependents] |
+| 🟡 4 | Contents insurance (Hausratversicherung) | ✅ / ❌ | [Recommended / OK] |
+| 🟡 5 | Legal expenses insurance (Rechtsschutzversicherung) | ✅ / ❌ | [Review / OK] |
+| 🟢 6 | Health insurance (GKV/PKV) | [GKV/PKV] | [Optimization / OK] |
 
 ---
 
-## 1. Haftpflichtversicherung
+## 1. Personal Liability Insurance (Haftpflichtversicherung)
 
 ### Situation
-- Status: [Vorhanden ✅ / Nicht vorhanden ❌ — KRITISCHE LÜCKE]
-- Deckungssumme (falls vorhanden): €X
+- Status: [In place ✅ / Not in place ❌ — CRITICAL GAP]
+- Coverage sum (if in place): €X
 
-### Analyse
+### Analysis
 [If missing: flag as immediate action — highest ROI per euro of any insurance; personal liability under §823 BGB is unlimited]
-[If present: confirm Deckungssumme ≥ €10M; check family coverage if applicable]
+[If present: confirm coverage sum ≥ €10M; check family coverage if applicable]
 
-### Empfehlung
-- **Aktion:** [Sofort abschließen / Prüfen ob Deckungssumme ausreicht / OK]
-- Empfohlene Deckungssumme: €10 Mio. Personen-/Sach-/Vermögensschäden
-- Geschätzte Kosten: €50–80/Jahr (Single) / €80–120/Jahr (Familie)
-- Vergleich: Check24, Verivox; Anbieter: ARAG, HUK-Coburg, Allianz, Gothaer, Cosmos Direkt
+### Recommendation
+- **Action:** [Take out immediately / Check whether coverage sum is sufficient / OK]
+- Recommended coverage sum: €10 million — bodily injury, property damage, financial loss
+- Estimated cost: €50–80/year (single) / €80–120/year (family)
+- Compare: Check24, Verivox; providers: ARAG, HUK-Coburg, Allianz, Gothaer, Cosmos Direkt
 
 ---
 
-## 2. Berufsunfähigkeitsversicherung (BU)
+## 2. Occupational Disability Insurance (BU/Berufsunfähigkeitsversicherung)
 
-### BU-Lückenrechnung
+### Disability Gap Calculation
 
-| Kennzahl | Wert |
+| Metric | Value |
 |----------|------|
-| Monatliches Nettoeinkommen | €X |
-| Zielrente (70–80% Netto) | €X/Monat |
-| Erwartete Erwerbsminderungsrente (GRV) | ~€X/Monat |
-| **BU-Bedarf (Lücke)** | **€X/Monat** |
-| Aktuelle BU-Rente (falls vorhanden) | €X/Monat |
-| **Verbleibende Absicherungslücke** | **€X/Monat** |
+| Monthly net income | €X |
+| Target replacement (70–80% net) | €X/month |
+| Expected reduced earnings capacity pension (GRV) | ~€X/month |
+| **Disability benefit needed (gap)** | **€X/month** |
+| Current BU monthly benefit (if in place) | €X/month |
+| **Remaining coverage gap** | **€X/month** |
 
-**Status:** [Gut abgesichert ✅ / Unterversichert ⚠️ / Keine BU — kritisch 🚨]
+**Status:** [Well covered ✅ / Underinsured ⚠️ / No disability insurance — critical 🚨]
 
-### Empfehlung
+### Recommendation
 [If gap exists:]
-- BU-Rente erhöhen auf €X/Monat (Nachversicherungsgarantie prüfen)
-- Oder: Neue BU beantragen — geschätzte Nettobeitrag: €X–X/Monat
-- Wichtige Qualitätskriterien: Verzicht auf abstrakte Verweisung, Nachversicherungsgarantie, Nettobeitrag prüfen (nicht Tarifbeitrag)
-- Immer: unabhängigen Versicherungsmakler einschalten
+- Increase BU monthly benefit to €X/month (check Nachversicherungsgarantie)
+- Or: Apply for new disability insurance — estimated net premium: €X–X/month
+- Key quality criteria: Verzicht auf abstrakte Verweisung, Nachversicherungsgarantie, check net premium (not tariff premium)
+- Always: engage an independent insurance broker (unabhängiger Versicherungsmakler)
 
 ---
 
-## 3. Risikolebensversicherung
+## 3. Term Life Insurance (Risikolebensversicherung)
 
 ### Situation
-[If no dependents: "Keine Abhängigen — Risikolebensversicherung derzeit nicht erforderlich."]
+[If no dependents: "No dependents — term life insurance not currently required."]
 
 [If dependents:]
 
-| Kennzahl | Wert |
+| Metric | Value |
 |----------|------|
-| Jährliches Nettoeinkommen | €X |
-| Empfohlene Mindest-Deckungssumme (10× Netto) | €X |
-| Restliche Hypothek / Familienschulden | €X |
-| Aktuell versicherte Summe | €X |
-| **Deckungslücke** | **€X** |
+| Annual net income | €X |
+| Recommended minimum coverage (10× net) | €X |
+| Remaining mortgage / family debt | €X |
+| Currently insured sum | €X |
+| **Coverage gap** | **€X** |
 
-**Status:** [Ausreichend ✅ / Lücke vorhanden ⚠️ / Keine Versicherung, Abhängige vorhanden 🚨]
+**Status:** [Adequate ✅ / Gap identified ⚠️ / No insurance with dependents 🚨]
 
-### Empfehlung
-- Standalone Risikolebensversicherung (term) bevorzugen — keine Restschuldversicherung der Bank
-- Keine Kapitallebensversicherung
-- Geschätzte Kosten: ~€15–30/Monat (35J, €300k, 20 Jahre, Nichtraucher)
+### Recommendation
+- Standalone term life insurance preferred — no Restschuldversicherung from bank
+- No Kapitallebensversicherung
+- Estimated cost: ~€15–30/month (age 35, €300k, 20 years, non-smoker)
 
 ---
 
-## 4. Hausratversicherung
+## 4. Contents Insurance (Hausratversicherung)
 
 ### Situation
-- Status: [Vorhanden ✅ / Nicht vorhanden ❌]
-- Mieter oder Eigentümer: [X]
-- Elementarschaden-Zusatz: [Vorhanden / Nicht vorhanden / Nicht geprüft]
+- Status: [In place ✅ / Not in place ❌]
+- Renter or owner: [X]
+- Elementarschaden add-on: [In place / Not in place / Not checked]
 
-### Analyse
-[For renters without Hausrat: recommend immediately]
-[Check: Unterversicherungsverzicht included? Fahrraddiebstahl covered?]
+### Analysis
+[For renters without contents insurance: recommend immediately]
+[Check: Unterversicherungsverzicht included? Bicycle theft covered?]
 [If in flood-prone area: flag Elementarschadenversicherung add-on]
 
-### Empfehlung
-- Geschätzte Versicherungssumme: €X (auf Basis Wohnfläche × €650/sqm)
-- Empfehlung Elementarschaden-Zusatz: [Ja — Region X / Prüfen]
-- Geschätzte Kosten: €60–150/Jahr
+### Recommendation
+- Estimated coverage sum: €X (based on floor area × €650/sqm)
+- Recommendation for Elementarschaden add-on: [Yes — Region X / Review]
+- Estimated cost: €60–150/year
 
 ---
 
-## 5. Rechtsschutzversicherung
+## 5. Legal Expenses Insurance (Rechtsschutzversicherung)
 
 ### Situation
-- Status: [Vorhanden ✅ / Nicht vorhanden ❌]
-- Module (falls vorhanden): [Arbeitsrecht / Verkehrsrecht / Mietrecht / Vertragsrecht]
-- Gewerkschaftsmitglied: [Ja — Arbeitsrecht abgedeckt / Nein]
+- Status: [In place ✅ / Not in place ❌]
+- Modules (if in place): [Employment law / Traffic law / Tenancy law / Contract law]
+- Trade union member: [Yes — employment law covered / No]
 
-### Analyse
-[Evaluate need per situation: renter + employee = high value; union member = Arbeitsrecht already covered]
-[Flag Wartezeit: cannot buy after dispute arises]
+### Analysis
+[Evaluate need per situation: renter + employee = high value; union member = employment law already covered]
+[Flag waiting period: cannot buy after dispute arises]
 
-### Empfehlung
-- **Empfehlung:** [Sinnvoll für dieses Profil / Weniger relevant / Gewerkschaft deckt Hauptrisiken ab]
-- Wenn sinnvoll: Module prüfen — Arbeitsrecht + Mietrecht als Minimum für Angestellte/Mieter
-- Geschätzte Kosten: €150–400/Jahr
+### Recommendation
+- **Recommendation:** [Worthwhile for this profile / Less relevant / Union covers main risks]
+- If worthwhile: review modules — employment law + tenancy law as minimum for Angestellte/renters
+- Estimated cost: €150–400/year
 
 ---
 
-## 6. Krankenversicherung (GKV / PKV)
+## 6. Health Insurance (GKV / PKV)
 
 ### Situation
-- Aktuell: [GKV/PKV] bei [Kasse/Versicherung], monatlich: €X (Arbeitnehmeranteil)
-- JAEG 2026: €73,800 — Status: [Über / Unter Grenze / Nicht anwendbar Selbstständig]
+- Current: [GKV/PKV] at [Kasse/Versicherung], monthly: €X (employee share)
+- JAEG 2026: €73,800 — Status: [Above / Below threshold / Not applicable — Selbstständig]
 
-### [If above JAEG or Selbstständig] GKV vs PKV Vergleich
+### [If above JAEG or Selbstständig] GKV vs PKV Comparison
 
-| Kriterium | GKV | PKV |
+| Criterion | GKV | PKV |
 |-----------|-----|-----|
-| Monatlicher Beitrag (AN-Anteil / netto) | €X | €X |
-| Jahreskosten | €X | €X |
-| Familienversicherung (Ehepartner/Kind) | KOSTENLOS | €X extra/Person |
-| Schutz bei Vorerkrankungen | Vollständig | [Ausschlüsse prüfen] |
-| Rückkehrrecht nach 55 | Möglich | Sehr schwierig |
-| Rentenphase | KVdR möglich (günstig) | Voller Beitrag allein |
+| Monthly contribution (employee share / net) | €X | €X |
+| Annual cost | €X | €X |
+| Family insurance (spouse/child) | FREE | €X extra/person |
+| Protection with pre-existing conditions | Full | [Check exclusions] |
+| Return right after 55 | Possible | Very difficult |
+| Retirement phase | KVdR possible (favorable) | Full premium alone |
 
-**Empfehlung:** [GKV beibehalten / PKV prüfen / Wechsel nicht empfehlenswert]
-**Begründung:** [Specific reasoning based on user profile — family, income stability, retirement plan]
+**Recommendation:** [Stay in GKV / Evaluate PKV / Switch not advisable]
+**Rationale:** [Specific reasoning based on user profile — family, income stability, retirement plan]
 
-### [If in GKV] Kassenwahl Optimierung
-- Aktueller Zusatzbeitrag: X%
-- Günstigere Alternativen: [list top 3 with current Zusatzbeitrag from gesetzliche-krankenkassen.de]
-- Monatliche Ersparnis bei Wechsel: €X
-- Empfohlene Zusatzversicherungen: [Zahnzusatz, Auslands-KV falls relevant]
+### [If in GKV] Kassenwahl Optimization
+- Current Zusatzbeitrag: X%
+- Cheaper alternatives: [list top 3 with current Zusatzbeitrag from gesetzliche-krankenkassen.de]
+- Monthly saving on switch: €X
+- Recommended supplemental insurance: [Zahnzusatz, Auslands-KV if relevant]
 
 ---
 
-## 7. Priorisierter Aktionsplan
+## 7. Prioritized Action Plan
 
-### Sofort (diese Woche)
-1. [Most critical gap — typically: Haftpflicht abschließen if missing]
-2. [Second priority — e.g., Krankenkasse wechseln if Zusatzbeitrag significantly above market]
+### Immediate (this week)
+1. [Most critical gap — typically: take out personal liability insurance if missing]
+2. [Second priority — e.g., switch Krankenkasse if Zusatzbeitrag significantly above market]
 
-### Dieser Monat
-1. [BU gap — unabhängigen Versicherungsmakler kontaktieren, Nettobeiträge vergleichen]
-2. [Hausrat abschließen if renter without coverage]
+### This month
+1. [Disability insurance (BU) gap — contact independent insurance broker (unabhängiger Versicherungsmakler), compare net premiums]
+2. [Take out contents insurance if renter without coverage]
 
-### Dieses Quartal
-1. [Risikolebens if dependents and gap identified]
-2. [Rechtsschutz — evaluate if Mieter and/or Angestellter without Gewerkschaft]
+### This quarter
+1. [Term life if dependents and gap identified]
+2. [Legal expenses — evaluate if renter and/or Angestellter without trade union]
 3. [Zahnzusatz before dental issues arise]
 
-### Mittel- bis Langfristig
+### Medium- to Long-Term
 1. [GKV/PKV strategic review if approaching JAEG threshold]
-2. [Elementarschaden add-on to Hausrat if flood-prone region]
+2. [Elementarschaden add-on to contents insurance if flood-prone region]
 3. [Pflegezusatz — consider under 40 while premiums are low]
 
 ---
 
-## 8. Empfohlene Anlaufstellen
+## 8. Recommended Resources
 
-- **Unabhängiger Versicherungsmakler** (§ 34d GewO) — für BU, PKV, Risikolebens
-  - NICHT: gebundene Vertreter von Allianz, AXA etc. (Ausschließlichkeitsvertreter — nicht unabhängig)
-  - Empfehlungen: Verbraucherzentrale.de oder BdV (Bund der Versicherten)
-- **Verbraucherzentrale.de** — unparteiische Versicherungsberatung (~€200/Stunde, unabhängig)
-- **Gesetzliche-Krankenkassen.de** — Kassenwahl und Zusatzbeitrag Vergleich
-- **Morgen & Morgen / Franke-Bornberg (franke-bornberg.de)** — BU-Rating-Tabellen (neutral)
-- **Bund der Versicherten (BdV)** — Beschwerdeanlaufstelle, Beratung
-- **Check24 / Verivox** — Haftpflicht, Hausrat, Rechtsschutz Preisvergleich
+- **Independent insurance broker (unabhängiger Versicherungsmakler)** (§ 34d GewO) — for disability insurance (BU), PKV, term life
+  - NOT: tied agents (Ausschließlichkeitsvertreter) from Allianz, AXA etc. — not independent
+  - Recommendations: Verbraucherzentrale.de or BdV (Bund der Versicherten)
+- **Verbraucherzentrale.de** — impartial insurance consultation (~€200/hour, independent)
+- **Gesetzliche-Krankenkassen.de** — Kassenwahl and Zusatzbeitrag comparison
+- **Morgen & Morgen / Franke-Bornberg (franke-bornberg.de)** — disability insurance (BU) rating tables (neutral)
+- **Bund der Versicherten (BdV)** — complaints contact, consultation
+- **Check24 / Verivox** — personal liability, contents insurance, legal expenses price comparison
 
 ---
 
-**DISCLAIMER:** Für Informations- und Bildungszwecke. Keine Beratung im Sinne des VVG (Versicherungsvertragsgesetz). Keine Haftung für Entscheidungen, die auf dieser Analyse basieren. Prämienangaben sind Richtwerte und keine Angebote. Beiträge und Grenzen ändern sich jährlich — Werte hier basieren auf 2026 Zahlen. Konsultieren Sie für alle Versicherungsentscheidungen einen unabhängigen Versicherungsmakler (§ 34d GewO).
+**DISCLAIMER:** For educational/informational purposes only. Not advice under VVG (Versicherungsvertragsgesetz). No liability for decisions based on this analysis. Premium figures are indicative and not offers. Contributions and thresholds change annually — values here are based on 2026 figures. For all insurance decisions, consult an independent insurance broker (unabhängiger Versicherungsmakler) (§ 34d GewO).
 ```
 
 ---
 
 ## Quality Standards
 
-- GKV/PKV comparison always shows **net cost comparison** (after AG-Zuschuss for Angestellte)
-- BU analysis always shows the **EMR gap** — not just "do you have a BU"
-- Always compare BU Nettobeitrag, not Tarifbeitrag
-- Haftpflicht flagged as immediate action if missing — highest ROI per euro
+- GKV/PKV comparison always shows **net cost comparison** (after employer contribution for Angestellte)
+- Disability insurance (BU) analysis always shows the **gap** — not just "do you have a BU"
+- Always compare disability insurance net premium (Nettobeitrag), not tariff premium
+- Personal liability insurance flagged as immediate action if missing — highest ROI per euro
 - All figures cited with data source and year; JAEG and BBG values taken from shared german-context.md
-- Never recommend specific insurer by name for BU or PKV (conflict risk); recommend unabhängiger Makler
+- Never recommend specific insurer by name for disability insurance (BU) or PKV (conflict risk); recommend independent insurance broker (unabhängiger Versicherungsmakler)
 - PKV recommendation requires ALL favorable factors to be present; default to GKV when uncertain
-- Risikolebens: always check for dependents first; never recommend without dependent need
-- Rechtsschutz: always check Gewerkschaft membership before recommending (Arbeitsrecht may be covered)
-- Hausrat: always check for Unterversicherungsverzicht and Elementarschaden relevance
+- Term life: always check for dependents first; never recommend without dependent need
+- Legal expenses: always check trade union membership before recommending (employment law may be covered)
+- Contents insurance: always check for Unterversicherungsverzicht and Elementarschaden relevance
 - Always close with disclaimer and professional referrals
 - No US insurance terminology, no dollar amounts, no ACA/COBRA/Medicare references
 
@@ -708,10 +708,10 @@ Write FINANCE-INSURANCE.md to current working directory with the following struc
 
 After writing FINANCE-INSURANCE.md:
 
-1. State the single most critical gap (Haftpflicht if missing is always first; BU gap if present)
+1. State the single most critical gap (personal liability insurance if missing is always first; disability insurance gap if present)
 2. State the monthly or annual cost to close the most critical gap
-3. Refer to unabhängigen Versicherungsmakler (§ 34d GewO) for BU and PKV decisions — not tied agents
+3. Refer to independent insurance broker (unabhängiger Versicherungsmakler) (§ 34d GewO) for disability insurance (BU) and PKV decisions — not tied agents (Ausschließlichkeitsvertreter)
 4. Suggest `/finance analyze` if full financial picture not yet assessed
 5. Suggest `/finance retirement` to see how current insurance fits retirement planning
 
-**DISCLAIMER:** Für Informations- und Bildungszwecke. Keine Beratung im Sinne des VVG.
+**DISCLAIMER:** For educational/informational purposes only. Not advice under VVG.

@@ -3,7 +3,7 @@ name: finance-compare
 description: Side-by-side comparison of two financial decisions for German clients. Trigger phrases: "soll ich kaufen oder mieten", "rent vs buy Germany", "GKV oder PKV", "ETF vs Fonds", "leasing vs kaufen Auto", "should I lease or buy", "is it worth buying a home in [German city]", "Preis-Miet-Verhältnis", "lohnt sich kaufen", "compare financial options Germany". Collects German-specific inputs (Bundesland, Kaufpreis, JAEG threshold, TER, Leasingrate), runs cost and opportunity-cost modelling with German tax and cost assumptions, and saves a structured recommendation to FINANCE-COMPARE.md.
 ---
 
-# Finance Compare — Finanzentscheidungen vergleichen
+# Finance Compare — Financial Decision Comparison
 
 **DISCLAIMER: For educational and informational purposes only. Not financial, tax, or legal advice. Consult a licensed Steuerberater, Finanzberater, or Rechtsanwalt before making major financial decisions. All projections rely on assumptions that may not hold.**
 
@@ -33,7 +33,7 @@ Ask only what is needed for the chosen scenario. Identify the comparison type fi
 **Step 2 — Scenario-specific inputs**
 
 **For Mieten vs Kaufen (RvB):**
-- Kaufpreis der Immobilie (€)
+- Purchase price (Kaufpreis) (€)
 - Equivalent Kaltmiete for the same property (€/month)
 - Bundesland (required for Grunderwerbsteuer)
 - Available down payment / Eigenkapital (€)
@@ -58,10 +58,10 @@ Ask only what is needed for the chosen scenario. Identify the comparison type fi
 - Investment amount and horizon (€, years)
 
 **For Auto: Leasing vs Kauf (LvK):**
-- Fahrzeugwert / Listenpreis (€)
-- Leasingrate per month (€) and Sonderzahlung upfront (€)
-- Laufzeit (months) and Restwert at end (€)
-- Kilometergrenze per year and penalty per excess km (€/km)
+- Vehicle value / Listenpreis (€)
+- Monthly Leasingrate (€) and upfront Sonderzahlung (€)
+- Term (Laufzeit) in months and Restwert at end (€)
+- Annual mileage limit (Kilometergrenze) and penalty per excess km (€/km)
 - Alternative: cash purchase available? Or financing (Effektivzins, Laufzeit)?
 - Usage: private only, or partly business (>50% business triggers 1%-Methode / Fahrtenbuch)
 
@@ -75,10 +75,10 @@ Before analysis, read `.claude/skills/shared/german-context.md` for German real 
 
 This is the most consequential comparison for most German clients. Germany has one of the lowest homeownership rates in the EU (~45%); renting long-term is a legitimate and often financially rational choice.
 
-#### Key metric: Preis-Miet-Verhältnis (P/M-Verhältnis)
+#### Key metric: Preis-Miet-Verhältnis (P/M ratio)
 
 ```
-P/M-Verhältnis = Kaufpreis ÷ (Kaltmiete × 12)
+P/M ratio = Kaufpreis ÷ (Kaltmiete × 12)
 ```
 
 This is the price-to-rent ratio expressed in years of rent. It is the primary filter before detailed modelling.
@@ -102,14 +102,14 @@ This is the price-to-rent ratio expressed in years of rent. It is the primary fi
 
 #### Buy-side costs
 
-**One-off Kaufnebenkosten (non-recoverable at purchase):**
+**One-off purchase transaction costs (Kaufnebenkosten) — non-recoverable at purchase:**
 
 | Cost | Rate | Notes |
 |------|------|-------|
 | Grunderwerbsteuer | BY 3.5% / HH 4.5% / BE, HB, NI, SN 5.0% / BW, HE, SL, ST 5.0% / BB, MV, NW, RP, SA, SH, TH 6.5% | Applied to Kaufpreis |
 | Notar + Grundbucheintrag | ~1.5–2% of Kaufpreis | Mandatory |
 | Maklercourtage (buyer share) | ~1.785% incl. MwSt | Only if Makler involved; 50/50 split since Dec 2020 |
-| **Total Kaufnebenkosten** | **~7–12%** | Varies by Bundesland and Makler involvement |
+| **Total transaction costs** | **~7–12%** | Varies by Bundesland and Makler involvement |
 
 These costs are sunk immediately and must be recouped through appreciation or rent savings before the purchase breaks even.
 
@@ -120,7 +120,7 @@ These costs are sunk immediately and must be recouped through appreciation or re
 | Annuität (Zins + Tilgung) | From mortgage offer | Sollzins 3–4.5% range; use shared context |
 | Grundsteuer | ~€100–300/month for typical apartment | Highly variable; reform values in effect 2025 |
 | Hausgeld / WEG-Rücklage | ~€2–4/m² monthly | For Eigentumswohnung in WEG |
-| Instandhaltungsrücklage (self-managed house) | ~€10–15/m²/year | Spread monthly |
+| Maintenance reserve (self-managed house) | ~€10–15/m²/year | Spread monthly |
 
 **Tax note for primary residence:** Mortgage interest is NOT tax-deductible for a primary residence (Eigennutzung). No equivalent to a mortgage interest deduction exists in Germany. Do not include this in any calculation.
 
@@ -179,9 +179,9 @@ Present as: "At current assumptions, buying breaks even at year N. If you plan t
 | Premium basis | Income-linked (capped at BBG) | Risk-based (age, health, Tarif) |
 | Family coverage | Free for non-working spouse and children | Separate policy per person |
 | Leistungsumfang | Standardised, lower | Customisable, typically better |
-| Rückkehr zu GKV | Possible before 55 if income drops below JAEG | Extremely difficult after 55 |
+| Return to GKV | Possible before 55 if income drops below JAEG | Extremely difficult after 55 |
 | Altersrückstellungen | None | Built into PKV premium; partially portable |
-| Beitragsanpassungen | Follows political decisions | Can rise substantially with age/inflation |
+| Premium adjustments | Follows political decisions | Can rise substantially with age/inflation |
 
 **Verdict framework:**
 - Young, healthy, single, high income, no plans for children → PKV may be cheaper short-term; model premium trajectory to age 67
@@ -214,7 +214,7 @@ Scale this to the user's actual investment amount and horizon.
 
 **Performance evidence:** Per SPIVA Europe Reports, 80–90% of actively managed equity funds underperform their benchmark index after fees over 10-year periods. This is a structural headwind for active funds.
 
-**German tax treatment is identical** for both: Abgeltungsteuer 25% + Soli (effective ~26.375%), with 30% Teilfreistellung on equity funds and equity ETFs. Vorabpauschale applies to accumulating funds; broker handles automatically.
+**German tax treatment is identical** for both: Abgeltungsteuer 25% + Soli (effective ~26.375%), with Teilfreistellung (30% partial exemption on equity ETF gains) on equity funds and equity ETFs. Vorabpauschale (annual notional ETF tax) applies to accumulating funds; broker handles automatically.
 
 **Verdict:** For long-term wealth building (horizon ≥ 10 years), low-cost UCITS ETFs (Ireland or Luxembourg domicile) outperform most active funds after costs for most investors. The burden of proof is on the active fund to demonstrate consistent alpha net of fees.
 
@@ -228,15 +228,15 @@ Scale this to the user's actual investment amount and horizon.
 ```
 Total Leasing Cost = (Leasingrate × Laufzeit) + Sonderzahlung
 ```
-At end: nothing owned. Car returned. Additional charges for Kilometerüberschreitung (typically €0.10–0.20/km over limit) and Verschleißschäden.
+At end: nothing owned. Car returned. Additional charges for excess mileage (Kilometerüberschreitung) (typically €0.10–0.20/km over limit) and wear damage (Verschleißschäden).
 
-**Finanzierung (Ratenkredit) total cost:**
+**Financing (Ratenkredit) total cost:**
 ```
 Total Financing Cost = Kaufpreis + Total Interest (Effektivzins × Laufzeit)
 ```
 At end: car owned, has residual value.
 
-**Barkauf total cost:**
+**Cash purchase total cost:**
 ```
 Total Cash Purchase Cost = Kaufpreis − Opportunity Cost of Capital
 Opportunity Cost = Kaufpreis × (investment return rate) × years
@@ -251,7 +251,7 @@ Cheapest in nominal terms if capital is available and not needed for higher-retu
 - Elektroauto: 0.25%-Methode if Listenpreis ≤ €70,000 (check current BMF guidance)
 
 **Verdict framework:**
-- Private use, capital available: Barkauf or low-Effektivzins Finanzierung almost always cheapest
+- Private use, capital available: cash purchase or low-Effektivzins financing almost always cheapest
 - Leasing is rational when: new car every 3 years is a preference, business deduction applies, or working capital must be preserved
 - Never compare Leasingrate alone to loan payment — this ignores that leasing builds zero equity
 
@@ -262,12 +262,12 @@ Cheapest in nominal terms if capital is available and not needed for higher-retu
 Save to `FINANCE-COMPARE.md` in the current working directory.
 
 ```markdown
-# Finanzentscheidung: [Scenario A] vs [Scenario B]
+# Financial Decision: [Scenario A] vs [Scenario B]
 
-**Vergleich:** [One-sentence framing in English]
-**Zeithorizont:** [X] Jahre
-**Erstellt:** [Date]
-**Bundesland / Standort:** [if applicable]
+**Comparison:** [One-sentence framing in English]
+**Time horizon:** [X] years
+**Created:** [Date]
+**Bundesland / Location:** [if applicable]
 
 > **DISCLAIMER:** For educational and informational purposes only. Not financial, tax, or legal advice.
 
@@ -275,25 +275,25 @@ Save to `FINANCE-COMPARE.md` in the current working directory.
 
 ## Executive Summary
 
-**Empfehlung:** [Option A or B] — [one-sentence reason]
+**Recommendation:** [Option A or B] — [one-sentence reason]
 **Confidence:** [High / Medium / Low]
-**Entscheidender Faktor:** [The single metric that tips the decision]
+**Deciding factor:** [The single metric that tips the decision]
 
 ---
 
 ## Option A: [Name]
 
-**Annahmen:**
+**Assumptions:**
 - [List each assumption with value and source]
 
-**Kosten-Übersicht:**
-| Posten | Einmalig (€) | Monatlich (€) | Über [X] Jahre (€) |
+**Cost overview:**
+| Item | One-off (€) | Monthly (€) | Over [X] years (€) |
 |--------|-------------|--------------|-------------------|
 | [Item] | | | |
 
-**Endvermögen nach [X] Jahren:** €[X]
-**Gesamtkosten nach [X] Jahren:** €[X]
-**Nettoposition:** €[X]
+**Net worth after [X] years:** €[X]
+**Total costs after [X] years:** €[X]
+**Net position:** €[X]
 
 ---
 
@@ -303,37 +303,37 @@ Save to `FINANCE-COMPARE.md` in the current working directory.
 
 ---
 
-## Direktvergleich
+## Direct Comparison
 
-| Kennzahl | Option A | Option B | Besser |
+| Metric | Option A | Option B | Better |
 |----------|----------|----------|--------|
-| Gesamtkosten ([X] Jahre) | €X | €X | A/B |
-| Endvermögen / Restwert | €X | €X | A/B |
-| Nettoposition | €X | €X | A/B |
-| Monatliche Belastung | €X | €X | A/B |
-| Opportunitätskosten | €X | €X | A/B |
-| Steuerliche Belastung | €X | €X | A/B |
-| Liquidität (1–10) | X | X | A/B |
-| Konzentrationsrisiko | X | X | A/B |
-| Reversibilität | X | X | A/B |
+| Total costs ([X] years) | €X | €X | A/B |
+| Net worth / residual value | €X | €X | A/B |
+| Net position | €X | €X | A/B |
+| Monthly outlay | €X | €X | A/B |
+| Opportunity cost | €X | €X | A/B |
+| Tax burden | €X | €X | A/B |
+| Liquidity (1–10) | X | X | A/B |
+| Concentration risk | X | X | A/B |
+| Reversibility | X | X | A/B |
 
 ---
 
-## Opportunitätskostenanalyse
+## Opportunity Cost Analysis
 
 [If Option A costs €X more per month than Option B, investing that difference at 7% real return over N years compounds to €Y. That is the true cost of choosing Option A.]
 
 ---
 
-## Break-Even-Analyse
+## Break-Even Analysis
 
 [Option A becomes cheaper than Option B at year N, assuming [key assumption]. Break-even shifts to year M if [sensitivity condition].]
 
 ---
 
-## Sensitivitätsanalyse
+## Sensitivity Analysis
 
-| Wenn sich dies ändert | Empfehlung ändert sich zu |
+| If this changes | Recommendation shifts to |
 |-----------------------|--------------------------|
 | [Assumption change] | [Option] |
 | [Assumption change] | [Option] |
@@ -341,11 +341,11 @@ Save to `FINANCE-COMPARE.md` in the current working directory.
 
 ---
 
-## Empfehlung
+## Recommendation
 
-**Wähle [Option A oder B].**
+**Choose [Option A or B].**
 
-**Begründung:**
+**Rationale:**
 1. [Primary reason with number]
 2. [Secondary reason]
 3. [Tie-breaker or non-financial factor]
@@ -357,7 +357,7 @@ Save to `FINANCE-COMPARE.md` in the current working directory.
 
 ---
 
-## Nächste Schritte
+## Next Steps
 
 1. [Specific, concrete action — e.g., "Request personalised mortgage offer from Interhyp or Dr. Klein"]
 2. [Specific, concrete action]
@@ -373,7 +373,7 @@ Save to `FINANCE-COMPARE.md` in the current working directory.
 - All monetary amounts in € (euros). No dollar amounts.
 - All cost rates sourced from `.claude/skills/shared/german-context.md` or labelled as estimates.
 - Grunderwerbsteuer must use the correct Bundesland rate — never a generic figure.
-- P/M-Verhältnis must be computed and stated explicitly for any Mieten vs Kaufen comparison.
+- P/M ratio must be computed and stated explicitly for any Mieten vs Kaufen comparison.
 - Opportunity cost of down payment must be shown separately, not omitted.
 - For GKV vs PKV: confirm JAEG eligibility before modelling. Flag Familienversicherung implications clearly.
 - For ETF vs Fonds: show the compounding TER difference table at the user's actual investment amount.
